@@ -1,0 +1,66 @@
+<!-- <svg xmlns="http://www.w3.org/2000/svg">
+    <symbol>
+        <path id="arrow-icon" stroke="#1E2022" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 10 9.5 1 1 10"/>
+    </symbol>
+    <symbol>
+       <path id="calendar" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M4.667 1.417V4.25M10.333 1.417V4.25M12.458 2.833H2.542c-.783 0-1.417.635-1.417 1.417v9.917c0 .782.634 1.417 1.417 1.417h9.916c.783 0 1.417-.635 1.417-1.417V4.25c0-.782-.634-1.417-1.417-1.417ZM1.125 7.083h12.75"/>
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+    <symbol>
+       
+    </symbol>
+</svg> -->
+
+<svg xmlns="http://www.w3.org/2000/svg" display="none">
+   <symbol id="arrow-icon" viewBox="0 0 18 10">
+      <path  fill="inherit" stroke="inherit" fill-rule="evenodd" clip-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 10 9.5 1 1 10"/>
+   </symbol>
+   <symbol id="calendar" viewBox="0 0 12 12">
+      <path stroke="inherit" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M4.667 1.417V4.25M10.333 1.417V4.25M12.458 2.833H2.542c-.783 0-1.417.635-1.417 1.417v9.917c0 .782.634 1.417 1.417 1.417h9.916c.783 0 1.417-.635 1.417-1.417V4.25c0-.782-.634-1.417-1.417-1.417ZM1.125 7.083h12.75"/>
+   </symbol>
+    <symbol fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27 27" id="search">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M18.5236 17.7716L26.2906 25.5387C26.4921 25.7474 26.4892 26.0791 26.2841 26.2842C26.0789 26.4894 25.7473 26.4923 25.5386 26.2907L17.7716 18.5236C13.6848 22.2027 7.41061 21.9559 3.62549 17.9669C-0.159626 13.978 -0.0773115 7.69955 3.81109 3.8112C7.69948 -0.0771477 13.978 -0.159461 17.967 3.62561C21.956 7.41068 22.2029 13.6848 18.5236 17.7716ZM1.98363 11.0243C1.98363 16.0173 6.0313 20.0649 11.0244 20.0649C16.015 20.0591 20.0592 16.0149 20.0651 11.0243C20.0651 6.03132 16.0174 1.9837 11.0244 1.9837C6.0313 1.9837 1.98363 6.03132 1.98363 11.0243Z" fill="black"></path>
+  </symbol>
+</svg>
+   

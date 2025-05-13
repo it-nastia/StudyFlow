@@ -1,0 +1,181 @@
+.header {
+  background-color: var(--header-background-color);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 2rem;
+  color: var(--primary-text-color);
+  font-size: 1rem;
+  width: 100%;
+  height: 4rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 100px;
+}
+
+.logo_img {
+  max-width: 35px;
+  height: auto;
+  fill: red;
+}
+
+.logo_name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: Montserrat;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.timeBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 0.4rem;
+  font-family: "Inria Sans";
+}
+
+.time {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.date {
+  font-size: 1rem;
+  color: var(--secondary-text-color);
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+.userName {
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.avatar {
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Основной стиль для хедера */
+/* .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--container-color);
+  box-shadow: 0 1px 0 rgba(22, 8, 43, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: var(--z-fixed);
+} */
+
+/* Контейнер хедера */
+/* .header__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+} */
+
+/* Логотип */
+/* .header__logo {
+  display: flex;
+  align-items: center;
+}
+
+.header__logoImage {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.header__logoText {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--title-color);
+} */
+
+/* Блок с датой и временем 
+.header__dateTime {
+  font-size: 1rem;
+  color: var(--text-color);
+}*/
+
+/* Блок с данными пользователя 
+.header__userInfo {
+  display: flex;
+  align-items: center;
+}
+
+.header__userLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.header__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.header__userName {
+  font-size: 1rem;
+  font-weight: bold;
+}*/
+
+/* Адаптивность 
+@media (max-width: 768px) {
+  .header__logoText {
+    font-size: 1.25rem;
+  }
+
+  .header__dateTime {
+    font-size: 0.9rem;
+  }
+
+  .header__userName {
+    font-size: 0.9rem;
+  }
+}*/
+/* @media (max-width: 480px) { */
+/*   .header__logoText { */
+/*     font-size: 1rem; */
+/*   } */

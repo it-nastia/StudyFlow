@@ -1,0 +1,65 @@
+/* HomePage.module.css */
+
+.homePage {
+  padding: 40px;
+}
+
+.banner {
+  background-color: var(--secondary-background-color);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  height: 9.6rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.banner__background {
+  background-color: var(--card-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  height: 100%;
+  border-radius: 8px;
+  position: relative;
+}
+
+.banner__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.banner__greating {
+  font-weight: 500;
+  font-size: 2rem;
+  font-family: Montserrat, sans-serif;
+}
+
+.banner__tasks {
+  font-size: 1.1rem;
+}
+
+.banner__image {
+  position: absolute;
+  bottom: 0px;
+  right: 10px;
+  /* background-color: #0056b3; */
+}
+
+.imageBanner {
+  text-align: center;
+}
+
+.imageBanner img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

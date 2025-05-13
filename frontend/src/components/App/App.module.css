@@ -1,0 +1,12 @@
+.wrapper {
+  margin-top: 4rem;
+}
+
+.menu {
+}
+
+.main {
+  /* width: calc(100% - 300px); */
+  max-width: 950px;
+  margin: 0 auto;
+}

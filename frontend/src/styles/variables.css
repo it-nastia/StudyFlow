@@ -1,0 +1,46 @@
+:root {
+  --primary-background-color: #f7f9fb; /* светлый фон */
+  --secondary-background-color: #e3e8f1; /* фон для карточек и задач */
+
+  --card-color: #f0f4f8;
+
+  --primary-text-color: #1e2022; /* темный цвет текста */
+  --secondary-text-color: #52616b; /* светлый текст */
+  --accent-color: #6a7af3; /* акцентный цвет для кнопок и ссылок */
+
+  --button-background-color: #c9d6df; /* фоновый цвет для кнопок */
+  --hover-button-background-color: #e8eef3; /* фоновый цвет для кнопок при наведении */
+
+  --header-background-color: #bfc7d1; /* цвет фона для шапки */
+
+  --hover-background-color: #d8e0ed; /* цвет фона при наведении на элементы */
+  --hover-text-color: #1e2022; /* цвет текста при наведении на элементы */
+  --active-background-color: #6a7af3; /* цвет фона для активных элементов */
+
+  --day-background-color: #ecf0ff;
+  --selected-day-background-color: #80cfb7;
+  --event-background-color: #6a7af3;
+  --hover-day-background-color: #d1d1d1;
+  --event-hover-background-color: #5a6fa6;
+
+  --button-hover-background-color: #5a6fa6;
+}
+
+/* :root {
+    --bg: #212123;
+    --dark: #191919;
+    --dark-sea: #576067;
+    --grey: #b8b8b8;
+    --white: #fff;
+    --violet: #8b57c6;
+    --violet-dark: #6c3eb8;
+    --light: #f6f6f7;
+    --sea: #616e74;
+}
+
+:root {
+    --darkreader-neutral-background: #212222;
+    --darkreader-neutral-text: #eae3d9;
+    --darkreader-selection-background: #165aaa;
+    --darkreader-selection-text: #fbf5ec;
+} */

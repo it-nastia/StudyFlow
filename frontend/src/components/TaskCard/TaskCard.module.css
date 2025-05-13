@@ -1,0 +1,83 @@
+.card {
+  background-color: #f0f4f8;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0 0 1rem 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #2e3d67;
+  display: flex;
+  gap: 2rem;
+}
+
+.card__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1 0 0 auto;
+  gap: 0.75rem;
+}
+
+.card__assignment {
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.card__info {
+  font-size: 0.9rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.card__title {
+}
+
+.card__description {
+}
+
+.card__details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #a5a1aa;
+}
+
+.card__eventDate,
+.card__deadline {
+  font-size: 0.8rem;
+  color: var(--secondary-text-color);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.card__icon {
+  stroke: var(--secondary-text-color);
+  width: 1rem;
+  height: 1rem;
+}
+
+.card__joinButton {
+  background-color: #3f4c75;
+  color: white;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  transition: all 0.3s ease, color 0.3s ease;
+}
+
+.card__joinButton:hover {
+  background-color: #5a6fa6;
+}
+
+.video-icon {
+  stroke: var(--primary-background-color);
+  stroke-width: 1.3px;
+}
