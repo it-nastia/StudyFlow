@@ -1,0 +1,101 @@
+.workspacePage {
+  width: 100%;
+  padding: 0 0px;
+}
+
+.header {
+  /* display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  border-bottom: 1px solid var(--border-color);*/
+  padding: 0px 0 0px 0;
+  margin-bottom: 24px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  font-size: 1.65rem;
+  line-height: 1.65rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+/* 
+.tabs {
+  display: flex;
+  gap: 8px;
+  color: var(--secondary-text-color);
+}
+
+.tab,
+.activeTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 6px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.tab:hover {
+  background: var(--hover-button-background-color);
+  color: var(--primary-text-color);
+}
+
+.activeTab {
+  background: var(--button-background-color);
+  border: 1px solid var(--button-border-color);
+  box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.07);
+  color: var(--primary-text-color);
+}
+
+.tabIcon {
+  display: flex;
+  align-items: center;
+} */
+.tabs {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0px;
+  color: var(--secondary-text-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.tab,
+.activeTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 6px 18px;
+  border-radius: 0px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.tab:hover {
+  background: var(--hover-button-background-color);
+  color: var(--primary-text-color);
+}
+
+.activeTab {
+  background: var(--button-background-color);
+  border: 1px solid var(--button-border-color);
+  box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.07);
+  color: var(--primary-text-color);
+}
+.content {
+  margin-top: 24px;
+}

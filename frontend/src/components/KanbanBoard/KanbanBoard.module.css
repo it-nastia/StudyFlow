@@ -1,0 +1,77 @@
+.kanbanBoard {
+  display: flex;
+  gap: 24px;
+}
+.column {
+  background: var(--table-header-background-color);
+  border-radius: 12px;
+  flex: 1 1 0;
+  min-width: 260px;
+  min-height: 60vh;
+  padding: 10px 8px 20px 8px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.columnHeader {
+  font-size: 1.4rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 12px;
+  padding: 5px 0 13px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+.cards {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.07);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #bfc6ce;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.27);
+}
+
+.classLink {
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-color);
+}
+.classLink:hover {
+  color: #0d2c5a;
+}
+.taskLink {
+  font-size: 1rem;
+}
+.taskLink:hover {
+  color: #1a4b8c;
+}
+.taskName {
+  margin-bottom: 5px;
+}
+.dates {
+  display: flex;
+  gap: 15px;
+  font-size: 0.7rem;
+  color: var(--secondary-text-color);
+  align-items: center;
+}
+.dateItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

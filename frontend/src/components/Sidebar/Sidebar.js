@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 
 import { LayoutGrid, CalendarDays, SquareKanban, Plus } from "lucide-react";
 
-import Workspace from "./Workspace";
+import Workspace from "./WorkspaceDrodownList";
 import styles from "./Sidebar.module.css";
 
 const Sidebar = () => {
@@ -78,6 +78,22 @@ const Sidebar = () => {
             </button>
           </div>
         </div>
+        <ul>
+          {/* {workspaces.map((workspace) => (
+            <li key={workspace.id}>
+              <span>{workspace.name}</span>
+              <ul>
+                {workspace.classes.map((className, index) => (
+                  <li key={index}>
+                    <Link to={`/class/${workspace.id}-${index}`}>
+                      {className}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))} */}
+        </ul>
       </nav>
     </aside>
   );

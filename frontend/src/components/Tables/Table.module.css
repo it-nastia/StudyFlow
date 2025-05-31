@@ -1,0 +1,91 @@
+.tableContainer {
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--border-color);
+  padding: 8px 3px;
+}
+
+.table th {
+  background-color: var(--table-header-background-color);
+  text-align: center;
+}
+
+.table td {
+  min-width: 70px;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actionButton {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+select {
+  font-size: 0.95rem;
+  border-radius: 0px;
+}
+
+option {
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 300px;
+}
+
+.addRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  cursor: pointer;
+  background-color: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* .addRow:hover {
+  background-color: var(--button-background-color);
+} */
+
+/* Стилизация горизонтальной прокрутки */
+.tableContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb {
+  background-color: #062648;
+  border-radius: 4px;
+}
+
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #062648;
+}
+
+.tableContainer::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}

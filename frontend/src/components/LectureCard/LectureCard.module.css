@@ -9,6 +9,10 @@
   gap: 2rem;
 }
 
+.card:hover {
+  box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.27);
+}
+
 .card__content {
   display: flex;
   flex-direction: column;

@@ -1,38 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { Calendar, momentLocalizer } from "react-big-calendar"; // Импортируем Calendar
-import moment from "moment"; // Используем moment.js для локализации
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import React, { useState } from "react";
 
-import styles from "./CalendarPage.css";
+import styles from "./CalendarPage.module.css"; // Подключаем кастомные стили
 
-const localizer = momentLocalizer(moment); // Локализуем с помощью moment
-
-// Пример данных для событий
-const events = [
-  {
-    title: "Meeting with John",
-    start: new Date(2025, 4, 3, 10, 0),
-    end: new Date(2025, 4, 3, 12, 0),
-  },
-  {
-    title: "Project Deadline",
-    start: new Date(2025, 4, 3, 14, 0),
-    end: new Date(2025, 4, 3, 15, 30),
-  },
-];
+import Calendar from "../../components/Calendar/Calendar"; // Импортируем компонент календаря
 
 const CalendarPage = () => {
   return (
-    <div className="calendar">
-      <Calendar
-        localizer={localizer}
-        events={events}
-        // startAccessor="start"
-        // endAccessor="end"
-        style={{ height: "100%" }}
-        className="calendar" // Добавляем наш класс из CSS Modules
-        views={["month", "week", "day"]} // Убедитесь, что виды активированы
-      />
+    <div className={styles.calendarContainer}>
+      <h2 className={styles.title}>Main Calendar</h2>
+      <Calendar />
     </div>
   );
 };

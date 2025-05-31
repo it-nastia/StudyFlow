@@ -10,6 +10,10 @@ import Header from "../Header/Header";
 import Sidebar from "../Sidebar/Sidebar";
 import HomePage from "../../pages/HomePage/HomePage";
 import CalendarPage from "../../pages/CalendarPage/CalendarPage";
+import WorkspacePage from "../../pages/WorkspacePage/WorkspacePage";
+import ClassPage from "../../pages/ClassPage/ClassPage";
+import TaskPage from "../../pages/TaskPage/TaskPage";
+import KanbanPage from "../../pages/KanbanPage/KanbanPage";
 
 import styles from "./App.module.css";
 
@@ -27,6 +31,18 @@ function App() {
               </Route>
               <Route path="/calendar" exact>
                 <CalendarPage />
+              </Route>
+              <Route path="/kanban" exact>
+                <KanbanPage />
+              </Route>
+              <Route path="/workspace/:workspaceId" exact>
+                <WorkspacePage />
+              </Route>
+              <Route path="/class/:classId" exact>
+                <ClassPage />
+              </Route>
+              <Route path="/task/:taskId" exact>
+                <TaskPage />
               </Route>
               <Redirect to="/home" />
             </Switch>

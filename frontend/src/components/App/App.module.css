@@ -1,5 +1,7 @@
 .wrapper {
   margin-top: 4rem;
+  width: calc(100% - 265px);
+  margin-left: 265px;
 }
 
 .menu {
@@ -7,6 +9,7 @@
 
 .main {
   /* width: calc(100% - 300px); */
-  max-width: 950px;
+  max-width: 1000px;
+  padding: 20px;
   margin: 0 auto;
 }

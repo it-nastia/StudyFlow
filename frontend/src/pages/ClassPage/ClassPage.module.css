@@ -1,0 +1,135 @@
+.classPage {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  /* padding: 10px 20px; */
+}
+
+.title {
+  font-size: 1.65rem;
+  line-height: 1.65rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.classSettings {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.settingsButton {
+  color: var(--primary-text-color);
+  border: none;
+  padding: 8px 10px 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: var(--primary-background-color);
+}
+
+.settingsButton:hover {
+  background-color: var(--hover-button-background-color);
+}
+
+.meetingLink {
+  background-color: var(--accent-color);
+  color: var(--primary-background-color);
+  padding: 0.5rem 1rem;
+  text-align: center;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  transition: all 0.3s ease, color 0.3s ease;
+}
+
+.meetingLink:hover {
+  background-color: #5a6fa6;
+}
+
+.tabs {
+  display: flex;
+  gap: 0px;
+  color: var(--secondary-text-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.tab,
+.activeTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 6px 18px;
+  border-radius: 0px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.tab:hover {
+  background: var(--hover-button-background-color);
+  color: var(--primary-text-color);
+}
+
+.activeTab {
+  background: var(--button-background-color);
+  border: 1px solid var(--button-border-color);
+  box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.07);
+  color: var(--primary-text-color);
+}
+
+.tabIcon {
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  margin-top: 24px;
+}
+
+/* 
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin: 0 5px;
+}
+
+.activeTab {
+  background-color: #007bff;
+  color: #ffffff;
+}
+*/
+.content {
+  flex: 1;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}

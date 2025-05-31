@@ -4,14 +4,20 @@
 
   --card-color: #f0f4f8;
 
-  --primary-text-color: #1e2022; /* темный цвет текста */
-  --secondary-text-color: #52616b; /* светлый текст */
-  --accent-color: #6a7af3; /* акцентный цвет для кнопок и ссылок */
+  --border-color: #bfc6ce;
 
-  --button-background-color: #c9d6df; /* фоновый цвет для кнопок */
-  --hover-button-background-color: #e8eef3; /* фоновый цвет для кнопок при наведении */
+  --primary-text-color: #1e2022;
+  --secondary-text-color: #52616b;
 
-  --header-background-color: #bfc7d1; /* цвет фона для шапки */
+  --accent-color: #3f4c75; /* акцентный цвет для кнопок и ссылок */
+
+  --button-background-color: #cfe3fa; /* фоновый цвет для кнопок */
+  --hover-button-background-color: #d6e3ef; /* фоновый цвет для кнопок при наведении */
+  --button-border-color: #bfc6ce;
+
+  --header-background-color: #c5d3e4; /* цвет фона для шапки */
+
+  --table-header-background-color: #dfe6f2; /* цвет фона для заголовков таблиц */
 
   --hover-background-color: #d8e0ed; /* цвет фона при наведении на элементы */
   --hover-text-color: #1e2022; /* цвет текста при наведении на элементы */
@@ -20,10 +26,8 @@
   --day-background-color: #ecf0ff;
   --selected-day-background-color: #80cfb7;
   --event-background-color: #6a7af3;
-  --hover-day-background-color: #d1d1d1;
+  --hover-day-background-color: #e6ebf9;
   --event-hover-background-color: #5a6fa6;
-
-  --button-hover-background-color: #5a6fa6;
 }
 
 /* :root {

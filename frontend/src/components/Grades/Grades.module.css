@@ -1,0 +1,54 @@
+.gradesContainer {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.gradesTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* Устанавливаем минимальную ширину для таблицы */
+}
+
+.gradesTable th {
+  background-color: var(--table-header-background-color);
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  min-width: 100px;
+}
+
+.gradesTable td {
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.participantName {
+  font-weight: 500;
+  text-align: left;
+}
+
+.gradeCell {
+}
+
+/* Стилизация горизонтальной прокрутки */
+.gradesContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.gradesContainer::-webkit-scrollbar-thumb {
+  background-color: #062648;
+  border-radius: 4px;
+}
+
+.gradesContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #062648;
+}
+
+.gradesContainer::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}

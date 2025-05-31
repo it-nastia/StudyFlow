@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./Workspace.module.css";
+import styles from "./WorkspaceDrodownList.module.css";
 import { NavLink } from "react-router-dom";
 
 import {
@@ -10,7 +10,7 @@ import {
   Plus,
 } from "lucide-react";
 
-const Workspace = ({ workspace }) => {
+const WorkspaceDrodownList = ({ workspace }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -21,10 +21,15 @@ const Workspace = ({ workspace }) => {
     <div className={styles.workspace}>
       <div className={styles.header} onClick={toggleExpand}>
         <div className={styles.header_item}>
-          <LayoutDashboard className={styles.icon} />
-          <span>{workspace.name}</span>
+          <NavLink
+            to={`/workspace/${workspace.id}`}
+            className={styles.workspaceLink}
+            onClick={(e) => e.stopPropagation()} // чтобы не раскрывать/сворачивать при переходе
+          >
+            <LayoutDashboard className={styles.icon} />
+            <span>{workspace.name}</span>
+          </NavLink>
         </div>
-
         {isExpanded ? <ChevronUp /> : <ChevronDown />}
       </div>
       {isExpanded && (
@@ -40,7 +45,7 @@ const Workspace = ({ workspace }) => {
             workspace.classes.map((className, index) => (
               <li key={index}>
                 <NavLink
-                  to={`/${workspace.name.toLowerCase()}/${className.toLowerCase()}`}
+                  to={`/class/${workspace.id}-${index}`}
                   className={({ isActive }) =>
                     `${styles.link} ${isActive ? styles.activeLink : ""}`
                   }
@@ -57,4 +62,4 @@ const Workspace = ({ workspace }) => {
   );
 };
 
-export default Workspace;
+export default WorkspaceDrodownList;
