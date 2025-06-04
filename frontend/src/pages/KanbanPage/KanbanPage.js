@@ -12,7 +12,7 @@ const TASKS = [
     assignment: "Gramma exercise 1",
     date: "10.09.2024",
     deadline: "16.09.2024",
-    status: "todo",
+    status: "To-Do",
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const TASKS = [
     assignment: "Lab work 3",
     date: "12.09.2024",
     deadline: "15.09.2024",
-    status: "todo",
+    status: "To-Do",
   },
   {
     id: 3,
@@ -30,7 +30,7 @@ const TASKS = [
     assignment: "Task 3",
     date: "12.09.2024",
     deadline: "15.09.2024",
-    status: "inprogress",
+    status: "In Progress",
   },
   {
     id: 4,
@@ -39,7 +39,7 @@ const TASKS = [
     assignment: "Lab work 1",
     date: "12.09.2024",
     deadline: "15.09.2024",
-    status: "done",
+    status: "Done",
   },
   {
     id: 5,
@@ -48,7 +48,7 @@ const TASKS = [
     assignment: "Lab work 2",
     date: "12.09.2024",
     deadline: "15.09.2024",
-    status: "done",
+    status: "Done",
   },
   {
     id: 6,
@@ -57,7 +57,7 @@ const TASKS = [
     assignment: "Task 1",
     date: "12.09.2024",
     deadline: "15.09.2024",
-    status: "done",
+    status: "Done",
   },
   {
     id: 7,
@@ -66,7 +66,7 @@ const TASKS = [
     assignment: "Task 2",
     date: "12.09.2024",
     deadline: "15.09.2024",
-    status: "done",
+    status: "Done",
   },
 ];
 

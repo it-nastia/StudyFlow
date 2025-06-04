@@ -90,10 +90,10 @@
 }
 
 .activeTab {
-  background: var(--button-background-color);
+  background: var(--tab-color);
   border: 1px solid var(--button-border-color);
   box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.07);
-  color: var(--primary-text-color);
+  color: var(--primary-background-color);
 }
 
 .tabIcon {

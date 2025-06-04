@@ -57,7 +57,10 @@
   background-color: var(--event-background-color);
   color: white;
   border-radius: 5px;
-  padding: 5px;
+  padding: 2px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .fc-event:hover {

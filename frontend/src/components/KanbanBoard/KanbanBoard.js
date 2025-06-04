@@ -17,7 +17,7 @@ const KanbanBoard = ({ tasks = [] }) => {
           <div className={styles.columnHeader}>{col.label}</div>
           <div className={styles.cards}>
             {tasks
-              .filter((t) => t.status === col.key)
+              .filter((t) => t.status === col.label)
               .map((task) => (
                 <div key={task.id} className={styles.card}>
                   <NavLink

@@ -1,4 +1,4 @@
-.tableContainer {
+.lectureTable {
   margin-bottom: 20px;
 }
 
@@ -11,14 +11,13 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  margin-bottom: 10px;
 }
-
 .table th,
 .table td {
   border: 1px solid var(--border-color);
-  padding: 8px 3px;
+  padding: 3px 5px;
 }
-
 .table th {
   background-color: var(--table-header-background-color);
   text-align: center;
@@ -32,6 +31,14 @@
   text-overflow: ellipsis;
 }
 
+.table td:has(select) {
+  padding: 0px;
+}
+
+.table td select option {
+  padding: 0px;
+}
+
 .actionButton {
   background-color: #007bff;
   color: #ffffff;
@@ -40,14 +47,6 @@
   border-radius: 4px;
   cursor: pointer;
   margin-right: 5px;
-}
-
-select {
-  font-size: 0.95rem;
-  border-radius: 0px;
-}
-
-option {
 }
 
 .truncate {
@@ -67,11 +66,6 @@ option {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* .addRow:hover {
-  background-color: var(--button-background-color);
-} */
-
-/* Стилизация горизонтальной прокрутки */
 .tableContainer::-webkit-scrollbar {
   height: 8px;
 }
@@ -88,4 +82,67 @@ option {
 .tableContainer::-webkit-scrollbar-track {
   background-color: #f1f1f1;
   border-radius: 4px;
+}
+
+.table td {
+  min-width: 70px;
+  font-size: 0.95rem;
+}
+
+.actionButton {
+  background-color: #334b70;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+select {
+  font-size: 0.95rem;
+  border-radius: 0px;
+}
+
+td option {
+  width: 100%;
+  padding: 8px;
+  text-align: center;
+}
+
+option {
+  font-size: 0.95rem;
+  border-radius: 0px;
+  padding: 8px;
+}
+
+.statusSelect {
+  width: 100%;
+  height: 100%;
+  border: none;
+  font-size: 0.95rem;
+  color: white;
+  padding: 8px;
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 0;
+}
+
+.statusSelect option[value="Done"],
+.statusSelect.Done {
+  background-color: #4caf50;
+}
+
+.statusSelect option[value="To-Do"],
+.statusSelect.To-Do {
+  background-color: #ef5350;
+}
+
+.statusSelect option[value="In Progress"],
+.statusSelect.In-Progress {
+  background-color: #ffa726;
 }

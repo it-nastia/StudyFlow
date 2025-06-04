@@ -16,7 +16,7 @@ const TaskTable = ({ tasks: initialtasks = [] }) => {
   };
 
   return (
-    <div className={styles.tableContainer}>
+    <div className={styles.taskTable}>
       <h2 className={styles.sectionTitle}>Tasks</h2>
       <table className={styles.table}>
         <thead>
@@ -52,7 +52,9 @@ const TaskTable = ({ tasks: initialtasks = [] }) => {
                 <select
                   value={task.status}
                   onChange={(e) => handleStatusChange(task.id, e.target.value)}
-                  className={styles.statusSelect}
+                  className={`${styles.statusSelect} ${
+                    styles[task.status.replace(" ", "-")]
+                  }`}
                 >
                   {statusOptions.map((option) => (
                     <option key={option} value={option}>

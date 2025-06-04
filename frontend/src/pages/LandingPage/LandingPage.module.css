@@ -1,0 +1,451 @@
+.landingPage {
+  min-height: 100vh;
+  background-color: var(--primary-background-color);
+  overflow: hidden;
+}
+
+/* Header Styles */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--header-background-color);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.headerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--primary-text-color);
+}
+
+.logoImg {
+  height: 32px;
+  margin-right: 0.5rem;
+}
+
+.logoName {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.navigation {
+  display: flex;
+  gap: 2rem;
+}
+
+.navigation a {
+  text-decoration: none;
+  color: var(--primary-text-color);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navigation a:hover {
+  color: var(--accent-color);
+}
+
+.authButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.loginButton,
+.registerButton {
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.loginButton {
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  background-color: var(--primary-background-color);
+}
+
+.loginButton:hover {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.registerButton {
+  background-color: var(--accent-color);
+  color: white;
+  border: 1px solid var(--accent-color);
+}
+
+.registerButton:hover {
+  color: var(--accent-color);
+
+  background-color: var(--primary-background-color);
+}
+
+/* Hero Section */
+.hero {
+  padding: 8rem 2rem 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 80vh;
+  overflow: hidden;
+}
+
+.heroContent {
+  flex: 1;
+  max-width: 600px;
+}
+
+.heroContent::after {
+  position: absolute;
+  content: "";
+  bottom: -560px;
+  left: -200px;
+  width: 150%;
+  height: 1000px;
+  background: #0f224a;
+  background: linear-gradient(
+    23deg,
+    rgba(15, 34, 74, 1) 0%,
+    rgba(45, 63, 112, 0.5) 50%,
+    rgba(157, 177, 245, 1) 100%
+  );
+  aspect-ratio: 1;
+  clip-path: shape(
+    from 71.38% 85.61%,
+    curve to 52.95% 94.58% with 65.03% 96.24%,
+    curve to 29.39% 89.28% with 40.88% 92.92%,
+    curve to 15.41% 73.85% with 17.91% 85.64%,
+    curve to 7.65% 50.97% with 12.9% 62.05%,
+    curve to 12.56% 32.66% with 2.41% 39.88%,
+    curve to 30.01% 18.2% with 22.71% 25.43%,
+    curve to 48.4% 8.19% with 37.32% 10.97%,
+    curve to 70.93% 9.73% with 59.48% 5.41%,
+    curve to 83.84% 26.29% with 82.37% 14.05%,
+    curve to 86.48% 48.27% with 85.3% 38.53%,
+    curve to 82.7% 66.49% with 87.67% 58.01%,
+    curve to 71.38% 85.61% with 77.74% 74.98%
+  );
+}
+
+.heroContent h1 {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: var(--primary-text-color);
+}
+
+.heroContent p {
+  font-size: 1.25rem;
+  color: var(--secondary-text-color);
+  margin-bottom: 2rem;
+}
+
+.heroImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroImage img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Features Section */
+.features {
+  padding: 4rem 2rem;
+  background-color: var(--secondary-background-color);
+  position: relative;
+  z-index: 10;
+}
+
+.features h2,
+.audience h2,
+.workflow h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 3rem;
+  color: var(--primary-text-color);
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.featureCard {
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  background-color: var(--hover-background-color);
+}
+
+.featureIcon {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.featureCard h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-text-color);
+}
+
+.featureCard p {
+  color: var(--secondary-text-color);
+}
+
+/* Audience Section */
+.audience {
+  padding: 4rem 2rem;
+  background-color: var(--primary-background-color);
+  position: relative;
+  z-index: 10;
+}
+
+.audienceGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.audienceCard {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--card-color);
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.audienceCard:hover {
+  background-color: var(--hover-background-color);
+}
+
+.audienceIcon {
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+
+.audienceCard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-text-color);
+}
+
+.audienceCard p {
+  color: var(--secondary-text-color);
+}
+
+/* Workflow Section */
+.workflow {
+  padding: 4rem 2rem;
+  background-color: var(--secondary-background-color);
+}
+
+.workflowGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.workflowStep {
+  position: relative;
+  padding: 2rem;
+  text-align: center;
+  background-color: var(--card-color);
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.workflowStep:hover {
+  background-color: var(--hover-background-color);
+}
+
+.stepNumber {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background-color: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.stepIcon {
+  color: var(--accent-color);
+  margin: 1.5rem 0 1rem;
+}
+
+.workflowStep h3 {
+  color: var(--primary-text-color);
+  margin-bottom: 1rem;
+}
+
+.workflowStep p {
+  color: var(--secondary-text-color);
+}
+
+/* CTA Section */
+.cta {
+  padding: 6rem 2rem;
+  text-align: center;
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.cta h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.cta p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.ctaButton {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background-color: var(--accent-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid var(--accent-color);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.ctaButton:hover {
+  background-color: var(--hover-button-background-color);
+  color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+/* Footer */
+.footer {
+  padding: 2rem;
+  background-color: var(--primary-background-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.footerContent {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footerLogo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--primary-text-color);
+}
+
+.copyright {
+  color: var(--secondary-text-color);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 6rem;
+  }
+
+  .heroContent {
+    margin-bottom: 3rem;
+  }
+
+  .heroContent h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerContent {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .navigation {
+    gap: 1rem;
+  }
+
+  .features h2,
+  .audience h2,
+  .workflow h2,
+  .cta h2 {
+    font-size: 2rem;
+  }
+
+  .footerContent {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroContent h1 {
+    font-size: 2rem;
+  }
+
+  .heroContent p {
+    font-size: 1.1rem;
+  }
+
+  .authButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .loginButton,
+  .registerButton {
+    width: 100%;
+    text-align: center;
+  }
+}

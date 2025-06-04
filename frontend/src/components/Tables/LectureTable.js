@@ -42,9 +42,13 @@ const LectureTable = ({ lectures: initialLectures = [] }) => {
                   {lecture.title}
                 </Link>
               </td>
-              <td>{lecture.date}</td>
-              <td>
-                {lecture.timeStart} - {lecture.timeEnd}
+              <td className={styles.dateCell}>
+                <time dateTime={lecture.date}>{lecture.date}</time>
+              </td>
+              <td className={styles.dateCell}>
+                <time dateTime={lecture.timeStart}>{lecture.timeStart}</time>
+                {" - "}
+                <time dateTime={lecture.timeEnd}>{lecture.timeEnd}</time>
               </td>
               <td>
                 <select
@@ -52,7 +56,9 @@ const LectureTable = ({ lectures: initialLectures = [] }) => {
                   onChange={(e) =>
                     handleStatusChange(lecture.id, e.target.value)
                   }
-                  className={styles.statusSelect}
+                  className={`${styles.statusSelect} ${
+                    styles[lecture.status.replace(" ", "-")]
+                  }`}
                 >
                   {statusOptions.map((option) => (
                     <option key={option} value={option}>
@@ -63,11 +69,6 @@ const LectureTable = ({ lectures: initialLectures = [] }) => {
               </td>
             </tr>
           ))}
-          {/* <tr>
-            <td colSpan="5" className={styles.addRow}>
-              <Plus size={16} /> <span>Add Lecture</span>
-            </td>
-          </tr> */}
         </tbody>
       </table>
       <button className={styles.addRow}>

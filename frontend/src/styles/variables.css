@@ -19,15 +19,19 @@
 
   --table-header-background-color: #dfe6f2; /* цвет фона для заголовков таблиц */
 
+  --tab-color: #526584;
   --hover-background-color: #d8e0ed; /* цвет фона при наведении на элементы */
   --hover-text-color: #1e2022; /* цвет текста при наведении на элементы */
   --active-background-color: #6a7af3; /* цвет фона для активных элементов */
 
-  --day-background-color: #ecf0ff;
+  /* --day-background-color: #ecf0ff;
   --selected-day-background-color: #80cfb7;
   --event-background-color: #6a7af3;
   --hover-day-background-color: #e6ebf9;
-  --event-hover-background-color: #5a6fa6;
+  --event-hover-background-color: #5a6fa6; */
+
+  --error-color: #c11515;
+  --disabled-color: #9e9e9e;
 }
 
 /* :root {
