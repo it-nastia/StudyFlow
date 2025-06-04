@@ -5,23 +5,24 @@ import {
   House,
   SquareKanban,
   CalendarDays,
-  File,
+  GraduationCap,
   UserRoundPlus,
 } from "lucide-react";
 import styles from "./ClassPage.module.css";
 import KanbanBoard from "../../components/KanbanBoard/KanbanBoard";
 import Calendar from "../../components/Calendar/Calendar";
 import MainTable from "../../components/MainTable/MainTable";
-import TaskContent from "../../components/TaskContent/TaskContent";
+import Participants from "../../components/Participants/Participants";
+import Grades from "../../components/Grades/Grades";
 
 const TABS = [
   { key: "main", label: "Main Table", icon: <House size={16} /> },
   { key: "kanban", label: "Kanban", icon: <SquareKanban size={16} /> },
   { key: "calendar", label: "Calendar", icon: <CalendarDays size={16} /> },
   {
-    key: "reports",
-    label: "Reports",
-    icon: <File size={16} />,
+    key: "grades",
+    label: "grades",
+    icon: <GraduationCap size={16} />,
     restricted: true,
   },
   {
@@ -71,6 +72,66 @@ const TASKS = [
     grade: 10,
   },
 ];
+const LECTURES = [
+  {
+    id: "lecture001",
+    title: "Lecture 1",
+    assignment: "Lecture about nature",
+    description: "Introduction to data science and its applications.",
+    date: "2025-06-01",
+    timeStart: "10:00",
+    timeEnd: "11:30",
+    status: "To-Do",
+  },
+  {
+    id: "lecture002",
+    title: "Lecture 2",
+    assignment: "Lecture about data science",
+    description: "Introduction to data science and its applications.",
+    date: "2025-06-03",
+    timeStart: "12:00",
+    timeEnd: "13:30",
+    status: "In Progress",
+  },
+  {
+    id: "lecture003",
+    title: "Lecture 3",
+    assignment: "Lecture about machine learning",
+    description: "Introduction to data science and its applications.",
+    date: "2025-06-05",
+    timeStart: "14:00",
+    timeEnd: "15:30",
+    status: "Done",
+  },
+  {
+    id: "lecture004",
+    title: "Lecture 4",
+    assignment: "Lecture about AI",
+    description: "Introduction to data science and its applications.",
+    date: "2025-06-07",
+    timeStart: "16:00",
+    timeEnd: "17:30",
+    status: "To-Do",
+  },
+];
+
+const PARTICIPANTS = [
+  {
+    id: "user001",
+    name: "Ivanenko Ivan",
+    lastName: "Ivanenko",
+    email: "email@gmai.com",
+  },
+  {
+    id: "user002",
+    name: "Petrenko Petro",
+    lastName: "Petrenko",
+    email: "wedool",
+  },
+  { id: "user003", name: "Tima Toma", lastName: "Toma", email: "wedool" },
+  { id: "user004", name: "Deniss Riss", lastName: "Riss", email: "wedool" },
+  { id: "user005", name: "Katina Marina", lastName: "Marina", email: "wedool" },
+];
 
 const ClassPage = ({ className = "New Class", isEditor = true }) => {
   const [activeTab, setActiveTab] = useState("main");
@@ -108,13 +169,15 @@ const ClassPage = ({ className = "New Class", isEditor = true }) => {
         )}
       </nav>
       <div className={styles.content}>
-        {activeTab === "main" && <MainTable />}
+        {activeTab === "main" && (
+          <MainTable lectures={LECTURES} tasks={TASKS} />
+        )}
         {activeTab === "kanban" && <KanbanBoard tasks={TASKS} />}
         {activeTab === "calendar" && <Calendar events={TASKS} />}
-        {activeTab === "reports" && isEditor && <TaskContent tasks={TASKS} />}
-        {activeTab === "participants" && isEditor && (
-          <div>Participants Content</div>
+        {activeTab === "grades" && isEditor && (
+          <Grades participants={PARTICIPANTS} tasks={TASKS} />
         )}
+        {activeTab === "participants" && isEditor && <Participants />}
       </div>
     </div>
   );

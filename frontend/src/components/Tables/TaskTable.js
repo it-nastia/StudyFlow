@@ -43,10 +43,14 @@ const TaskTable = ({ tasks: initialtasks = [] }) => {
                   {task.title}
                 </Link>
               </td>
-              <td>{task.date}</td>
+              <td>
+                <time dateTime={task.date}>{task.date}</time>
+              </td>
               <td>{task.deadline}</td>
               <td>
-                {task.timeStart} - {task.timeEnd}
+                <time dateTime={task.timeStart}>{task.timeStart}</time>
+                {" - "}
+                <time dateTime={task.timeEnd}>{task.timeEnd}</time>
               </td>
               <td>
                 <select

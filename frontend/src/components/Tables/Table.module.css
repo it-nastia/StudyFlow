@@ -35,6 +35,11 @@
   padding: 0px;
 }
 
+.table td:has(time),
+td.smallCell {
+  text-align: center;
+}
+
 .table td select option {
   padding: 0px;
 }
