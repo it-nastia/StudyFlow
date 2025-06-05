@@ -10,7 +10,7 @@ import {
   Plus,
 } from "lucide-react";
 
-const WorkspaceDrodownList = ({ workspace }) => {
+const WorkspaceDrodownList = ({ workspace, onCreateClass }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -34,27 +34,35 @@ const WorkspaceDrodownList = ({ workspace }) => {
       </div>
       {isExpanded && (
         <ul className={styles.classList}>
-          {workspace.classes.length === 0 ? (
+          {!workspace.classes || workspace.classes.length === 0 ? (
             <li className={styles.addClass}>
-              <button className={styles.button}>
+              <button className={styles.button} onClick={onCreateClass}>
                 <Plus className={styles.icon} />
                 <span>New Class</span>
               </button>
             </li>
           ) : (
-            workspace.classes.map((className, index) => (
-              <li key={index}>
-                <NavLink
-                  to={`/class/${workspace.id}-${index}`}
-                  className={({ isActive }) =>
-                    `${styles.link} ${isActive ? styles.activeLink : ""}`
-                  }
-                >
-                  <Table2 className={styles.icon} />
-                  {className}
-                </NavLink>
+            <>
+              {workspace.classes.map((classItem) => (
+                <li key={classItem.id}>
+                  <NavLink
+                    to={`/class/${classItem.id}`}
+                    className={({ isActive }) =>
+                      `${styles.link} ${isActive ? styles.activeLink : ""}`
+                    }
+                  >
+                    <Table2 className={styles.icon} />
+                    {classItem.name}
+                  </NavLink>
+                </li>
+              ))}
+              <li className={styles.addClass}>
+                <button className={styles.button} onClick={onCreateClass}>
+                  <Plus className={styles.icon} />
+                  <span>New Class</span>
+                </button>
               </li>
-            ))
+            </>
           )}
         </ul>
       )}

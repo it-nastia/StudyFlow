@@ -58,6 +58,86 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
+// Create a new class in a workspace
+router.post("/:workspaceId/classes", auth, async (req, res) => {
+  try {
+    const workspaceId = parseInt(req.params.workspaceId);
+    const userId = req.user.id;
+    const { name, meetingLink, description, code } = req.body;
+
+    // Validate input
+    if (!name) {
+      return res.status(400).json({ message: "Class name is required" });
+    }
+
+    // Check if user has access to the workspace
+    const workspace = await prisma.workspace.findFirst({
+      where: {
+        id: workspaceId,
+        users: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    });
+
+    if (!workspace) {
+      return res
+        .status(404)
+        .json({ message: "Workspace not found or access denied" });
+    }
+
+    // Create class and associate it with the workspace in a transaction
+    const result = await prisma.$transaction(async (prisma) => {
+      // Create the class
+      const newClass = await prisma.class.create({
+        data: {
+          name,
+          meetingLink,
+          about: description,
+          code,
+          // Associate with workspace
+          workspaces: {
+            create: {
+              workspaceId,
+            },
+          },
+          // Make creator an editor
+          editors: {
+            create: {
+              userId,
+            },
+          },
+          // Also add creator as a participant
+          participants: {
+            create: {
+              userId,
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          meetingLink: true,
+          about: true,
+          code: true,
+        },
+      });
+
+      return newClass;
+    });
+
+    res.status(201).json(result);
+  } catch (error) {
+    console.error("Error creating class:", error);
+    res.status(500).json({
+      message: "Failed to create class",
+      details: error.message,
+    });
+  }
+});
+
 // Get all workspaces for the current user
 router.get("/", auth, async (req, res) => {
   try {

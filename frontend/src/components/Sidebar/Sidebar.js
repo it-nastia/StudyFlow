@@ -4,13 +4,16 @@ import { LayoutGrid, CalendarDays, SquareKanban, Plus } from "lucide-react";
 
 import Workspace from "./WorkspaceDrodownList";
 import CreateWorkspaceModal from "../Modal/CreateWorkspaceModal";
+import CreateClassModal from "../CreateClassModal";
 import styles from "./Sidebar.module.css";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 const Sidebar = () => {
   const [workspaces, setWorkspaces] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
+  const [isClassModalOpen, setIsClassModalOpen] = useState(false);
+  const [activeWorkspace, setActiveWorkspace] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -39,74 +42,89 @@ const Sidebar = () => {
         headers: getAuthHeaders(),
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          navigate("/login");
-          return;
-        }
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch workspaces");
-      }
-
-      const data = await response.json();
-      setWorkspaces(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching workspaces:", error);
-      if (error.message === "No authentication token found") {
+      if (response.status === 401) {
         navigate("/login");
         return;
       }
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch workspaces");
+      }
+
+      const data = await response.json();
+      setWorkspaces(data);
+    } catch (error) {
       setError("Failed to load workspaces");
+      console.error("Error fetching workspaces:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCreateWorkspace = async (workspaceName) => {
+  const handleCreateWorkspace = async (workspaceData) => {
     try {
-      setError(null);
-
       const response = await fetch(`${API_BASE_URL}/api/workspaces`, {
         method: "POST",
         headers: getAuthHeaders(),
-        body: JSON.stringify({ name: workspaceName }),
+        body: JSON.stringify(workspaceData),
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          navigate("/login");
-          return;
-        }
-        const errorData = await response.json();
-        throw new Error(
-          errorData.details || errorData.message || "Failed to create workspace"
-        );
+        throw new Error("Failed to create workspace");
       }
 
       const newWorkspace = await response.json();
-      setWorkspaces([...workspaces, newWorkspace]);
-      setIsModalOpen(false);
-      navigate(`/workspace/${newWorkspace.id}`);
+      setWorkspaces((prev) => [...prev, newWorkspace]);
+      setIsWorkspaceModalOpen(false);
     } catch (error) {
       console.error("Error creating workspace:", error);
-      if (error.message === "No authentication token found") {
-        navigate("/login");
-        return;
+      setError("Failed to create workspace");
+    }
+  };
+
+  const handleCreateClass = async (formData) => {
+    try {
+      if (!activeWorkspace) {
+        throw new Error("No workspace selected");
       }
-      setError(error.message);
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/workspaces/${activeWorkspace.id}/classes`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create class");
+      }
+
+      const newClass = await response.json();
+
+      // Update the workspaces state with the new class
+      setWorkspaces((prevWorkspaces) =>
+        prevWorkspaces.map((workspace) =>
+          workspace.id === activeWorkspace.id
+            ? {
+                ...workspace,
+                classes: [...(workspace.classes || []), newClass],
+              }
+            : workspace
+        )
+      );
+
+      setIsClassModalOpen(false);
+      navigate(`/class/${newClass.id}`);
+    } catch (error) {
+      console.error("Error creating class:", error);
+      setError("Failed to create class");
     }
   };
 
   return (
-    <aside className={styles.sidebar}>
+    <div className={styles.sidebar}>
       <nav className={styles.navbar}>
         <ul className={styles.menu}>
           <li className={styles.menu_item}>
@@ -117,7 +135,7 @@ const Sidebar = () => {
               }
             >
               <LayoutGrid className={styles.icon} />
-              Home
+              Dashboard
             </NavLink>
           </li>
           <li className={styles.menu_item}>
@@ -143,33 +161,54 @@ const Sidebar = () => {
             </NavLink>
           </li>
         </ul>
+
         <div className={styles.workspaces}>
-          {error && <div className={styles.error}>{error}</div>}
-          {!isLoading && !error && workspaces.length == 0 && (
+          {isLoading ? (
+            <p>Loading workspaces...</p>
+          ) : error ? (
+            <div className={styles.error}>{error}</div>
+          ) : workspaces.length === 0 ? (
             <div className={styles.emptyState}>
-              <p>You don't have any workspaces yet</p>
+              <p>No workspaces yet</p>
               <p>Create your first workspace to get started!</p>
             </div>
+          ) : (
+            workspaces.map((workspace) => (
+              <Workspace
+                key={workspace.id}
+                workspace={workspace}
+                onCreateClass={() => {
+                  setActiveWorkspace(workspace);
+                  setIsClassModalOpen(true);
+                }}
+              />
+            ))
           )}
-          {workspaces.map((workspace) => (
-            <Workspace key={workspace.id} workspace={workspace} />
-          ))}
-          <div className={styles.addWorkspace}>
-            <button className={styles.button} onClick={handleOpenModal}>
-              <Plus className={styles.icon} />
-              <span>New Workspace</span>
-            </button>
-          </div>
         </div>
-        <ul></ul>
+
+        <div className={styles.addWorkspace}>
+          <button
+            className={styles.button}
+            onClick={() => setIsWorkspaceModalOpen(true)}
+          >
+            <Plus className={styles.icon} />
+            Add Workspace
+          </button>
+        </div>
       </nav>
 
       <CreateWorkspaceModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isWorkspaceModalOpen}
+        onClose={() => setIsWorkspaceModalOpen(false)}
         onSubmit={handleCreateWorkspace}
       />
-    </aside>
+
+      <CreateClassModal
+        isOpen={isClassModalOpen}
+        onClose={() => setIsClassModalOpen(false)}
+        onSubmit={handleCreateClass}
+      />
+    </div>
   );
 };
 
