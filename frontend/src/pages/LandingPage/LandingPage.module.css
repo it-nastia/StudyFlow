@@ -110,9 +110,10 @@
 .heroContent {
   flex: 1;
   max-width: 600px;
+  position: relative;
 }
 
-.heroContent::after {
+.hero::after {
   position: absolute;
   content: "";
   bottom: -560px;
@@ -162,13 +163,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .heroImage img {
   max-width: 100%;
   height: auto;
   border-radius: 8px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); */
 }
 
 /* Features Section */

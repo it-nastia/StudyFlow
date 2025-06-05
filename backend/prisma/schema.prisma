@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement()) @map("user_id")
+  firstName     String   @db.VarChar(50)
+  lastName      String   @db.VarChar(50)
+  phone         String   @unique @db.VarChar(20)
+  email         String   @unique @db.VarChar(100)
+  about         String?  @db.Text
+  password      String   @db.VarChar(255)
+
+  // Отношения
+  workspaces    WorkspacesList[]
+  participantIn ClassParticipantList[]
+  editorIn      ClassEditorList[]
+  lectureStatus UserLectureStatus[]
+  taskStatus    UserTaskStatus[]
+  reports       ReportsList[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id        Int      @id @default(autoincrement()) @map("workspace_id")
+  name      String   @db.VarChar(200)
+  
+  // Отношения
+  users     WorkspacesList[]
+  classes   ClassesList[]
+
+  @@map("workspaces")
+}
+
+model WorkspacesList {
+  user        User      @relation(fields: [userId], references: [id])
+  userId      Int       @map("user_id")
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int       @map("workspace_id")
+
+  @@id([userId, workspaceId])
+  @@map("workspaces_lists")
+}
+
+model Class {
+  id          Int      @id @default(autoincrement()) @map("class_id")
+  name        String   @db.VarChar(200)
+  meetingLink String?  @map("meeting_link") @db.VarChar(255)
+  code        String   @db.VarChar(20)
+  about       String?  @db.Text
+
+  // Отношения
+  workspaces  ClassesList[]
+  participants ClassParticipantList[]
+  editors     ClassEditorList[]
+  lectures    LecturesList[]
+  tasks       TasksList[]
+
+  @@map("classes")
+}
+
+model ClassesList {
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int       @map("workspace_id")
+  class       Class     @relation(fields: [classId], references: [id])
+  classId     Int       @map("class_id")
+
+  @@id([workspaceId, classId])
+  @@map("classes_lists")
+}
+
+model ClassParticipantList {
+  user    User    @relation(fields: [userId], references: [id])
+  userId  Int     @map("user_id")
+  class   Class   @relation(fields: [classId], references: [id])
+  classId Int     @map("class_id")
+
+  @@id([userId, classId])
+  @@map("class_participant_lists")
+}
+
+model ClassEditorList {
+  user    User    @relation(fields: [userId], references: [id])
+  userId  Int     @map("user_id")
+  class   Class   @relation(fields: [classId], references: [id])
+  classId Int     @map("class_id")
+
+  @@id([userId, classId])
+  @@map("class_editor_lists")
+}
+
+model Lecture {
+  id             Int      @id @default(autoincrement()) @map("lecture_id")
+  assignment     String   @db.Text
+  title          String   @db.Text
+  description    String?  @db.Text
+  assignmentDate DateTime? @map("assignment_date") @db.Date
+
+  // Отношения
+  classes        LecturesList[]
+  userStatuses   UserLectureStatus[]
+
+  @@map("lectures")
+}
+
+model LecturesList {
+  class     Class   @relation(fields: [classId], references: [id])
+  classId   Int     @map("class_id")
+  lecture   Lecture @relation(fields: [lectureId], references: [id])
+  lectureId Int     @map("lecture_id")
+
+  @@id([classId, lectureId])
+  @@map("lectures_lists")
+}
+
+enum Status {
+  TO_DO      @map("To-Do")
+  IN_PROGRESS @map("In Progress")
+  DONE       @map("Done")
+}
+
+model UserLectureStatus {
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @map("user_id")
+  lecture   Lecture @relation(fields: [lectureId], references: [id])
+  lectureId Int     @map("lecture_id")
+  status    Status
+
+  @@id([userId, lectureId])
+  @@map("user_lecture_statuses")
+}
+
+model Task {
+  id             Int       @id @default(autoincrement()) @map("task_id")
+  assignment     String    @db.VarChar(255)
+  title          String    @db.VarChar(100)
+  description    String?   @db.Text
+  assignmentDate DateTime? @map("assignment_date") @db.Date
+  deadline       DateTime? @db.Date
+  grade         Decimal?    @db.Decimal(5,2)
+
+  // Отношения
+  classes    TasksList[]
+  userStatuses UserTaskStatus[]
+  reports    ReportsList[]
+
+  @@map("tasks")
+}
+
+model TasksList {
+  class   Class @relation(fields: [classId], references: [id])
+  classId Int   @map("class_id")
+  task    Task  @relation(fields: [taskId], references: [id])
+  taskId  Int   @map("task_id")
+
+  @@id([classId, taskId])
+  @@map("tasks_list")
+}
+
+model UserTaskStatus {
+  user    User   @relation(fields: [userId], references: [id])
+  userId  Int    @map("user_id")
+  task    Task   @relation(fields: [taskId], references: [id])
+  taskId  Int    @map("task_id")
+  status  Status
+
+  @@id([userId, taskId])
+  @@map("user_task_statuses")
+}
+
+model Report {
+  id         Int       @id @default(autoincrement()) @map("report_id")
+  name       String?   @db.Text
+  type       String?   @db.Text
+  path       String?   @db.Text
+  uploadDate DateTime? @map("upload_date") @db.Date
+  grade      Decimal?    @db.Decimal(5,2)
+
+  // Отношения
+  taskReports ReportsList[]
+
+  @@map("reports")
+}
+
+model ReportsList {
+  task      Task    @relation(fields: [taskId], references: [id])
+  taskId    Int     @map("task_id")
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @map("user_id")
+  report    Report  @relation(fields: [reportId], references: [id])
+  reportId  Int     @map("report_id")
+
+  @@id([taskId, userId, reportId])
+  @@map("reports_list")
+}

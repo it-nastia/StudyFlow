@@ -24,12 +24,12 @@ function App() {
   return (
     <div className={styles.App}>
       <Router>
-        {/* <Routes>
+        <Routes>
           <Route path="/" element={<LandingPage />} />
-        </Routes> */}
-        <Header />
+        </Routes>
+        {/* <Header /> */}
         <div className={styles.wrapper}>
-          <Sidebar className={styles.menu} />
+          {/* <Sidebar className={styles.menu} /> */}
           <main className={styles.main}>
             <Routes>
               <Route path="/home" element={<HomePage />} />

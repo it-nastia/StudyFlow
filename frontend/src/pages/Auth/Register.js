@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../../config/api";
 import logo from "../../images/logo.svg";
 import styles from "./Auth.module.css";
 
 const Register = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -84,14 +85,32 @@ const Register = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        // Here you would typically make an API call to register the user
-        // For now, we'll just simulate a successful registration
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        history.push("/login");
+        const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Registration failed");
+        }
+
+        // Если регистрация успешна, сохраняем токен
+        localStorage.setItem("token", data.token);
+
+        // Показываем сообщение об успехе
+        alert("Registration successful! Please log in.");
+
+        // Перенаправляем на страницу входа
+        navigate("/login");
       } catch (error) {
         setErrors((prev) => ({
           ...prev,
-          submit: "Registration failed. Please try again.",
+          submit: error.message || "Registration failed. Please try again.",
         }));
       } finally {
         setIsSubmitting(false);

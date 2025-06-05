@@ -53,14 +53,31 @@ const Login = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        // Here you would typically make an API call to authenticate the user
-        // For now, we'll just simulate a successful login
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        history.push("/home");
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Login failed");
+        }
+
+        // Store the token in localStorage
+        localStorage.setItem("token", data.token);
+        // Store user data if needed
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // Redirect to home page
+        history("/home");
       } catch (error) {
         setErrors((prev) => ({
           ...prev,
-          submit: "Invalid email or password",
+          submit: error.message || "Invalid email or password",
         }));
       } finally {
         setIsSubmitting(false);

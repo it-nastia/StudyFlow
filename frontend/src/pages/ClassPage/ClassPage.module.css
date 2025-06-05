@@ -102,30 +102,9 @@
 }
 
 .content {
-  margin-top: 24px;
+  margin-top: 0px;
 }
 
-/* 
-.tabs {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.tab {
-  padding: 10px 20px;
-  cursor: pointer;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  margin: 0 5px;
-}
-
-.activeTab {
-  background-color: #007bff;
-  color: #ffffff;
-}
-*/
 .content {
   flex: 1;
   padding: 20px;

@@ -1,38 +1,91 @@
-import React from "react";import { BrowserRouter as Router, Switch } from "react-router-dom";
-import ProtectedRoute from "../../src/components/ProtectedRoute/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
-import AuthLayout from "../../src/components/Layout/AuthLayout";
-
-// Public pages
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import LandingPage from "./pages/LandingPage/LandingPage";
-import Login from "./pages/AuthPage/Login";
-import Register from "./pages/AuthPage/Register";
-
-// Protected pages
-import HomePage from "./pages/HomePageHomePage";
-import Profile from "./pages/Profile/Profile";
-import Schedule from "./pages/Schedule/Schedule";
-import Lectures from "./pages/Lectures/Lectures";
-import Assignments from "./pages/Assignments/Assignments";
+import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
+import HomePage from "./pages/HomePage/HomePage";
+import CalendarPage from "./pages/CalendarPage/CalendarPage";
+import KanbanPage from "./pages/KanbanPage/KanbanPage";
+import WorkspacePage from "./pages/WorkspacePage/WorkspacePage";
+import ClassPage from "./pages/ClassPage/ClassPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import "./styles/variables.css";
 
 const App = () => {
+  const isAuthenticated = localStorage.getItem("token");
+
   return (
     <Router>
-      <Switch>
-        {/* Public Routes */}
-        <PublicRoute exact path="/" component={LandingPage} />
-        <PublicRoute restricted path="/login" component={Login} />
-        <PublicRoute restricted path="/register" component={Register} />
+      <Routes>
+        {/* Публичные маршруты */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to="/home" replace /> : <Login />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? <Navigate to="/home" replace /> : <Register />
+          }
+        />
 
-        {/* Protected Routes */}
-        <ProtectedRoute path="/home" component={HomePage} />
-        <ProtectedRoute path="/profile" component={Profile} />
-        <ProtectedRoute path="/schedule" component={Schedule} />
-        <ProtectedRoute path="/lectures" component={Lectures} />
-        <ProtectedRoute path="/assignments" component={Assignments} />
-      </Switch>
+        {/* Защищенные маршруты */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/calendar"
+          element={
+            <ProtectedRoute>
+              <CalendarPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/kanban"
+          element={
+            <ProtectedRoute>
+              <KanbanPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/workspace/:id"
+          element={
+            <ProtectedRoute>
+              <WorkspacePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/class/:id"
+          element={
+            <ProtectedRoute>
+              <ClassPage />
+            </ProtectedRoute>
+          }
+        />
 
-        </Route>
+        {/* Редирект для несуществующих маршрутов */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

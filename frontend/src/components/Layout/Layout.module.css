@@ -1,0 +1,28 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--primary-background-color);
+}
+
+.container {
+  display: flex;
+  flex: 1;
+}
+
+.main {
+  flex: 1;
+  padding: 1rem;
+  margin-top: 60px; /* Высота header */
+  margin-left: 340px; /* Ширина sidebar */
+  background-color: var(--primary-background-color);
+  min-height: calc(100vh - 60px);
+  max-width: 1100px;
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+    padding: 1rem;
+  }
+}

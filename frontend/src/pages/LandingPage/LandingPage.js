@@ -12,6 +12,7 @@ import {
   Clock,
   BarChart,
 } from "lucide-react";
+import banner from "../../images/banner.png";
 import logo from "../../images/logo.svg";
 import styles from "./LandingPage.module.css";
 
@@ -86,7 +87,8 @@ const LandingPage = () => {
           </Link>
           <nav className={styles.navigation}>
             <a href="#features">Features</a>
-            <a href="#benefits">Benefits</a>
+            <a href="#audiences">Audiences</a>
+            <a href="#workflow">Workflow</a>
           </nav>
           <div className={styles.authButtons}>
             <Link to="/login" className={styles.loginButton}>
@@ -112,11 +114,9 @@ const LandingPage = () => {
         </div>
         <div className={styles.heroImage}>
           {/* You'll need to add your app interface image here */}
-          <img src="/app-interface.png" alt="StudyFlow Interface" />
+          <img src={banner} alt="StudyFlow Interface" />
         </div>
       </section>
-
-      {/* Features Section */}
       <section className={styles.features} id="features">
         <h2>Key Features</h2>
         <div className={styles.featureGrid}>
@@ -131,7 +131,7 @@ const LandingPage = () => {
       </section>
 
       {/* Audience Section */}
-      <section className={styles.audience}>
+      <section className={styles.audience} id="audiences">
         <h2>Your Learning Tool</h2>
         <div className={styles.audienceGrid}>
           {audiences.map((audience, index) => (
@@ -145,7 +145,7 @@ const LandingPage = () => {
       </section>
 
       {/* Workflow Section */}
-      <section className={styles.workflow}>
+      <section className={styles.workflow} id="workflow">
         <h2>How It Works</h2>
         <div className={styles.workflowGrid}>
           {workflow.map((step, index) => (

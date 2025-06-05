@@ -24,7 +24,7 @@
 
 .fc-button {
   background-color: var(--button-background-color);
-  color: white;
+  color: var(--primary-text-color);
   padding: 5px 15px;
   border: none;
   border-radius: 5px;
@@ -50,21 +50,24 @@
 
 .fc-selected {
   background-color: var(--selected-day-background-color);
-  color: white;
+  color: var(--primary-text-color);
 }
 
 .fc-event {
-  background-color: var(--event-background-color);
-  color: white;
+  background-color: rgba(133, 167, 203, 0.6);
+  color: var(--primary-text-color);
+  border-color: var(--border-color);
   border-radius: 5px;
   padding: 2px;
+  cursor: pointer;
   flex-wrap: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: background-color 0.3s ease;
 }
 
 .fc-event:hover {
-  background-color: var(--event-hover-background-color);
+  background-color: rgba(115, 185, 222, 0.6);
 }
 
 .fc .fc-daygrid-day.fc-day-today {

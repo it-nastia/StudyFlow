@@ -1,59 +1,108 @@
 .mainTable {
-  margin-top: 32px;
+  padding: 20px;
+  background-color: var(--primary-background-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 .classList {
   list-style: none;
   padding: 0;
-  margin: 0 0 32px 0;
+  margin: 0;
 }
 .classRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 12px;
   border-bottom: 1px solid var(--border-color);
+}
+.classRow:last-child {
+  border-bottom: none;
 }
 .classInfo {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 16px;
 }
 .icon {
-  width: 24px;
-  height: 24px;
+  color: var(--secondary-text-color);
+}
+.classLink {
+  color: var(--primary-text-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+.classLink:hover {
+  text-decoration: underline;
 }
 .exitBtn {
   background: none;
   border: none;
+  padding: 6px;
   cursor: pointer;
-  padding: 4px;
+  color: var(--secondary-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
-  transition: background 0.2s;
 }
 .exitBtn:hover {
-  background: #e3eaf2;
+  background-color: var(--hover-background-color);
+  color: var(--error-color);
 }
 .exitIcon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 .actions {
   display: flex;
-  gap: 16px;
+  gap: 12px;
+  margin-top: 20px;
   justify-content: flex-end;
-  margin-top: 24px;
 }
 .actionBtn {
-  padding: 8px 32px;
-  border-radius: 4px;
-  border: 1px solid var(--button-border-color);
-  background: #dde6ef;
-  color: #222;
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--primary-background-color);
+  color: var(--primary-text-color);
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.2s, border 0.2s;
+  transition: all 0.2s ease;
 }
 .actionBtn:hover {
-  background: #c7d5e6;
+  background-color: var(--hover-background-color);
+  border-color: var(--hover-border-color);
+}
+.emptyState {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--secondary-text-color);
+}
+.emptyState p {
+  margin: 8px 0;
+}
+.emptyState p:first-child {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--primary-text-color);
+}
+.emptyStateActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--secondary-text-color);
+}
+.error {
+  text-align: center;
+  padding: 40px;
+  color: var(--error-color);
 }

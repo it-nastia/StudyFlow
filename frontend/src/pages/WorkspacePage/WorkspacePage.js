@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { House, SquareKanban, CalendarDays } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styles from "./WorkspacePage.module.css";
 import WorkspaceMainTable from "./WorkspaceMainTable";
 import KanbanBoard from "../../components/KanbanBoard/KanbanBoard";
 import Calendar from "../../components/Calendar/Calendar";
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 const TABS = [
   { key: "main", label: "Main Table", icon: <House size={16} /> },
@@ -14,9 +16,69 @@ const TABS = [
 
 const WorkspacePage = () => {
   const [activeTab, setActiveTab] = useState("main");
+  const [workspace, setWorkspace] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { id } = useParams(); // Получаем id из URL
 
-  // TODO: получить workspaceId из URL и загрузить данные рабочего пространства
-  const workspaceName = "Workspace Name"; // заглушка
+  useEffect(() => {
+    fetchWorkspaceData();
+  }, [id]);
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+  };
+
+  const fetchWorkspaceData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch(`${API_BASE_URL}/api/workspaces/${id}`, {
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch workspace data");
+      }
+
+      const data = await response.json();
+      setWorkspace(data);
+    } catch (error) {
+      console.error("Error fetching workspace:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleJoinClass = () => {
+    // TODO: Implement class joining functionality
+  };
+
+  const handleCreateClass = () => {
+    // TODO: Implement class creation functionality
+  };
+
+  if (isLoading) {
+    return <div className={styles.loading}>Loading workspace...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
+
+  if (!workspace) {
+    return <div className={styles.error}>Workspace not found</div>;
+  }
 
   const TASKS = [
     {
@@ -83,6 +145,7 @@ const WorkspacePage = () => {
       status: "done",
     },
   ];
+
   const EVENTS = [
     {
       title: "English",
@@ -129,7 +192,7 @@ const WorkspacePage = () => {
   return (
     <div className={styles.workspacePage}>
       <div className={styles.header}>
-        <h1 className={styles.title}>{workspaceName}</h1>
+        <h1 className={styles.title}>{workspace.name}</h1>
         <div className={styles.tabs}>
           {TABS.map((tab) => (
             <button
@@ -147,13 +210,9 @@ const WorkspacePage = () => {
       <div className={styles.content}>
         {activeTab === "main" && (
           <WorkspaceMainTable
-            classes={[
-              { id: 1, name: "Class 1" },
-              { id: 2, name: "Class 2" },
-              { id: 3, name: "Class 3" },
-            ]}
-            onJoin={() => {}}
-            onCreate={() => {}}
+            classes={workspace.classes}
+            onJoin={handleJoinClass}
+            onCreate={handleCreateClass}
           />
         )}
         {activeTab === "kanban" && <KanbanBoard tasks={TASKS} />}

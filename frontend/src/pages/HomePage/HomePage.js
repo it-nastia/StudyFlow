@@ -13,29 +13,29 @@ const HomePage = () => {
       : "Good Evening!";
 
   const lectures = [
-    {
-      assignment: "Artificial Intelligence",
-      title: "Lecture 5",
-      description: "Introduction to Kohonen's networks.",
-      date: "03.05.2025",
-      time: "14:00-15:20",
-      status: "Upcoming",
-      videoLink: "https://example.com/meeting-link",
-    },
+    // {
+    //   assignment: "Artificial Intelligence",
+    //   title: "Lecture 5",
+    //   description: "Introduction to Kohonen's networks.",
+    //   date: "03.05.2025",
+    //   time: "14:00-15:20",
+    //   status: "Upcoming",
+    //   videoLink: "https://example.com/meeting-link",
+    // },
   ];
 
   const tasks = [
-    {
-      assignment: "English B1",
-      title: "Task 1",
-      description: "Present Perfect Continuous",
-      date: "03.05.2025",
-      time: "16:00-17:20",
-      deadline: "04.05.2025",
-      grade: "A",
-      status: "In Progress",
-      videoLink: "https://example.com/meeting-link",
-    },
+    // {
+    //   assignment: "English B1",
+    //   title: "Task 1",
+    //   description: "Present Perfect Continuous",
+    //   date: "03.05.2025",
+    //   time: "16:00-17:20",
+    //   deadline: "04.05.2025",
+    //   grade: "A",
+    //   status: "In Progress",
+    //   videoLink: "https://example.com/meeting-link",
+    // },
   ];
 
   return (

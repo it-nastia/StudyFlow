@@ -1,32 +1,108 @@
-import React, { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
-
+import React, { useState, useEffect } from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { LayoutGrid, CalendarDays, SquareKanban, Plus } from "lucide-react";
 
 import Workspace from "./WorkspaceDrodownList";
+import CreateWorkspaceModal from "../Modal/CreateWorkspaceModal";
 import styles from "./Sidebar.module.css";
 
-const Sidebar = () => {
-  const [workspaces, setWorkspaces] = useState([
-    {
-      id: 1,
-      name: "Workspace 1",
-      classes: ["Class 1", "Class 2", "Class 3"],
-    },
-    {
-      id: 2,
-      name: "Workspace 2",
-      classes: [],
-    },
-  ]);
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
-  const addWorkspace = () => {
-    const newWorkspace = {
-      id: workspaces.length + 1,
-      name: `Workspace ${workspaces.length + 1}`,
-      classes: [],
+const Sidebar = () => {
+  const [workspaces, setWorkspaces] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchWorkspaces();
+  }, []);
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     };
-    setWorkspaces([...workspaces, newWorkspace]);
+  };
+
+  const fetchWorkspaces = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetch(`${API_BASE_URL}/api/workspaces`, {
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          navigate("/login");
+          return;
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch workspaces");
+      }
+
+      const data = await response.json();
+      setWorkspaces(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching workspaces:", error);
+      if (error.message === "No authentication token found") {
+        navigate("/login");
+        return;
+      }
+      setError("Failed to load workspaces");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCreateWorkspace = async (workspaceName) => {
+    try {
+      setError(null);
+
+      const response = await fetch(`${API_BASE_URL}/api/workspaces`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ name: workspaceName }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          navigate("/login");
+          return;
+        }
+        const errorData = await response.json();
+        throw new Error(
+          errorData.details || errorData.message || "Failed to create workspace"
+        );
+      }
+
+      const newWorkspace = await response.json();
+      setWorkspaces([...workspaces, newWorkspace]);
+      setIsModalOpen(false);
+      navigate(`/workspace/${newWorkspace.id}`);
+    } catch (error) {
+      console.error("Error creating workspace:", error);
+      if (error.message === "No authentication token found") {
+        navigate("/login");
+        return;
+      }
+      setError(error.message);
+    }
   };
 
   return (
@@ -68,124 +144,33 @@ const Sidebar = () => {
           </li>
         </ul>
         <div className={styles.workspaces}>
+          {error && <div className={styles.error}>{error}</div>}
+          {!isLoading && !error && workspaces.length == 0 && (
+            <div className={styles.emptyState}>
+              <p>You don't have any workspaces yet</p>
+              <p>Create your first workspace to get started!</p>
+            </div>
+          )}
           {workspaces.map((workspace) => (
             <Workspace key={workspace.id} workspace={workspace} />
           ))}
           <div className={styles.addWorkspace}>
-            <button className={styles.button} onClick={addWorkspace}>
+            <button className={styles.button} onClick={handleOpenModal}>
               <Plus className={styles.icon} />
-              <span>New Workspace </span>
+              <span>New Workspace</span>
             </button>
           </div>
         </div>
-        <ul>
-          {/* {workspaces.map((workspace) => (
-            <li key={workspace.id}>
-              <span>{workspace.name}</span>
-              <ul>
-                {workspace.classes.map((className, index) => (
-                  <li key={index}>
-                    <Link to={`/class/${workspace.id}-${index}`}>
-                      {className}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))} */}
-        </ul>
+        <ul></ul>
       </nav>
+
+      <CreateWorkspaceModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSubmit={handleCreateWorkspace}
+      />
     </aside>
   );
 };
 
 export default Sidebar;
-
-// import React, { useState } from "react";
-// import { NavLink } from "react-router-dom";
-// import styles from "./Sidebar.module.css"; // Импорт стилей
-
-// const Sidebar = () => {
-//   const [isOpen, setIsOpen] = useState(false);
-//   const [activeLink, setActiveLink] = useState("");
-
-//   const handleLinkClick = (link) => {
-//     setActiveLink(link);
-//   };
-
-//   const toggleMenu = () => {
-//     setIsOpen(!isOpen);
-//   };
-
-//   return (
-//     <nav className={`${styles.nav} ${isOpen ? styles.showMenu : ""}`}>
-//       <div className={styles.nav__container}>
-//         <div>
-//           <a href="#" className={`${styles.nav__link} ${styles.nav__logo}`}>
-//             <i className="bx bxs-disc"></i>
-//             <span className={styles.nav__logoName}>Bedimcode</span>
-//           </a>
-
-//           <div className={styles.nav__list}>
-//             <div className={styles.nav__items}>
-//               <h3 className={styles.nav__subtitle}>Profile</h3>
-
-//               <NavLink
-//                 to="/"
-//                 className={`${styles.nav__link} ${
-//                   activeLink === "home" ? styles.active : ""
-//                 }`}
-//                 onClick={() => handleLinkClick("home")}
-//               >
-//                 <i className="bx bx-home"></i>
-//                 <span className={styles.nav__name}>Home</span>
-//               </NavLink>
-
-//               <div className={styles.nav__dropdown}>
-//                 <a href="#" className={styles.nav__link}>
-//                   <i className="bx bx-user"></i>
-//                   <span className={styles.nav__name}>Profile</span>
-//                   <i
-//                     className={`bx bx-chevron-down ${styles.nav__dropdownIcon}`}
-//                   ></i>
-//                 </a>
-
-//                 <div className={styles.nav__dropdownCollapse}>
-//                   <div className={styles.nav__dropdownContent}>
-//                     <a href="#" className={styles.nav__dropdownItem}>
-//                       Passwords
-//                     </a>
-//                     <a href="#" className={styles.nav__dropdownItem}>
-//                       Mail
-//                     </a>
-//                     <a href="#" className={styles.nav__dropdownItem}>
-//                       Accounts
-//                     </a>
-//                   </div>
-//                 </div>
-//               </div>
-
-//               <NavLink
-//                 to="/messages"
-//                 className={`${styles.nav__link} ${
-//                   activeLink === "messages" ? styles.active : ""
-//                 }`}
-//                 onClick={() => handleLinkClick("messages")}
-//               >
-//                 <i className="bx bx-message-rounded"></i>
-//                 <span className={styles.nav__name}>Messages</span>
-//               </NavLink>
-//             </div>
-//           </div>
-//         </div>
-
-//         <NavLink to="/logout" className={styles.nav__link}>
-//           <i className="bx bx-log-out"></i>
-//           <span className={styles.nav__name}>Log Out</span>
-//         </NavLink>
-//       </div>
-//     </nav>
-//   );
-// };
-
-// export default Sidebar;
