@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Settings } from "lucide-react";
 import {
   Video,
@@ -14,6 +14,7 @@ import Calendar from "../../components/Calendar/Calendar";
 import MainTable from "../../components/MainTable/MainTable";
 import Participants from "../../components/Participants/Participants";
 import Grades from "../../components/Grades/Grades";
+import { useParams } from "react-router-dom";
 
 const TABS = [
   { key: "main", label: "Main Table", icon: <House size={16} /> },
@@ -133,20 +134,52 @@ const PARTICIPANTS = [
   { id: "user005", name: "Katina Marina", lastName: "Marina", email: "wedool" },
 ];
 
-const ClassPage = ({ className = "New Class", isEditor = true }) => {
+const ClassPage = ({ isEditor = true }) => {
   const [activeTab, setActiveTab] = useState("main");
+  const [classData, setClassData] = useState({
+    id: "",
+    name: "Loading...",
+    meetingLink: "",
+    lectures: [],
+    tasks: [],
+  });
+  const { classId } = useParams();
+
+  useEffect(() => {
+    // В будущем здесь будет запрос к API для получения данных класса
+    // Временно используем моковые данные
+    const fetchClassData = async () => {
+      // Имитация загрузки данных
+      const mockClassData = {
+        id: classId,
+        name: "Data Science and Analytics",
+        meetingLink: "https://meet.google.com/abc-defg-hij",
+        lectures: LECTURES,
+        tasks: TASKS,
+      };
+      setClassData(mockClassData);
+    };
+
+    fetchClassData();
+  }, [classId]);
 
   return (
     <div className={styles.classPage}>
       <div className={styles.header}>
         <div className={styles.classSettings}>
-          <h1 className={styles.title}>{className}</h1>
-
-          <button className={styles.settingsButton}>
-            <Settings size={20} />
-          </button>
+          <h1 className={styles.title}>{classData.name}</h1>
+          {isEditor && (
+            <button className={styles.settingsButton}>
+              <Settings size={20} />
+            </button>
+          )}
         </div>
-        <a href="#" className={styles.meetingLink}>
+        <a
+          href={classData.meetingLink}
+          className={styles.meetingLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <Video />
           Join Meeting
         </a>
@@ -170,12 +203,12 @@ const ClassPage = ({ className = "New Class", isEditor = true }) => {
       </nav>
       <div className={styles.content}>
         {activeTab === "main" && (
-          <MainTable lectures={LECTURES} tasks={TASKS} />
+          <MainTable lectures={classData.lectures} tasks={classData.tasks} />
         )}
-        {activeTab === "kanban" && <KanbanBoard tasks={TASKS} />}
-        {activeTab === "calendar" && <Calendar events={TASKS} />}
+        {activeTab === "kanban" && <KanbanBoard tasks={classData.tasks} />}
+        {activeTab === "calendar" && <Calendar events={classData.tasks} />}
         {activeTab === "grades" && isEditor && (
-          <Grades participants={PARTICIPANTS} tasks={TASKS} />
+          <Grades participants={PARTICIPANTS} tasks={classData.tasks} />
         )}
         {activeTab === "participants" && isEditor && <Participants />}
       </div>

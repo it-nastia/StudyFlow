@@ -151,3 +151,10 @@ option {
 .statusSelect.In-Progress {
   background-color: #ffa726;
 }
+
+.emptyState {
+  text-align: center;
+  padding: 20px !important;
+  color: var(--secondary-text-color);
+  font-style: italic;
+}

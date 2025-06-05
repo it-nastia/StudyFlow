@@ -24,7 +24,7 @@ const WorkspaceDrodownList = ({ workspace, onCreateClass }) => {
           <NavLink
             to={`/workspace/${workspace.id}`}
             className={styles.workspaceLink}
-            onClick={(e) => e.stopPropagation()} // чтобы не раскрывать/сворачивать при переходе
+            onClick={(e) => e.stopPropagation()}
           >
             <LayoutDashboard className={styles.icon} />
             <span>{workspace.name}</span>
@@ -32,6 +32,7 @@ const WorkspaceDrodownList = ({ workspace, onCreateClass }) => {
         </div>
         {isExpanded ? <ChevronUp /> : <ChevronDown />}
       </div>
+
       {isExpanded && (
         <ul className={styles.classList}>
           {!workspace.classes || workspace.classes.length === 0 ? (
@@ -56,12 +57,12 @@ const WorkspaceDrodownList = ({ workspace, onCreateClass }) => {
                   </NavLink>
                 </li>
               ))}
-              <li className={styles.addClass}>
+              {/* <li className={styles.addClass}>
                 <button className={styles.button} onClick={onCreateClass}>
                   <Plus className={styles.icon} />
                   <span>New Class</span>
                 </button>
-              </li>
+              </li> */}
             </>
           )}
         </ul>

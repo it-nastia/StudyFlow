@@ -1,7 +1,16 @@
 .workspace {
-  /* margin-bottom: 1rem; */
+  margin-bottom: 2px;
+  position: relative;
 }
-
+.workspace::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  width: 90%;
+  height: 1px;
+  background-color: var(--border-color);
+}
 .header {
   display: flex;
   justify-content: space-between;
@@ -11,6 +20,9 @@
   padding: 0.6rem;
   transition: background-color 0.3s ease;
   padding: 0.5rem 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--primary-text-color);
 }
 
@@ -50,8 +62,19 @@
   font-size: 1rem;
   display: flex;
   align-items: center;
-  padding: 0.5rem 1rem 0.5rem 2rem;
+  padding: 0.4rem 1rem 0.4rem 2rem;
+  position: relative;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  bottom: 0px;
+  left: 1.5rem;
+  width: 80%;
+  height: 1px;
+  background-color: var(--border-color);
 }
 
 .link:hover {

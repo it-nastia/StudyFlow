@@ -29,46 +29,54 @@ const LectureTable = ({ lectures: initialLectures = [] }) => {
           </tr>
         </thead>
         <tbody>
-          {lectures.map((lecture) => (
-            <tr key={lecture.id}>
-              <td className={styles.truncate}>
-                <Link to={`/lecture/${lecture.id}`} className={styles.link}>
-                  {lecture.assignment}
-                </Link>
-              </td>
-
-              <td className={styles.truncate}>
-                <Link to={`/lecture/${lecture.id}`} className={styles.link}>
-                  {lecture.title}
-                </Link>
-              </td>
-              <td className={styles.dateCell}>
-                <time dateTime={lecture.date}>{lecture.date}</time>
-              </td>
-              <td className={styles.dateCell}>
-                <time dateTime={lecture.timeStart}>{lecture.timeStart}</time>
-                {" - "}
-                <time dateTime={lecture.timeEnd}>{lecture.timeEnd}</time>
-              </td>
-              <td>
-                <select
-                  value={lecture.status}
-                  onChange={(e) =>
-                    handleStatusChange(lecture.id, e.target.value)
-                  }
-                  className={`${styles.statusSelect} ${
-                    styles[lecture.status.replace(" ", "-")]
-                  }`}
-                >
-                  {statusOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+          {lectures.length === 0 ? (
+            <tr>
+              <td colSpan="5" className={styles.emptyState}>
+                No lectures available yet. Click "Add Lecture" to create your
+                first lecture.
               </td>
             </tr>
-          ))}
+          ) : (
+            lectures.map((lecture) => (
+              <tr key={lecture.id}>
+                <td className={styles.truncate}>
+                  <Link to={`/lecture/${lecture.id}`} className={styles.link}>
+                    {lecture.assignment}
+                  </Link>
+                </td>
+                <td className={styles.truncate}>
+                  <Link to={`/lecture/${lecture.id}`} className={styles.link}>
+                    {lecture.title}
+                  </Link>
+                </td>
+                <td className={styles.dateCell}>
+                  <time dateTime={lecture.date}>{lecture.date}</time>
+                </td>
+                <td className={styles.dateCell}>
+                  <time dateTime={lecture.timeStart}>{lecture.timeStart}</time>
+                  {" - "}
+                  <time dateTime={lecture.timeEnd}>{lecture.timeEnd}</time>
+                </td>
+                <td>
+                  <select
+                    value={lecture.status}
+                    onChange={(e) =>
+                      handleStatusChange(lecture.id, e.target.value)
+                    }
+                    className={`${styles.statusSelect} ${
+                      styles[lecture.status.replace(" ", "-")]
+                    }`}
+                  >
+                    {statusOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
       <button className={styles.addRow}>
