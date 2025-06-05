@@ -39,7 +39,8 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit }) => {
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
     }
-    return newErrors;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const isValidUrl = (url) => {
@@ -51,14 +52,28 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newErrors = validateForm();
-
-    if (Object.keys(newErrors).length === 0) {
-      onSubmit(formData);
-    } else {
-      setErrors(newErrors);
+    if (validateForm()) {
+      try {
+        const classData = {
+          name: formData.name.trim(),
+          meetingLink: formData.meetingLink.trim(),
+          description: formData.description.trim(),
+        };
+        await onSubmit(classData);
+        // Reset form
+        setFormData({
+          name: "",
+          meetingLink: "",
+          description: "",
+        });
+      } catch (error) {
+        setErrors((prev) => ({
+          ...prev,
+          submit: error.message || "Failed to create class",
+        }));
+      }
     }
   };
 
@@ -74,6 +89,7 @@ const CreateClassModal = ({ isOpen, onClose, onSubmit }) => {
           </button>
         </div>
         <form onSubmit={handleSubmit} className={styles.form}>
+          {errors.submit && <div className={styles.error}>{errors.submit}</div>}
           <div className={styles.formGroup}>
             <label htmlFor="name">Class Name*</label>
             <input

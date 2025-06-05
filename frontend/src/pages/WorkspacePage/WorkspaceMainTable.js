@@ -3,39 +3,26 @@ import { Link, useNavigate } from "react-router-dom";
 import { PanelsTopLeft, LogOut, Plus, Terminal } from "lucide-react";
 import styles from "./WorkspaceMainTable.module.css";
 import CreateClassModal from "../../components/CreateClassModal/CreateClassModal";
-import { v4 as uuidv4 } from "uuid";
 
 const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleCreateClass = async (formData) => {
     try {
-      const classCode = uuidv4().slice(0, 10); // Generate a unique 10-character code
-      const newClass = {
-        id: uuidv4(),
-        code: classCode,
-        name: formData.name,
-        meetingLink: formData.meetingLink,
-        description: formData.description,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Here you would typically make an API call to save the class
-      // For now, we'll just call onCreate with the new class data
-      await onCreate(newClass);
-
-      // Close the modal and navigate to the new class page
+      const newClass = await onCreate(formData);
       setIsCreateModalOpen(false);
       navigate(`/class/${newClass.id}`);
     } catch (error) {
       console.error("Error creating class:", error);
-      // Here you might want to show an error message to the user
+      setError(error.message || "Failed to create class");
     }
   };
 
   return (
     <div className={styles.mainTable}>
+      {error && <div className={styles.error}>{error}</div>}
       {classes.length === 0 ? (
         <div className={styles.emptyState}>
           <p>You don't have any classes in this workspace yet</p>

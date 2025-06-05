@@ -58,7 +58,7 @@ model Class {
   id          Int      @id @default(autoincrement()) @map("class_id")
   name        String   @db.VarChar(200)
   meetingLink String?  @map("meeting_link") @db.VarChar(255)
-  code        String   @db.VarChar(20)
+  code        String   @unique @db.VarChar(20)
   about       String?  @db.Text
 
   // Отношения

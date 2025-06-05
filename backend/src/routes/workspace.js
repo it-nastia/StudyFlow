@@ -1,6 +1,7 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 const auth = require("../middleware/auth");
+const { v4: uuidv4 } = require("uuid");
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -17,30 +18,18 @@ router.post("/", auth, async (req, res) => {
 
     // Create workspace and associate it with the user in a transaction
     const result = await prisma.$transaction(async (prisma) => {
-      // Create the workspace
       const workspace = await prisma.workspace.create({
         data: {
           name,
           users: {
             create: {
-              userId: userId,
+              userId,
             },
           },
         },
         select: {
           id: true,
           name: true,
-          classes: {
-            select: {
-              class: {
-                select: {
-                  id: true,
-                  name: true,
-                  code: true,
-                },
-              },
-            },
-          },
         },
       });
 
@@ -63,11 +52,28 @@ router.post("/:workspaceId/classes", auth, async (req, res) => {
   try {
     const workspaceId = parseInt(req.params.workspaceId);
     const userId = req.user.id;
-    const { name, meetingLink, description, code } = req.body;
+    const { name, meetingLink, description } = req.body;
 
     // Validate input
-    if (!name) {
-      return res.status(400).json({ message: "Class name is required" });
+    const errors = {};
+    if (!name || !name.trim()) {
+      errors.name = "Class name is required";
+    }
+    if (!meetingLink || !meetingLink.trim()) {
+      errors.meetingLink = "Meeting link is required";
+    } else {
+      try {
+        new URL(meetingLink);
+      } catch {
+        errors.meetingLink = "Please enter a valid URL";
+      }
+    }
+    if (!description || !description.trim()) {
+      errors.description = "Description is required";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return res.status(400).json({ message: "Validation failed", errors });
     }
 
     // Check if user has access to the workspace
@@ -88,14 +94,24 @@ router.post("/:workspaceId/classes", auth, async (req, res) => {
         .json({ message: "Workspace not found or access denied" });
     }
 
+    // Generate a unique class code
+    let code;
+    let existingClass;
+    do {
+      code = uuidv4().slice(0, 10);
+      existingClass = await prisma.class.findUnique({
+        where: { code },
+      });
+    } while (existingClass);
+
     // Create class and associate it with the workspace in a transaction
     const result = await prisma.$transaction(async (prisma) => {
       // Create the class
       const newClass = await prisma.class.create({
         data: {
-          name,
-          meetingLink,
-          about: description,
+          name: name.trim(),
+          meetingLink: meetingLink.trim(),
+          about: description.trim(),
           code,
           // Associate with workspace
           workspaces: {

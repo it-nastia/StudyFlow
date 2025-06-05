@@ -5,8 +5,7 @@ import styles from "./WorkspacePage.module.css";
 import WorkspaceMainTable from "./WorkspaceMainTable";
 import KanbanBoard from "../../components/KanbanBoard/KanbanBoard";
 import Calendar from "../../components/Calendar/Calendar";
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+import { API_ENDPOINTS } from "../../config/api";
 
 const TABS = [
   { key: "main", label: "Main Table", icon: <House size={16} /> },
@@ -19,7 +18,7 @@ const WorkspacePage = () => {
   const [workspace, setWorkspace] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { id } = useParams(); // Получаем id из URL
+  const { id } = useParams();
 
   useEffect(() => {
     fetchWorkspaceData();
@@ -41,9 +40,12 @@ const WorkspacePage = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/workspaces/${id}`, {
-        headers: getAuthHeaders(),
-      });
+      const response = await fetch(
+        `${API_ENDPOINTS.BASE_URL}/workspaces/${id}`,
+        {
+          headers: getAuthHeaders(),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -64,8 +66,35 @@ const WorkspacePage = () => {
     // TODO: Implement class joining functionality
   };
 
-  const handleCreateClass = () => {
-    // TODO: Implement class creation functionality
+  const handleCreateClass = async (classData) => {
+    try {
+      const response = await fetch(
+        `${API_ENDPOINTS.BASE_URL}/workspaces/${id}/classes`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(classData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create class");
+      }
+
+      const newClass = await response.json();
+
+      // Update workspace data with the new class
+      setWorkspace((prevWorkspace) => ({
+        ...prevWorkspace,
+        classes: [...(prevWorkspace.classes || []), newClass],
+      }));
+
+      return newClass;
+    } catch (error) {
+      console.error("Error creating class:", error);
+      throw error;
+    }
   };
 
   if (isLoading) {
