@@ -2,6 +2,7 @@ const API_BASE_URL =
   process.env.REACT_APP_API_URL || "http://localhost:3000/api";
 
 export const API_ENDPOINTS = {
+  BASE_URL: API_BASE_URL,
   AUTH: {
     REGISTER: `${API_BASE_URL}/auth/register`,
     LOGIN: `${API_BASE_URL}/auth/login`,

@@ -8,7 +8,10 @@ const CreateWorkspaceModal = ({ isOpen, onClose, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (workspaceName.trim()) {
-      onSubmit(workspaceName);
+      const workspaceData = {
+        name: workspaceName.trim(),
+      };
+      onSubmit(workspaceData);
       setWorkspaceName("");
     }
   };

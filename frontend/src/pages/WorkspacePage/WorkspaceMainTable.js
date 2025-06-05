@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PanelsTopLeft, LogOut, Plus, Terminal } from "lucide-react";
 import styles from "./WorkspaceMainTable.module.css";
-import CreateClassModal from "../../components/CreateClassModal";
+import CreateClassModal from "../../components/CreateClassModal/CreateClassModal";
 import { v4 as uuidv4 } from "uuid";
 
 const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {

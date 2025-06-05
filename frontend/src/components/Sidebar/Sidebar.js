@@ -4,10 +4,9 @@ import { LayoutGrid, CalendarDays, SquareKanban, Plus } from "lucide-react";
 
 import Workspace from "./WorkspaceDrodownList";
 import CreateWorkspaceModal from "../Modal/CreateWorkspaceModal";
-import CreateClassModal from "../CreateClassModal";
+import CreateClassModal from "../CreateClassModal/CreateClassModal";
 import styles from "./Sidebar.module.css";
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
+import { API_ENDPOINTS } from "../../config/api";
 
 const Sidebar = () => {
   const [workspaces, setWorkspaces] = useState([]);
@@ -38,7 +37,7 @@ const Sidebar = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/workspaces`, {
+      const response = await fetch(`${API_ENDPOINTS.BASE_URL}/workspaces`, {
         headers: getAuthHeaders(),
       });
 
@@ -63,14 +62,15 @@ const Sidebar = () => {
 
   const handleCreateWorkspace = async (workspaceData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/workspaces`, {
+      const response = await fetch(`${API_ENDPOINTS.BASE_URL}/workspaces`, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify(workspaceData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create workspace");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create workspace");
       }
 
       const newWorkspace = await response.json();
@@ -89,7 +89,7 @@ const Sidebar = () => {
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/workspaces/${activeWorkspace.id}/classes`,
+        `${API_ENDPOINTS.BASE_URL}/workspaces/${activeWorkspace.id}/classes`,
         {
           method: "POST",
           headers: getAuthHeaders(),
@@ -98,7 +98,8 @@ const Sidebar = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to create class");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create class");
       }
 
       const newClass = await response.json();

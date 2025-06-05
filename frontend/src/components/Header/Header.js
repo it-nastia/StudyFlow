@@ -27,13 +27,6 @@ const Header = ({ user }) => {
     })
     .toLowerCase();
 
-  const USER = {
-    id: 1,
-    firstName: "Nastia",
-    lastName: "Lysenko",
-    avatar: "",
-  };
-
   return (
     <header className={styles.header}>
       <NavLink to="/" className={styles.logo}>
@@ -50,15 +43,15 @@ const Header = ({ user }) => {
         <div className={styles.user}>
           <NavLink to="/profile" className={styles.profile}>
             <span className={styles.userName}>
-              {USER.firstName} {USER.lastName}
+              {user?.firstName} {user?.lastName}
             </span>
             <div className={styles.avatar}>
-              {USER.avatar ? (
-                <img src={USER.avatar} alt="User Avatar" />
+              {user?.avatar ? (
+                <img src={user.avatar} alt="User Avatar" />
               ) : (
                 <span>
-                  {USER.firstName.charAt(0)}
-                  {USER.lastName.charAt(0)}
+                  {user?.firstName?.charAt(0)}
+                  {user?.lastName?.charAt(0)}
                 </span>
               )}
             </div>
