@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { PanelsTopLeft, LogOut, Plus } from "lucide-react";
+import { PanelsTopLeft, LogOut, Plus, Terminal } from "lucide-react";
 import styles from "./WorkspaceMainTable.module.css";
 
 const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
@@ -12,8 +12,8 @@ const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
           <p>Create your first class or join an existing one to get started!</p>
           <div className={styles.emptyStateActions}>
             <button className={styles.actionBtn} onClick={onJoin}>
-              <Plus className={styles.icon} />
-              Join Class
+              <Terminal className={styles.icon} />
+              Join Class by Code
             </button>
             <button className={styles.actionBtn} onClick={onCreate}>
               <Plus className={styles.icon} />

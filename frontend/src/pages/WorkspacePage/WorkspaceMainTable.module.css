@@ -77,6 +77,11 @@
   background-color: var(--hover-background-color);
   border-color: var(--hover-border-color);
 }
+
+.actionBtn:nth-child(2) {
+  background-color: var(--secondary-background-color);
+}
+
 .emptyState {
   text-align: center;
   padding: 40px 20px;
