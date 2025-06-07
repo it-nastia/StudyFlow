@@ -85,29 +85,41 @@ const Register = () => {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
+        console.log("Starting registration process...");
+        console.log("API endpoint:", API_ENDPOINTS.AUTH.REGISTER);
+        console.log("Request data:", { ...formData, password: "[REDACTED]" });
+
         const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(formData),
+          credentials: "include",
         });
 
+        console.log("Response status:", response.status);
+        console.log(
+          "Response headers:",
+          Object.fromEntries(response.headers.entries())
+        );
+
         const data = await response.json();
+        console.log("Response data:", data);
 
         if (!response.ok) {
           throw new Error(data.error || "Registration failed");
         }
 
-        // Если регистрация успешна, сохраняем токен
         localStorage.setItem("token", data.token);
-
-        // Показываем сообщение об успехе
         alert("Registration successful! Please log in.");
-
-        // Перенаправляем на страницу входа
         navigate("/login");
       } catch (error) {
+        console.error("Registration error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name,
+        });
         setErrors((prev) => ({
           ...prev,
           submit: error.message || "Registration failed. Please try again.",
