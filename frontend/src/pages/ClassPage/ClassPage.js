@@ -15,7 +15,7 @@ import MainTable from "../../components/MainTable/MainTable";
 import Participants from "../../components/Participants/Participants";
 import Grades from "../../components/Grades/Grades";
 import ClassSettingsModal from "../../components/ClassSettingsModal/ClassSettingsModal";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../../utils/axios";
 
 const TABS = [
@@ -37,7 +37,9 @@ const TABS = [
 ];
 
 const ClassPage = ({ isEditor = true }) => {
-  const [activeTab, setActiveTab] = useState("main");
+  const location = useLocation();
+  const initialTab = location.state?.activeTab || "main";
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [classData, setClassData] = useState({
     id: "",
     name: "Loading...",

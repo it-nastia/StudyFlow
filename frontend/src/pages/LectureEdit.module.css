@@ -19,6 +19,17 @@
   gap: 8px;
 }
 
+.classLink {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.classLink:hover {
+  color: var(--accent-hover-color);
+  text-decoration: underline;
+}
+
 .meetingLink {
   display: flex;
   align-items: center;
@@ -35,6 +46,7 @@
 .meetingLink:hover {
   background-color: var(--accent-color);
 }
+
 .tabs {
   display: flex;
   gap: 0px;

@@ -1,24 +1,50 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-
-import {
-  Video,
-  House,
-  SquareKanban,
-  CalendarDays,
-  ChevronRight,
-  SquarePen,
-  FileText,
-  Plus,
-} from "lucide-react";
-
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { SquarePen, FileText, Plus, ChevronRight } from "lucide-react";
+import { Video, House, SquareKanban, CalendarDays } from "lucide-react";
+import axios from "../utils/axios";
 import styles from "./LectureEdit.module.css";
 
 const LectureEdit = () => {
   const { classId, lectureId } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("edit");
   const [assignmentDate, setAssignmentDate] = useState("");
   const [status, setStatus] = useState("To-Do");
+  const [classData, setClassData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchClassData = async () => {
+      try {
+        const response = await axios.get(`/api/classes/${classId}`);
+        setClassData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchClassData();
+  }, [classId]);
+
+  const handleTabClick = (tabId) => {
+    if (tabId !== "edit" && tabId !== "reports") {
+      navigate(`/class/${classId}`, { state: { activeTab: tabId } });
+    } else {
+      setActiveTab(tabId);
+    }
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   const tabs = [
     { id: "main", label: "Main Table", icon: <House size={16} /> },
@@ -29,7 +55,7 @@ const LectureEdit = () => {
       id: "reports",
       label: "Reports",
       icon: <FileText size={16} />,
-      disabled: true,
+      disabled: true, // Disable this tab for now
     },
   ];
 
@@ -38,12 +64,15 @@ const LectureEdit = () => {
       {/* Header */}
       <div className={styles.header}>
         <h1 className={styles.title}>
-          <span>Class name</span> <ChevronRight size={22} />{" "}
-          <span>Lecture title</span>{" "}
+          <Link to={`/class/${classId}`} className={styles.classLink}>
+            {classData?.name || "Loading..."}
+          </Link>
+          {<ChevronRight size={22} />}
+          <span>{lectureId === "new" ? "New Lecture" : "Edit Lecture"}</span>
         </h1>
         <button className={styles.meetingLink}>
-          <Video />
-          Join Meeting
+          <Video size={16} />
+          <span className={styles.joinText}>Join Meeting</span>
         </button>
       </div>
 
@@ -55,7 +84,7 @@ const LectureEdit = () => {
             className={`${styles.tab} ${
               activeTab === tab.id ? styles.activeTab : ""
             }`}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => handleTabClick(tab.id)}
             disabled={tab.disabled}
           >
             <span className={styles.tabIcon}>{tab.icon}</span>
