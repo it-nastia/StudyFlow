@@ -1,37 +1,76 @@
 .gradesContainer {
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
   overflow-x: auto;
-  white-space: nowrap;
 }
 
 .gradesTable {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px; /* Устанавливаем минимальную ширину для таблицы */
+  background: white;
+  border: 1px solid #e5e7eb;
 }
 
-.gradesTable th {
-  background-color: var(--table-header-background-color);
-  padding: 10px;
-  text-align: center;
-  font-weight: 600;
-  border: 1px solid var(--border-color);
-  min-width: 100px;
-}
-
+.gradesTable th,
 .gradesTable td {
-  padding: 10px;
-  border: 1px solid var(--border-color);
+  padding: 12px;
   text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+.participantHeader {
+  background-color: #f3f4f6;
+  text-align: left !important;
+  min-width: 200px;
+}
+
+.taskHeader {
+  background-color: #f3f4f6;
+  min-width: 120px;
+}
+
+.totalHeader {
+  background-color: #e8f5e9;
+  min-width: 120px;
+}
+
+.taskLink {
+  color: var(--primary-text-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.taskLink:hover {
+  text-decoration: underline;
+}
+
+.maxGrade {
+  font-size: 14px;
+  color: var(--secondary-text-color);
+  margin-top: 4px;
 }
 
 .participantName {
+  text-align: left !important;
   font-weight: 500;
-  text-align: left;
+  color: var(--primary-text-color);
 }
 
 .gradeCell {
+  color: var(--secondary-text-color);
+}
+
+.totalScore {
+  background-color: #e8f5e9;
+  font-weight: 500;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px;
+  color: var(--secondary-text-color);
+  background: white;
+  border-radius: 8px;
+  margin: 20px;
 }
 
 /* Стилизация горизонтальной прокрутки */

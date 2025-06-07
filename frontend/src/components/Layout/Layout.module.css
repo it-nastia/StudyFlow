@@ -18,7 +18,7 @@
   margin: 60px auto 0px;
   background-color: var(--primary-background-color);
   min-height: calc(100vh - 60px);
-  max-width: 1100px;
+  max-width: 1200px;
 }
 
 @media (max-width: 768px) {

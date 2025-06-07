@@ -33,7 +33,7 @@ const Participants = ({ participants = [], editors = [] }) => {
             onClick={handleAddEditor}
             title="Add Editor"
           >
-            <UserRoundPlus size={16} />
+            <UserRoundPlus size={20} />
           </button>
         </div>
 
@@ -52,7 +52,7 @@ const Participants = ({ participants = [], editors = [] }) => {
                   onClick={() => handleRemoveEditor(editor.id)}
                   title="Remove Editor"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={17} />
                 </button>
               </li>
             ))
@@ -68,7 +68,7 @@ const Participants = ({ participants = [], editors = [] }) => {
             onClick={handleAddParticipant}
             title="Add Participant"
           >
-            <UserRoundPlus size={16} />
+            <UserRoundPlus size={20} />
           </button>
         </div>
 
@@ -87,7 +87,7 @@ const Participants = ({ participants = [], editors = [] }) => {
                   onClick={() => handleRemoveParticipant(participant.id)}
                   title="Remove Participant"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={17} />
                 </button>
               </li>
             ))

@@ -22,7 +22,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 500;
-  color: #333;
+  color: var(--prymary-text-color);
 }
 
 .addButton {
@@ -31,7 +31,7 @@
   justify-content: center;
   background: none;
   border: none;
-  color: #666;
+  color: var(--secondary-text-color);
   cursor: pointer;
   padding: 8px;
   border-radius: 4px;
@@ -40,7 +40,7 @@
 
 .addButton:hover {
   background-color: #f0f0f0;
-  color: #333;
+  color: var(--prymary-text-color);
 }
 
 .list {
@@ -74,12 +74,12 @@
 
 .name {
   font-weight: 500;
-  color: #333;
+  color: var(--prymary-text-color);
 }
 
 .email {
   font-size: 14px;
-  color: #666;
+  color: var(--secondary-text-color);
 }
 
 .deleteButton {
@@ -101,12 +101,12 @@
 }
 
 .deleteButton:hover {
-  background-color: #fde8e8;
+  background-color: #d3d8eb;
 }
 
 .emptyState {
   text-align: center;
   padding: 20px;
-  color: #666;
+  color: var(--secondary-text-color);
   font-style: italic;
 }
