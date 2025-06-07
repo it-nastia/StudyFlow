@@ -14,6 +14,7 @@ import Calendar from "../../components/Calendar/Calendar";
 import MainTable from "../../components/MainTable/MainTable";
 import Participants from "../../components/Participants/Participants";
 import Grades from "../../components/Grades/Grades";
+import ClassSettingsModal from "../../components/ClassSettingsModal/ClassSettingsModal";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../utils/axios";
 
@@ -50,6 +51,7 @@ const ClassPage = ({ isEditor = true }) => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const { classId } = useParams();
   const navigate = useNavigate();
 
@@ -130,6 +132,29 @@ const ClassPage = ({ isEditor = true }) => {
     fetchClassData();
   }, [classId, navigate]);
 
+  const handleSettingsSave = async (updatedData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(`/api/classes/${classId}`, updatedData);
+
+      if (!response.data) {
+        throw new Error("No data received from server");
+      }
+
+      setClassData((prev) => ({
+        ...prev,
+        ...updatedData,
+      }));
+
+      setIsSettingsModalOpen(false);
+    } catch (error) {
+      console.error("Error updating class:", error);
+      // Here you might want to show an error message to the user
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!classId) {
     return <div className={styles.error}>Invalid class ID</div>;
   }
@@ -149,12 +174,14 @@ const ClassPage = ({ isEditor = true }) => {
           <div className={styles.classSettings}>
             <h1 className={styles.title}>{classData.name}</h1>
             {isEditor && (
-              <button className={styles.settingsButton}>
+              <button
+                className={styles.settingsButton}
+                onClick={() => setIsSettingsModalOpen(true)}
+              >
                 <Settings size={20} />
               </button>
             )}
           </div>
-          <p className={styles.classCode}>Class Code: {classData.code}</p>
         </div>
         {classData.meetingLink && (
           <a
@@ -168,6 +195,16 @@ const ClassPage = ({ isEditor = true }) => {
           </a>
         )}
       </div>
+
+      {isEditor && (
+        <ClassSettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          onSave={handleSettingsSave}
+          classData={classData}
+        />
+      )}
+
       <nav className={styles.tabs}>
         {TABS.map(
           (tab) =>

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import styles from "./Table.module.css";
 
 const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
+  const navigate = useNavigate();
+  const { classId } = useParams();
   const [lectures, setLectures] = useState(initialLectures);
   const statusOptions = ["To-Do", "In Progress", "Done"];
 
@@ -13,6 +15,10 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
         lecture.id === id ? { ...lecture, status: newStatus } : lecture
       )
     );
+  };
+
+  const handleAddLecture = () => {
+    navigate(`/class/${classId}/lecture/new/edit`);
   };
 
   return (
@@ -40,12 +46,18 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
             lectures.map((lecture) => (
               <tr key={lecture.id}>
                 <td className={styles.truncate}>
-                  <Link to={`/lecture/${lecture.id}`} className={styles.link}>
+                  <Link
+                    to={`/class/${classId}/lecture/${lecture.id}/edit`}
+                    className={styles.link}
+                  >
                     {lecture.assignment}
                   </Link>
                 </td>
                 <td className={styles.truncate}>
-                  <Link to={`/lecture/${lecture.id}`} className={styles.link}>
+                  <Link
+                    to={`/class/${classId}/lecture/${lecture.id}/edit`}
+                    className={styles.link}
+                  >
                     {lecture.title}
                   </Link>
                 </td>
@@ -80,7 +92,7 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
         </tbody>
       </table>
       {isEditor && (
-        <button className={styles.addRow}>
+        <button className={styles.addRow} onClick={handleAddLecture}>
           <Plus size={16} /> <span>Add Lecture</span>
         </button>
       )}

@@ -13,6 +13,7 @@ import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import KanbanPage from "./pages/KanbanPage/KanbanPage";
 import WorkspacePage from "./pages/WorkspacePage/WorkspacePage";
 import ClassPage from "./pages/ClassPage/ClassPage";
+import LectureEdit from "./pages/LectureEdit";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles/variables.css";
 
@@ -74,6 +75,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ClassPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/class/:classId/lecture/:lectureId/edit"
+          element={
+            <ProtectedRoute>
+              <LectureEdit />
             </ProtectedRoute>
           }
         />
