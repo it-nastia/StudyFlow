@@ -12,6 +12,9 @@ export const API_ENDPOINTS = {
     BASE: `${API_BASE_URL}/users`,
     BY_ID: (id) => `${API_BASE_URL}/users/${id}`,
   },
+  CLASSES: {
+    BY_ID: (classId) => `${API_BASE_URL}/classes/${classId}`,
+  },
   // Добавьте другие endpoints по мере необходимости
 };
 

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import styles from "./Table.module.css";
 
-const LectureTable = ({ lectures: initialLectures = [] }) => {
+const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
   const [lectures, setLectures] = useState(initialLectures);
   const statusOptions = ["To-Do", "In Progress", "Done"];
 
@@ -17,7 +17,6 @@ const LectureTable = ({ lectures: initialLectures = [] }) => {
 
   return (
     <div className={styles.tableContainer}>
-      <h2 className={styles.sectionTitle}>Lectures</h2>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -32,8 +31,9 @@ const LectureTable = ({ lectures: initialLectures = [] }) => {
           {lectures.length === 0 ? (
             <tr>
               <td colSpan="5" className={styles.emptyState}>
-                No lectures available yet. Click "Add Lecture" to create your
-                first lecture.
+                {isEditor
+                  ? 'No lectures available yet. Click "Add Lecture" to create your first lecture.'
+                  : "No lectures available yet."}
               </td>
             </tr>
           ) : (
@@ -79,9 +79,11 @@ const LectureTable = ({ lectures: initialLectures = [] }) => {
           )}
         </tbody>
       </table>
-      <button className={styles.addRow}>
-        <Plus size={16} /> <span>Add Lecture</span>
-      </button>
+      {isEditor && (
+        <button className={styles.addRow}>
+          <Plus size={16} /> <span>Add Lecture</span>
+        </button>
+      )}
     </div>
   );
 };

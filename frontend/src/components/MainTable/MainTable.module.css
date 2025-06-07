@@ -1,32 +1,108 @@
 .mainTable {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
-.tableSection {
+.accordion {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.sectionTitle {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 10px;
+.accordion.expanded {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.table {
+.accordionHeader {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.accordionHeader:hover {
+  background-color: #f5f5f5;
+}
+
+.accordionHeader h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+.accordionContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  padding: 0 20px;
+}
+
+.accordionContent.show {
+  max-height: 500px;
+  padding: 0 20px 20px;
+}
+
+.classDescription {
+  margin: 0;
+  line-height: 1.6;
+  color: #666;
+}
+
+.noDescription {
+  margin: 0;
+  color: var(--secondary-text-color);
+  font-style: italic;
+}
+
+.tables {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.section h3 {
+  margin: 0 0 15px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+}
+
+table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.table th,
-.table td {
-  border: 1px solid #e0e0e0;
-  padding: 10px;
+th,
+td {
+  padding: 12px;
   text-align: left;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.table th {
-  background-color: #f0f0f0;
+th {
+  font-weight: 500;
+  color: #666;
+  background-color: #f5f5f5;
+}
+
+tr:hover td {
+  background-color: #f9f9f9;
 }
 
 .actionButton {

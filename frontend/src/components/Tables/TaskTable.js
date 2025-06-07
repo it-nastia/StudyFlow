@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./Table.module.css";
 import { Plus } from "lucide-react";
 
-const TaskTable = ({ tasks: initialTasks = [] }) => {
+const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
   const [tasks, setTasks] = useState(initialTasks);
   const statusOptions = ["To-Do", "In Progress", "Done"];
 
@@ -17,7 +17,6 @@ const TaskTable = ({ tasks: initialTasks = [] }) => {
 
   return (
     <div className={styles.taskTable}>
-      <h2 className={styles.sectionTitle}>Tasks</h2>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -34,8 +33,9 @@ const TaskTable = ({ tasks: initialTasks = [] }) => {
           {tasks.length === 0 ? (
             <tr>
               <td colSpan="7" className={styles.emptyState}>
-                No tasks available yet. Click "Add Task" to create your first
-                task.
+                {isEditor
+                  ? 'No tasks available yet. Click "Add Task" to create your first task.'
+                  : "No tasks available yet."}
               </td>
             </tr>
           ) : (
@@ -83,9 +83,11 @@ const TaskTable = ({ tasks: initialTasks = [] }) => {
           )}
         </tbody>
       </table>
-      <button className={styles.addRow}>
-        <Plus size={16} /> <span>Add Task</span>
-      </button>
+      {isEditor && (
+        <button className={styles.addRow}>
+          <Plus size={16} /> <span>Add Task</span>
+        </button>
+      )}
     </div>
   );
 };

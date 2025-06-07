@@ -25,21 +25,15 @@ const App = () => {
         {/* Публичные маршруты */}
         <Route
           path="/"
-          element={
-            isAuthenticated ? <Navigate to="/home" replace /> : <LandingPage />
-          }
+          element={isAuthenticated ? <LandingPage /> : <LandingPage />}
         />
         <Route
           path="/login"
-          element={
-            isAuthenticated ? <Navigate to="/home" replace /> : <Login />
-          }
+          element={isAuthenticated ? <Login /> : <Login />}
         />
         <Route
           path="/register"
-          element={
-            isAuthenticated ? <Navigate to="/home" replace /> : <Register />
-          }
+          element={isAuthenticated ? <Register /> : <Register />}
         />
 
         {/* Защищенные маршруты */}
@@ -76,7 +70,7 @@ const App = () => {
           }
         />
         <Route
-          path="/class/:id"
+          path="/class/:classId"
           element={
             <ProtectedRoute>
               <ClassPage />

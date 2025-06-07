@@ -6,12 +6,20 @@ require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const workspaceRoutes = require("./routes/workspace");
+const classRoutes = require("./routes/classRoutes");
 
 const app = express();
 
 // Middleware
 app.use(helmet()); // Безопасность
-app.use(cors()); // CORS
+app.use(
+  cors({
+    origin: "http://localhost:3000", // URL фронтенда
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+); // CORS
 app.use(express.json()); // Парсинг JSON
 app.use(express.urlencoded({ extended: true })); // Парсинг URL-encoded bodies
 
@@ -33,6 +41,13 @@ app.get("/", (req, res) => {
         updateUser: "PUT /api/users/:id",
         deleteUser: "DELETE /api/users/:id",
       },
+      classes: {
+        getAllClasses: "GET /api/classes",
+        getClass: "GET /api/classes/:id",
+        createClass: "POST /api/classes",
+        updateClass: "PUT /api/classes/:id",
+        deleteClass: "DELETE /api/classes/:id",
+      },
       workspaces: {
         create: "POST /api/workspaces",
         getAllWorkspaces: "GET /api/workspaces",
@@ -47,6 +62,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes); // Аутентификация и регистрация
 app.use("/api/users", userRoutes); // Операции с пользователями
 app.use("/api/workspaces", workspaceRoutes); // Операции с рабочими пространствами
+app.use("/api/classes", classRoutes); // Операции с классами
 
 // Базовый маршрут для проверки работоспособности API
 app.get("/api/health", (req, res) => {

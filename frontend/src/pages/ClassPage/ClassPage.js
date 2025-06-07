@@ -14,7 +14,8 @@ import Calendar from "../../components/Calendar/Calendar";
 import MainTable from "../../components/MainTable/MainTable";
 import Participants from "../../components/Participants/Participants";
 import Grades from "../../components/Grades/Grades";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "../../utils/axios";
 
 const TABS = [
   { key: "main", label: "Main Table", icon: <House size={16} /> },
@@ -34,155 +35,138 @@ const TABS = [
   },
 ];
 
-const TASKS = [
-  {
-    id: "task001",
-    assignment: "Task 1",
-    title: "Data profiling and exploration",
-    description: "Complete the grammar exercises from the textbook.",
-    date: "2025-06-02",
-    timeStart: "14:00",
-    timeEnd: "15:30",
-    status: "To-Do",
-    deadline: "2025-06-06",
-    grade: 10,
-  },
-  {
-    id: "task002",
-    assignment: "Task 2",
-    title: "Implement data cleaning pipeline",
-
-    description: "Implement a data cleaning pipeline for the dataset.",
-    date: "2025-06-04",
-    timeStart: "13:00",
-    timeEnd: "14:30",
-    status: "In Progress",
-    deadline: "2025-06-08",
-    grade: 10,
-  },
-  {
-    id: "task003",
-    assignment: "Task 3",
-    title: "Train and evaluate a clustering model",
-    description: "Train and evaluate a clustering model on the dataset.",
-    date: "2025-06-06",
-    timeStart: "11:00",
-    timeEnd: "12:30",
-    status: "Done",
-    deadline: "2025-06-09",
-    grade: 10,
-  },
-];
-const LECTURES = [
-  {
-    id: "lecture001",
-    title: "Lecture 1",
-    assignment: "Lecture about nature",
-    description: "Introduction to data science and its applications.",
-    date: "2025-06-01",
-    timeStart: "10:00",
-    timeEnd: "11:30",
-    status: "To-Do",
-  },
-  {
-    id: "lecture002",
-    title: "Lecture 2",
-    assignment: "Lecture about data science",
-    description: "Introduction to data science and its applications.",
-    date: "2025-06-03",
-    timeStart: "12:00",
-    timeEnd: "13:30",
-    status: "In Progress",
-  },
-  {
-    id: "lecture003",
-    title: "Lecture 3",
-    assignment: "Lecture about machine learning",
-    description: "Introduction to data science and its applications.",
-    date: "2025-06-05",
-    timeStart: "14:00",
-    timeEnd: "15:30",
-    status: "Done",
-  },
-  {
-    id: "lecture004",
-    title: "Lecture 4",
-    assignment: "Lecture about AI",
-    description: "Introduction to data science and its applications.",
-    date: "2025-06-07",
-    timeStart: "16:00",
-    timeEnd: "17:30",
-    status: "To-Do",
-  },
-];
-
-const PARTICIPANTS = [
-  {
-    id: "user001",
-    name: "Ivanenko Ivan",
-    lastName: "Ivanenko",
-    email: "email@gmai.com",
-  },
-  {
-    id: "user002",
-    name: "Petrenko Petro",
-    lastName: "Petrenko",
-    email: "wedool",
-  },
-  { id: "user003", name: "Tima Toma", lastName: "Toma", email: "wedool" },
-  { id: "user004", name: "Deniss Riss", lastName: "Riss", email: "wedool" },
-  { id: "user005", name: "Katina Marina", lastName: "Marina", email: "wedool" },
-];
-
 const ClassPage = ({ isEditor = true }) => {
   const [activeTab, setActiveTab] = useState("main");
   const [classData, setClassData] = useState({
     id: "",
     name: "Loading...",
     meetingLink: "",
+    about: "",
+    code: "",
     lectures: [],
     tasks: [],
+    participants: [],
+    editors: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { classId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // В будущем здесь будет запрос к API для получения данных класса
-    // Временно используем моковые данные
     const fetchClassData = async () => {
-      // Имитация загрузки данных
-      const mockClassData = {
-        id: classId,
-        name: "Data Science and Analytics",
-        meetingLink: "https://meet.google.com/abc-defg-hij",
-        lectures: LECTURES,
-        tasks: TASKS,
-      };
-      setClassData(mockClassData);
+      if (!classId) {
+        setError("Class ID is missing");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await axios.get(`/api/classes/${classId}`);
+
+        if (!response.data) {
+          throw new Error("No data received from server");
+        }
+
+        const formattedData = {
+          ...response.data,
+          lectures:
+            response.data.lectures?.map((item) => ({
+              id: item.lecture.id,
+              title: item.lecture.title,
+              assignment: item.lecture.assignment,
+              description: item.lecture.description,
+              date: item.lecture.assignmentDate,
+              status: "To-Do", // Получаем из userLectureStatus если есть
+            })) || [],
+          tasks:
+            response.data.tasks?.map((item) => ({
+              id: item.task.id,
+              title: item.task.title,
+              assignment: item.task.assignment,
+              description: item.task.description,
+              date: item.task.assignmentDate,
+              deadline: item.task.deadline,
+              grade: item.task.grade,
+              status: "To-Do", // Получаем из userTaskStatus если есть
+            })) || [],
+          participants:
+            response.data.participants?.map((item) => ({
+              id: item.user.id,
+              name: `${item.user.firstName} ${item.user.lastName}`,
+              email: item.user.email,
+              phone: item.user.phone,
+              about: item.user.about,
+            })) || [],
+          editors:
+            response.data.editors?.map((item) => ({
+              id: item.user.id,
+              name: `${item.user.firstName} ${item.user.lastName}`,
+              email: item.user.email,
+              phone: item.user.phone,
+              about: item.user.about,
+            })) || [],
+        };
+
+        setClassData(formattedData);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching class data:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "Failed to load class data";
+        setError(errorMessage);
+
+        if (error.response?.status === 404) {
+          navigate("/");
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchClassData();
-  }, [classId]);
+  }, [classId, navigate]);
+
+  if (!classId) {
+    return <div className={styles.error}>Invalid class ID</div>;
+  }
+
+  if (loading) {
+    return <div className={styles.loading}>Loading...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
 
   return (
     <div className={styles.classPage}>
       <div className={styles.header}>
-        <div className={styles.classSettings}>
-          <h1 className={styles.title}>{classData.name}</h1>
-          {isEditor && (
-            <button className={styles.settingsButton}>
-              <Settings size={20} />
-            </button>
-          )}
+        <div className={styles.classInfo}>
+          <div className={styles.classSettings}>
+            <h1 className={styles.title}>{classData.name}</h1>
+            {isEditor && (
+              <button className={styles.settingsButton}>
+                <Settings size={20} />
+              </button>
+            )}
+          </div>
+          <p className={styles.classCode}>Class Code: {classData.code}</p>
         </div>
-        <a
-          href={classData.meetingLink}
-          className={styles.meetingLink}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Video />
-          Join Meeting
-        </a>
+        {classData.meetingLink && (
+          <a
+            href={classData.meetingLink}
+            className={styles.meetingLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Video />
+            Join Meeting
+          </a>
+        )}
       </div>
       <nav className={styles.tabs}>
         {TABS.map(
@@ -203,14 +187,40 @@ const ClassPage = ({ isEditor = true }) => {
       </nav>
       <div className={styles.content}>
         {activeTab === "main" && (
-          <MainTable lectures={classData.lectures} tasks={classData.tasks} />
+          <MainTable
+            lectures={classData.lectures}
+            tasks={classData.tasks}
+            about={classData.about}
+            isEditor={isEditor}
+          />
         )}
         {activeTab === "kanban" && <KanbanBoard tasks={classData.tasks} />}
-        {activeTab === "calendar" && <Calendar events={classData.tasks} />}
-        {activeTab === "grades" && isEditor && (
-          <Grades participants={PARTICIPANTS} tasks={classData.tasks} />
+        {activeTab === "calendar" && (
+          <Calendar
+            events={[
+              ...classData.lectures.map((lecture) => ({
+                ...lecture,
+                type: "lecture",
+              })),
+              ...classData.tasks.map((task) => ({
+                ...task,
+                type: "task",
+              })),
+            ]}
+          />
         )}
-        {activeTab === "participants" && isEditor && <Participants />}
+        {activeTab === "grades" && isEditor && (
+          <Grades
+            participants={classData.participants}
+            tasks={classData.tasks}
+          />
+        )}
+        {activeTab === "participants" && isEditor && (
+          <Participants
+            participants={classData.participants}
+            editors={classData.editors}
+          />
+        )}
       </div>
     </div>
   );

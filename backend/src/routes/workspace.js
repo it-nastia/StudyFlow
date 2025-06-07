@@ -268,4 +268,49 @@ router.get("/:id", auth, async (req, res) => {
   }
 });
 
+// Route to get all class data
+router.get("/classes/:classId", auth, async (req, res) => {
+  try {
+    const classId = parseInt(req.params.classId);
+
+    const classData = await prisma.class.findUnique({
+      where: { id: classId },
+      include: {
+        lectures: {
+          include: {
+            lecture: true,
+          },
+        },
+        tasks: {
+          include: {
+            task: true,
+          },
+        },
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+        editors: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!classData) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    res.json(classData);
+  } catch (error) {
+    console.error("Error fetching class data:", error);
+    res.status(500).json({
+      message: "Failed to fetch class data",
+      details: error.message,
+    });
+  }
+});
+
 module.exports = router;
