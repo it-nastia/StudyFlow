@@ -24,7 +24,7 @@ const TABS = [
   { key: "calendar", label: "Calendar", icon: <CalendarDays size={16} /> },
   {
     key: "grades",
-    label: "grades",
+    label: "Grades",
     icon: <GraduationCap size={16} />,
     restricted: true,
   },
