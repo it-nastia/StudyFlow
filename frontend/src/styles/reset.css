@@ -8,7 +8,7 @@
   box-sizing: border-box;
 }
 li {
-  list-style: none;
+  /* list-style: none; */
 }
 a {
   color: inherit;
