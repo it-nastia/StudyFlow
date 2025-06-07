@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { API_ENDPOINTS } from "../../config/api";
 import logo from "../../images/logo.svg";
 import styles from "./Auth.module.css";
@@ -12,11 +13,14 @@ const Register = () => {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
     about: "",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -61,6 +65,13 @@ const Register = () => {
         "Password must contain at least one uppercase letter, one lowercase letter, and one number";
     }
 
+    // Confirm Password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -87,15 +98,19 @@ const Register = () => {
       try {
         console.log("Starting registration process...");
         console.log("API endpoint:", API_ENDPOINTS.AUTH.REGISTER);
-        console.log("Request data:", { ...formData, password: "[REDACTED]" });
+
+        const { confirmPassword, ...registrationData } = formData;
+        console.log("Request data:", {
+          ...registrationData,
+          password: "[REDACTED]",
+        });
 
         const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
-          credentials: "include",
+          body: JSON.stringify(registrationData),
         });
 
         console.log("Response status:", response.status);
@@ -223,16 +238,55 @@ const Register = () => {
             <label htmlFor="password" className={styles.label}>
               Password*
             </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Password"
-              className={errors.password ? styles.errorInput : ""}
-            />
+            <div className={styles.passwordInputWrapper}>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Password"
+                className={errors.password ? styles.errorInput : ""}
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
             {errors.password && (
               <span className={styles.errorText}>{errors.password}</span>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="confirmPassword" className={styles.label}>
+              Confirm Password*
+            </label>
+            <div className={styles.passwordInputWrapper}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm Password"
+                className={errors.confirmPassword ? styles.errorInput : ""}
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <span className={styles.errorText}>{errors.confirmPassword}</span>
             )}
           </div>
 

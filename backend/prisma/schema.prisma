@@ -111,6 +111,7 @@ model Lecture {
   // Отношения
   classes        LecturesList[]
   userStatuses   UserLectureStatus[]
+  files          LectureFilesList[]
 
   @@map("lectures")
 }
@@ -152,9 +153,10 @@ model Task {
   grade         Decimal?    @db.Decimal(5,2)
 
   // Отношения
-  classes    TasksList[]
+  classes      TasksList[]
   userStatuses UserTaskStatus[]
-  reports    ReportsList[]
+  reports      ReportsList[]
+  files        TaskFilesList[]
 
   @@map("tasks")
 }
@@ -204,4 +206,40 @@ model ReportsList {
 
   @@id([taskId, userId, reportId])
   @@map("reports_list")
+}
+
+model File {
+  id          Int       @id @default(autoincrement()) @map("file_id")
+  name        String    @db.VarChar(255)
+  type        String    @db.VarChar(100)
+  size        Int
+  url         String    @db.Text
+  publicId    String    @map("public_id") @db.VarChar(255)
+  uploadDate  DateTime  @default(now()) @map("upload_date") @db.Timestamp()
+
+  // Отношения
+  lectures    LectureFilesList[]
+  tasks       TaskFilesList[]
+
+  @@map("files")
+}
+
+model LectureFilesList {
+  lecture   Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  lectureId Int     @map("lecture_id")
+  file      File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId    Int     @map("file_id")
+
+  @@id([lectureId, fileId])
+  @@map("lecture_files_list")
+}
+
+model TaskFilesList {
+  task      Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    Int     @map("task_id")
+  file      File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId    Int     @map("file_id")
+
+  @@id([taskId, fileId])
+  @@map("task_files_list")
 }
