@@ -4,9 +4,9 @@ import styles from "./KanbanBoard.module.css";
 import { NavLink } from "react-router-dom";
 
 const COLUMNS = [
-  { key: "todo", label: "To-Do", serverStatus: "TO_DO" },
-  { key: "inprogress", label: "In Progress", serverStatus: "IN_PROGRESS" },
-  { key: "done", label: "Done", serverStatus: "DONE" },
+  { key: "todo", label: "To-Do" },
+  { key: "inprogress", label: "In Progress" },
+  { key: "done", label: "Done" },
 ];
 
 const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
@@ -15,17 +15,31 @@ const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
     if (!status) return "todo";
 
     // Handle server-side status format (e.g., "TO_DO", "IN_PROGRESS")
-    if (status === "TO_DO") return "todo";
-    if (status === "IN_PROGRESS") return "inprogress";
-    if (status === "DONE") return "done";
+    const serverStatusMap = {
+      TO_DO: "todo",
+      IN_PROGRESS: "inprogress",
+      DONE: "done",
+    };
 
-    // Handle display format (e.g., "To-Do", "In Progress")
-    const normalized = status.toLowerCase().replace(/ /g, "");
-    if (normalized === "to-do") return "todo";
-    if (normalized === "inprogress") return "inprogress";
-    if (normalized === "done") return "done";
+    // Handle display status format (e.g., "To-Do", "In Progress")
+    const displayStatusMap = {
+      "To-Do": "todo",
+      "In Progress": "inprogress",
+      Done: "done",
+    };
 
-    return normalized;
+    // Try server format first
+    if (serverStatusMap[status]) {
+      return serverStatusMap[status];
+    }
+
+    // Then try display format
+    if (displayStatusMap[status]) {
+      return displayStatusMap[status];
+    }
+
+    // If neither matches, convert to lowercase and remove spaces as fallback
+    return status.toLowerCase().replace(/ /g, "");
   };
 
   // Function to get class info by id
@@ -59,13 +73,11 @@ const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
           <span className={styles.dateItem}>
             <Calendar size={15} /> {item.date}
           </span>
-          <span className={styles.dateItem}>
-            {isTask && (
-              <div>
-                <CalendarCheck size={15} /> {item.deadline}
-              </div>
-            )}
-          </span>
+          {isTask && item.deadline && (
+            <span className={styles.dateItem}>
+              <CalendarCheck size={15} /> {item.deadline}
+            </span>
+          )}
         </div>
       </div>
     );
@@ -73,33 +85,22 @@ const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
 
   return (
     <div className={styles.kanbanBoard}>
-      {COLUMNS.map((col) => {
-        // Filter items for this column
-        const columnTasks = tasks.filter(
-          (t) => normalizeStatus(t.status) === col.key
-        );
-        const columnLectures = lectures.filter(
-          (l) => normalizeStatus(l.status) === col.key
-        );
+      {COLUMNS.map((col) => (
+        <div key={col.key} className={styles.column}>
+          <div className={styles.columnHeader}>{col.label}</div>
+          <div className={styles.cards}>
+            {/* Render tasks */}
+            {tasks
+              .filter((t) => normalizeStatus(t.status) === col.key)
+              .map((task) => renderCard(task, "task"))}
 
-        return (
-          <div key={col.key} className={styles.column}>
-            <div className={styles.columnHeader}>
-              <span>{col.label}</span>
-              <span className={styles.count}>
-                {columnTasks.length + columnLectures.length}
-              </span>
-            </div>
-            <div className={styles.cards}>
-              {/* Render tasks */}
-              {columnTasks.map((task) => renderCard(task, "task"))}
-
-              {/* Render lectures */}
-              {columnLectures.map((lecture) => renderCard(lecture, "lecture"))}
-            </div>
+            {/* Render lectures */}
+            {lectures
+              .filter((l) => normalizeStatus(l.status) === col.key)
+              .map((lecture) => renderCard(lecture, "lecture"))}
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   );
 };

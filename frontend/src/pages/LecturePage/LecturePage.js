@@ -276,7 +276,7 @@ const LecturePage = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <div className={styles.taskEditorWrapper}>
+            <div className={styles.editorWrapper}>
               <EditorContent editor={editor} className={styles.editor} />
             </div>
           </div>

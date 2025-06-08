@@ -11,6 +11,7 @@ import {
   Video,
   Paperclip,
   SquarePen,
+  FileText,
 } from "lucide-react";
 
 // TipTap imports
@@ -28,6 +29,9 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
+
+// Components
+import Reports from "../../components/Reports/Reports";
 
 // Styles
 import styles from "../LectureEditPage/LectureEdit.module.css";
@@ -55,6 +59,7 @@ const TaskPage = () => {
   const [assignment, setAssignment] = useState("");
   const [attachments, setAttachments] = useState([]);
   const [isEditor, setIsEditor] = useState(false);
+  const [participants, setParticipants] = useState([]);
 
   const editor = useEditor({
     extensions: [
@@ -147,6 +152,7 @@ const TaskPage = () => {
         ]);
 
         setClassData(classResponse.data);
+        setParticipants(classResponse.data.participants || []);
 
         const token = localStorage.getItem("token");
         let currentUserId = null;
@@ -219,6 +225,8 @@ const TaskPage = () => {
   const handleTabClick = (tabId) => {
     if (tabId === "edit") {
       navigate(`/class/${classId}/task/${taskId}/edit`);
+    } else if (tabId === "reports") {
+      setActiveTab(tabId);
     } else if (tabId !== activeTab) {
       navigate(`/class/${classId}`, { state: { activeTab: tabId } });
     }
@@ -239,7 +247,10 @@ const TaskPage = () => {
   ];
 
   if (isEditor) {
-    tabs.push({ id: "edit", label: "Edit", icon: <SquarePen size={16} /> });
+    tabs.push(
+      { id: "edit", label: "Edit", icon: <SquarePen size={16} /> },
+      { id: "reports", label: "Reports", icon: <FileText size={16} /> }
+    );
   }
 
   return (
@@ -278,100 +289,106 @@ const TaskPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className={styles.content}>
-        <div className={styles.mainContent}>
-          <div className={styles.heading}>
-            <p className={styles.headingValue}>{title}</p>
+      {activeTab === "reports" ? (
+        <Reports participants={participants} />
+      ) : (
+        <div className={styles.content}>
+          <div className={styles.mainContent}>
+            <div className={styles.heading}>
+              <p className={styles.headingValue}>{title}</p>
+            </div>
+
+            <div className={styles.formGroup}>
+              <div className={styles.editorWrapper}>
+                <EditorContent editor={editor} className={styles.editor} />
+              </div>
+            </div>
           </div>
 
-          <div className={styles.formGroup}>
-            <div className={styles.taskEditorWrapper}>
-              <EditorContent editor={editor} className={styles.editor} />
+          {/* Side Panel */}
+          <div className={styles.sidePanel}>
+            <div className={styles.formGroup + " " + styles.formGroupTime}>
+              <label className={styles.label}>Date:</label>
+              <time className={styles.readOnlyField} dateTime={assignmentDate}>
+                {formatDate(assignmentDate)}
+              </time>
+            </div>
+
+            <div className={styles.formGroup + " " + styles.formGroupTime}>
+              <label className={styles.label}>Deadline:</label>
+              <time className={styles.readOnlyField} dateTime={deadline}>
+                {formatDate(deadline)}
+              </time>
+            </div>
+
+            <div className={styles.formGroup + " " + styles.formGroupTime}>
+              <label className={styles.label}>Start Time:</label>
+              <time className={styles.readOnlyField} dateTime={timeStart}>
+                {formatTime(timeStart)}
+              </time>
+            </div>
+
+            <div className={styles.formGroup + " " + styles.formGroupTime}>
+              <label className={styles.label}>End Time:</label>
+              <time className={styles.readOnlyField} dateTime={timeEnd}>
+                {formatTime(timeEnd)}
+              </time>
+            </div>
+
+            <div className={styles.formGroup + " " + styles.formGroupTime}>
+              <label className={styles.label}>Grade:</label>
+              <span className={styles.readOnlyField}>
+                {grade !== "" ? grade : "Not graded"}
+              </span>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Status</label>
+              <select
+                className={`${styles.select} ${
+                  styles[status.replace(" ", "-")]
+                }`}
+                value={status}
+                onChange={(e) => handleStatusChange(e.target.value)}
+              >
+                <option value="To-Do">To-Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Done">Done</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Attachments</label>
+              <div className={styles.attachmentBox}>
+                {attachments.length === 0 ? (
+                  <p className={styles.noFiles}>No files attached</p>
+                ) : (
+                  <ul className={styles.fileList}>
+                    {attachments.map((file) => (
+                      <li key={file.id} className={styles.fileItem}>
+                        <div className={styles.fileInfo}>
+                          <Paperclip size={16} className={styles.fileIcon} />
+                          <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.fileName}
+                          >
+                            {file.name}
+                          </a>
+                          <span className={styles.fileSize}>
+                            ({formatFileSize(file.size)})
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Side Panel */}
-        <div className={styles.sidePanel}>
-          <div className={styles.formGroup + " " + styles.formGroupTime}>
-            <label className={styles.label}>Date:</label>
-            <time className={styles.readOnlyField} dateTime={assignmentDate}>
-              {formatDate(assignmentDate)}
-            </time>
-          </div>
-
-          <div className={styles.formGroup + " " + styles.formGroupTime}>
-            <label className={styles.label}>Deadline:</label>
-            <time className={styles.readOnlyField} dateTime={deadline}>
-              {formatDate(deadline)}
-            </time>
-          </div>
-
-          <div className={styles.formGroup + " " + styles.formGroupTime}>
-            <label className={styles.label}>Start Time:</label>
-            <time className={styles.readOnlyField} dateTime={timeStart}>
-              {formatTime(timeStart)}
-            </time>
-          </div>
-
-          <div className={styles.formGroup + " " + styles.formGroupTime}>
-            <label className={styles.label}>End Time:</label>
-            <time className={styles.readOnlyField} dateTime={timeEnd}>
-              {formatTime(timeEnd)}
-            </time>
-          </div>
-
-          <div className={styles.formGroup + " " + styles.formGroupTime}>
-            <label className={styles.label}>Grade:</label>
-            <span className={styles.readOnlyField}>
-              {grade !== "" ? grade : "Not graded"}
-            </span>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Status</label>
-            <select
-              className={`${styles.select} ${styles[status.replace(" ", "-")]}`}
-              value={status}
-              onChange={(e) => handleStatusChange(e.target.value)}
-            >
-              <option value="To-Do">To-Do</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Done">Done</option>
-            </select>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Attachments</label>
-            <div className={styles.attachmentBox}>
-              {attachments.length === 0 ? (
-                <p className={styles.noFiles}>No files attached</p>
-              ) : (
-                <ul className={styles.fileList}>
-                  {attachments.map((file) => (
-                    <li key={file.id} className={styles.fileItem}>
-                      <div className={styles.fileInfo}>
-                        <Paperclip size={16} className={styles.fileIcon} />
-                        <a
-                          href={file.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.fileName}
-                        >
-                          {file.name}
-                        </a>
-                        <span className={styles.fileSize}>
-                          ({formatFileSize(file.size)})
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

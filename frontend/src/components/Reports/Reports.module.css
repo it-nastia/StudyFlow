@@ -1,0 +1,93 @@
+.reportsContainer {
+  padding: 20px;
+  background: var(--primary-background-color);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reportsTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--primary-background-color);
+}
+
+.reportsTable th,
+.reportsTable td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.reportsTable th {
+  font-weight: 600;
+  color: var(--primary-text-color);
+  background: var(--table-header-background-color);
+}
+
+.participantCell {
+  font-weight: 500;
+  color: var(--primary-text-color);
+  min-width: 150px;
+}
+
+.filesCell {
+  min-width: 300px;
+}
+
+.dateCell {
+  min-width: 150px;
+  color: var(--secondary-text-color);
+  font-size: 0.9em;
+}
+
+.filesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.fileIcon {
+  color: var(--secondary-text-color);
+}
+
+.fileName {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.fileName:hover {
+  text-decoration: underline;
+}
+
+.fileSize {
+  color: var(--secondary-text-color);
+  font-size: 0.9em;
+}
+
+.noFiles {
+  color: var(--secondary-text-color);
+  font-style: italic;
+}
+
+.gradeCell {
+  text-align: center;
+  min-width: 100px;
+}
+
+.grade {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.noGrade {
+  color: var(--secondary-text-color);
+  font-style: italic;
+}
