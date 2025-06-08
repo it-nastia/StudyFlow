@@ -316,68 +316,62 @@ const LectureEdit = () => {
     try {
       setIsLoading(true);
 
-      // Форматирование времени
-      const formatTime = (time) => {
-        if (!time) return null;
-        // Проверяем, является ли time строкой
-        if (typeof time === "string") {
-          return time;
-        }
-        // Если это объект Date
-        if (time instanceof Date) {
-          return time.toTimeString().split(" ")[0];
-        }
-        // Если это объект moment или dayjs
-        if (typeof time.format === "function") {
-          return time.format("HH:mm:ss");
-        }
-        return null;
-      };
-
-      // Подготовка данных лекции
+      // Format the date and time data
       const lectureData = {
         assignment: assignment,
         title: title,
         description: description || null,
-        assignmentDate: assignmentDate || null,
-        timeStart: formatTime(timeStart),
-        timeEnd: formatTime(timeEnd),
+        assignmentDate: assignmentDate
+          ? new Date(assignmentDate).toISOString()
+          : null,
+        timeStart: timeStart || null,
+        timeEnd: timeEnd || null,
         classId: classId,
       };
 
       let savedLecture;
 
       if (lectureId && lectureId !== "new") {
-        // Обновление существующей лекции
+        // Update existing lecture
         const response = await axios.put(
           `/api/lectures/${lectureId}`,
           lectureData
         );
         savedLecture = response.data;
       } else {
-        // Создание новой лекции
+        // Create new lecture
         const response = await axios.post("/api/lectures", lectureData);
         savedLecture = response.data;
       }
 
-      // Загрузка файлов, если они есть
+      // Upload files if any
       if (attachments.length > 0) {
         const formData = new FormData();
         attachments.forEach((attachment) => {
-          formData.append("files", attachment.file);
+          if (attachment.file) {
+            // Only append if it's a new file
+            formData.append("files", attachment.file);
+          }
         });
 
-        // Загрузка файлов
-        const filesResponse = await axios.post("/api/files/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        // Only upload if there are new files
+        if (formData.has("files")) {
+          // Upload files
+          const filesResponse = await axios.post(
+            "/api/files/upload",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
 
-        // Связывание файлов с лекцией
-        await axios.post(`/api/lectures/${savedLecture.id}/files`, {
-          fileIds: filesResponse.data.map((file) => file.id),
-        });
+          // Link files with lecture
+          await axios.post(`/api/lectures/${savedLecture.id}/files`, {
+            fileIds: filesResponse.data.map((file) => file.id),
+          });
+        }
       }
 
       setIsLoading(false);
@@ -385,7 +379,7 @@ const LectureEdit = () => {
     } catch (error) {
       setIsLoading(false);
       console.error("Error saving lecture:", error);
-      // Здесь можно добавить отображение ошибки пользователю
+      // Here you could add user-facing error display
     }
   };
 

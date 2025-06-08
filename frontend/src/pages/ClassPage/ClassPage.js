@@ -71,14 +71,6 @@ const transformLectureData = (lecture) => {
 };
 
 const transformTaskData = (task) => {
-  const normalizeStatus = (status) => {
-    if (!status) return "To-Do";
-    return status
-      .split(/[_ ]/)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
-
   return {
     id: task.id,
     title: task.title,
@@ -89,7 +81,7 @@ const transformTaskData = (task) => {
     timeStart: task.timeStart || "",
     timeEnd: task.timeEnd || "",
     grade: task.grade,
-    status: normalizeStatus(task.status),
+    status: task.status || "TO_DO",
   };
 };
 

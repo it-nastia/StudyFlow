@@ -6,9 +6,7 @@ import axios from "../../utils/axios";
 
 const formatTime = (timeString) => {
   if (!timeString) return "";
-  // Convert ISO time string to local time format
-  const time = new Date(`1970-01-01T${timeString}`);
-  return time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return timeString;
 };
 
 const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
@@ -17,6 +15,20 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
   const [lectures, setLectures] = useState(initialLectures);
   const statusOptions = ["To-Do", "In Progress", "Done"];
 
+  // Map display status to server status and vice versa
+  const statusMapping = {
+    display: {
+      "To-Do": "TO_DO",
+      "In Progress": "IN_PROGRESS",
+      Done: "DONE",
+    },
+    server: {
+      TO_DO: "To-Do",
+      IN_PROGRESS: "In Progress",
+      DONE: "Done",
+    },
+  };
+
   console.log("LectureTable received lectures:", initialLectures);
 
   useEffect(() => {
@@ -24,10 +36,11 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
     setLectures(initialLectures);
   }, [initialLectures]);
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newDisplayStatus) => {
     try {
-      // Convert status to server format (uppercase with underscore)
-      const serverStatus = newStatus.toUpperCase().replace(" ", "_");
+      // Convert display status to server status
+      const serverStatus = statusMapping.display[newDisplayStatus];
+      console.log("Sending status to server:", serverStatus);
 
       await axios.patch(`/api/lectures/${id}/status`, {
         status: serverStatus,
@@ -35,7 +48,7 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
 
       setLectures((prevLectures) =>
         prevLectures.map((lecture) =>
-          lecture.id === id ? { ...lecture, status: newStatus } : lecture
+          lecture.id === id ? { ...lecture, status: serverStatus } : lecture
         )
       );
     } catch (err) {
@@ -45,6 +58,15 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
 
   const handleAddLecture = () => {
     navigate(`/class/${classId}/lecture/new/edit`);
+  };
+
+  const getDisplayStatus = (serverStatus) => {
+    // If it's already a display status (e.g., "In Progress"), return as is
+    if (statusOptions.includes(serverStatus)) {
+      return serverStatus;
+    }
+    // Otherwise, convert from server status (e.g., "IN_PROGRESS") to display status
+    return statusMapping.server[serverStatus] || "To-Do";
   };
 
   const getLectureLink = (lectureId) => {
@@ -74,7 +96,14 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
             </tr>
           ) : (
             lectures.map((lecture) => {
-              console.log("Rendering lecture row:", lecture);
+              const displayStatus = getDisplayStatus(lecture.status);
+              console.log(
+                "Lecture status:",
+                lecture.status,
+                "Display status:",
+                displayStatus
+              );
+
               return (
                 <tr key={lecture.id}>
                   <td>
@@ -105,12 +134,12 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
                   </td>
                   <td>
                     <select
-                      value={lecture.status || "To-Do"}
+                      value={displayStatus}
                       onChange={(e) =>
                         handleStatusChange(lecture.id, e.target.value)
                       }
                       className={`${styles.statusSelect} ${
-                        styles[(lecture.status || "To-Do").replace(" ", "-")]
+                        styles[displayStatus.replace(" ", "-")]
                       }`}
                     >
                       {statusOptions.map((option) => (

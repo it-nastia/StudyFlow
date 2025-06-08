@@ -341,6 +341,10 @@
   overflow: hidden;
 }
 
+.taskEditorWrapper {
+  border: none;
+}
+
 .menuBar {
   padding: 0.5rem;
   border-bottom: 1px solid var(--border-color);

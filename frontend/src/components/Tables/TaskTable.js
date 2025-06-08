@@ -10,6 +10,20 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
   const [tasks, setTasks] = useState(initialTasks);
   const statusOptions = ["To-Do", "In Progress", "Done"];
 
+  // Map display status to server status and vice versa
+  const statusMapping = {
+    display: {
+      "To-Do": "TO_DO",
+      "In Progress": "IN_PROGRESS",
+      Done: "DONE",
+    },
+    server: {
+      TO_DO: "To-Do",
+      IN_PROGRESS: "In Progress",
+      DONE: "Done",
+    },
+  };
+
   console.log("TaskTable received tasks:", initialTasks);
 
   useEffect(() => {
@@ -17,10 +31,10 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
     setTasks(initialTasks);
   }, [initialTasks]);
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (id, newDisplayStatus) => {
     try {
-      // Convert status to server format (uppercase with underscore)
-      const serverStatus = newStatus.toUpperCase().replace(/ /g, "_");
+      // Convert display status to server status
+      const serverStatus = statusMapping.display[newDisplayStatus];
       console.log("Sending status to server:", serverStatus);
 
       await axios.patch(`/api/tasks/${id}/status`, {
@@ -29,7 +43,7 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
 
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
-          task.id === id ? { ...task, status: newStatus } : task
+          task.id === id ? { ...task, status: serverStatus } : task
         )
       );
     } catch (err) {
@@ -39,6 +53,15 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
 
   const handleAddTask = () => {
     navigate(`/class/${classId}/task/new/edit`);
+  };
+
+  const getDisplayStatus = (serverStatus) => {
+    // If it's already a display status (e.g., "In Progress"), return as is
+    if (statusOptions.includes(serverStatus)) {
+      return serverStatus;
+    }
+    // Otherwise, convert from server status (e.g., "IN_PROGRESS") to display status
+    return statusMapping.server[serverStatus] || "To-Do";
   };
 
   return (
@@ -66,7 +89,14 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
             </tr>
           ) : (
             tasks.map((task) => {
-              console.log("Rendering task with status:", task.status);
+              const displayStatus = getDisplayStatus(task.status);
+              console.log(
+                "Task status:",
+                task.status,
+                "Display status:",
+                displayStatus
+              );
+
               return (
                 <tr key={task.id}>
                   <td>
@@ -96,12 +126,12 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
                   </td>
                   <td>
                     <select
-                      value={task.status || "To-Do"}
+                      value={displayStatus}
                       onChange={(e) =>
                         handleStatusChange(task.id, e.target.value)
                       }
                       className={`${styles.statusSelect} ${
-                        styles[(task.status || "To-Do").replace(/ /g, "-")]
+                        styles[displayStatus.replace(/ /g, "-")]
                       }`}
                     >
                       {statusOptions.map((option) => (

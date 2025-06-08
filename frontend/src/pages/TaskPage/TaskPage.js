@@ -285,7 +285,7 @@ const TaskPage = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <div className={styles.editorWrapper}>
+            <div className={styles.taskEditorWrapper}>
               <EditorContent editor={editor} className={styles.editor} />
             </div>
           </div>

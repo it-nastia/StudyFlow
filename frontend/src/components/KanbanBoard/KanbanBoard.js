@@ -4,17 +4,28 @@ import styles from "./KanbanBoard.module.css";
 import { NavLink } from "react-router-dom";
 
 const COLUMNS = [
-  { key: "todo", label: "To-Do" },
-  { key: "inprogress", label: "In Progress" },
-  { key: "done", label: "Done" },
+  { key: "todo", label: "To-Do", serverStatus: "TO_DO" },
+  { key: "inprogress", label: "In Progress", serverStatus: "IN_PROGRESS" },
+  { key: "done", label: "Done", serverStatus: "DONE" },
 ];
 
 const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
   // Function to normalize status for comparison
   const normalizeStatus = (status) => {
     if (!status) return "todo";
-    // Convert any status format to lowercase without spaces
-    return status.toLowerCase().replace(/ /g, "");
+
+    // Handle server-side status format (e.g., "TO_DO", "IN_PROGRESS")
+    if (status === "TO_DO") return "todo";
+    if (status === "IN_PROGRESS") return "inprogress";
+    if (status === "DONE") return "done";
+
+    // Handle display format (e.g., "To-Do", "In Progress")
+    const normalized = status.toLowerCase().replace(/ /g, "");
+    if (normalized === "to-do") return "todo";
+    if (normalized === "inprogress") return "inprogress";
+    if (normalized === "done") return "done";
+
+    return normalized;
   };
 
   // Function to get class info by id
@@ -62,22 +73,33 @@ const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
 
   return (
     <div className={styles.kanbanBoard}>
-      {COLUMNS.map((col) => (
-        <div key={col.key} className={styles.column}>
-          <div className={styles.columnHeader}>{col.label}</div>
-          <div className={styles.cards}>
-            {/* Render tasks */}
-            {tasks
-              .filter((t) => normalizeStatus(t.status) === col.key)
-              .map((task) => renderCard(task, "task"))}
+      {COLUMNS.map((col) => {
+        // Filter items for this column
+        const columnTasks = tasks.filter(
+          (t) => normalizeStatus(t.status) === col.key
+        );
+        const columnLectures = lectures.filter(
+          (l) => normalizeStatus(l.status) === col.key
+        );
 
-            {/* Render lectures */}
-            {lectures
-              .filter((l) => normalizeStatus(l.status) === col.key)
-              .map((lecture) => renderCard(lecture, "lecture"))}
+        return (
+          <div key={col.key} className={styles.column}>
+            <div className={styles.columnHeader}>
+              <span>{col.label}</span>
+              <span className={styles.count}>
+                {columnTasks.length + columnLectures.length}
+              </span>
+            </div>
+            <div className={styles.cards}>
+              {/* Render tasks */}
+              {columnTasks.map((task) => renderCard(task, "task"))}
+
+              {/* Render lectures */}
+              {columnLectures.map((lecture) => renderCard(lecture, "lecture"))}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

@@ -10,6 +10,9 @@ const {
 const router = express.Router();
 const prisma = new PrismaClient();
 
+// Valid status values
+const VALID_STATUSES = ["TO_DO", "IN_PROGRESS", "DONE"];
+
 // Get a specific lecture by ID
 router.get("/:lectureId", auth, async (req, res) => {
   try {
@@ -89,6 +92,14 @@ router.patch("/:lectureId/status", auth, async (req, res) => {
     const userId = req.user.id;
     const { status } = req.body;
 
+    // Validate status
+    if (!status || !VALID_STATUSES.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid status value",
+        validValues: VALID_STATUSES,
+      });
+    }
+
     // Find the lecture and check access
     const lecture = await prisma.lecture.findUnique({
       where: { id: lectureId },
@@ -139,7 +150,7 @@ router.patch("/:lectureId/status", auth, async (req, res) => {
       },
     });
 
-    res.json({ message: "Status updated successfully" });
+    res.json({ message: "Status updated successfully", status });
   } catch (error) {
     console.error("Error updating lecture status:", error);
     res.status(500).json({

@@ -108,6 +108,15 @@ router.patch("/:taskId/status", auth, async (req, res) => {
     const userId = req.user.id;
     const { status } = req.body;
 
+    // Validate status
+    const validStatuses = ["TO_DO", "IN_PROGRESS", "DONE"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        message: "Invalid status value",
+        details: `Status must be one of: ${validStatuses.join(", ")}`,
+      });
+    }
+
     // Find the task and check access
     const task = await prisma.task.findUnique({
       where: { id: taskId },
@@ -149,7 +158,7 @@ router.patch("/:taskId/status", auth, async (req, res) => {
     }
 
     // Update the status in UserTaskStatus
-    await prisma.userTaskStatus.upsert({
+    const updatedStatus = await prisma.userTaskStatus.upsert({
       where: {
         userId_taskId: {
           userId,
@@ -166,7 +175,11 @@ router.patch("/:taskId/status", auth, async (req, res) => {
       },
     });
 
-    res.json({ message: "Status updated successfully", status });
+    // Return the server-side status format
+    res.json({
+      message: "Status updated successfully",
+      status: updatedStatus.status,
+    });
   } catch (error) {
     console.error("Error updating task status:", error);
     res.status(500).json({

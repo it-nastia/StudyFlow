@@ -94,19 +94,7 @@ const LecturePage = () => {
 
   const formatTime = (timeString) => {
     if (!timeString) return "";
-    try {
-      // Extract time directly from the ISO string without timezone conversion
-      const matches = timeString.match(/T(\d{2}):(\d{2})/);
-      if (!matches) return "";
-
-      const hours = matches[1];
-      const minutes = matches[2];
-
-      return `${hours}:${minutes}`;
-    } catch (error) {
-      console.error("Error formatting time:", error, "timeString:", timeString);
-      return "";
-    }
+    return timeString;
   };
 
   const formatDate = (dateString) => {
@@ -288,7 +276,7 @@ const LecturePage = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <div className={styles.editorWrapper}>
+            <div className={styles.taskEditorWrapper}>
               <EditorContent editor={editor} className={styles.editor} />
             </div>
           </div>
