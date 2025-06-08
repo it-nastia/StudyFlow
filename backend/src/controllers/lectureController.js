@@ -31,8 +31,8 @@ const createLecture = async (req, res) => {
         title,
         description,
         assignmentDate: assignmentDate ? new Date(assignmentDate) : null,
-        timeStart: timeStart ? timeStart : null,
-        timeEnd: timeEnd ? timeEnd : null,
+        timeStart,
+        timeEnd,
         classes: {
           create: [
             {
@@ -49,6 +49,11 @@ const createLecture = async (req, res) => {
         classes: {
           include: {
             class: true,
+          },
+        },
+        files: {
+          include: {
+            file: true,
           },
         },
       },
@@ -79,7 +84,24 @@ const updateLecture = async (req, res) => {
       timeEnd,
     } = req.body;
 
-    // Обновляем лекцию
+    // First check if the lecture exists
+    const existingLecture = await prisma.lecture.findUnique({
+      where: { id: parseInt(lectureId) },
+      include: {
+        classes: true,
+        files: {
+          include: {
+            file: true,
+          },
+        },
+      },
+    });
+
+    if (!existingLecture) {
+      return res.status(404).json({ message: "Lecture not found" });
+    }
+
+    // Update the lecture
     const lecture = await prisma.lecture.update({
       where: {
         id: parseInt(lectureId),
@@ -89,8 +111,20 @@ const updateLecture = async (req, res) => {
         title,
         description,
         assignmentDate: assignmentDate ? new Date(assignmentDate) : null,
-        timeStart: timeStart ? timeStart : null,
-        timeEnd: timeEnd ? timeEnd : null,
+        timeStart,
+        timeEnd,
+      },
+      include: {
+        classes: {
+          include: {
+            class: true,
+          },
+        },
+        files: {
+          include: {
+            file: true,
+          },
+        },
       },
     });
 
@@ -110,7 +144,7 @@ const addFilesToLecture = async (req, res) => {
     const { lectureId } = req.params;
     const { fileIds } = req.body;
 
-    // Проверяем существование лекции
+    // Check if the lecture exists
     const lecture = await prisma.lecture.findUnique({
       where: { id: parseInt(lectureId) },
     });
@@ -119,17 +153,30 @@ const addFilesToLecture = async (req, res) => {
       return res.status(404).json({ error: "Lecture not found" });
     }
 
-    // Создаем связи между лекцией и файлами
-    const fileConnections = fileIds.map((fileId) => ({
-      lectureId: parseInt(lectureId),
-      fileId: parseInt(fileId),
-    }));
-
-    await prisma.lectureFilesList.createMany({
-      data: fileConnections,
+    // Create file connections
+    const updatedLecture = await prisma.lecture.update({
+      where: { id: parseInt(lectureId) },
+      data: {
+        files: {
+          create: fileIds.map((fileId) => ({
+            file: {
+              connect: {
+                id: parseInt(fileId),
+              },
+            },
+          })),
+        },
+      },
+      include: {
+        files: {
+          include: {
+            file: true,
+          },
+        },
+      },
     });
 
-    res.status(200).json({ message: "Files linked successfully" });
+    res.status(200).json(updatedLecture);
   } catch (error) {
     console.error("Error linking files to lecture:", error);
     res.status(500).json({

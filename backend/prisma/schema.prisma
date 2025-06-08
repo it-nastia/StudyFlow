@@ -106,9 +106,9 @@ model Lecture {
   assignment     String   @db.Text
   title          String   @db.Text
   description    String?  @db.Text
-  assignmentDate DateTime? @map("assignment_date") @db.Date
-  timeStart      DateTime? @map("time_start") @db.Timestamp()
-  timeEnd        DateTime? @map("time_end") @db.Timestamp()
+  assignmentDate DateTime? @map("assignment_date") @db.Timestamp()
+  timeStart      String?   @map("time_start") @db.VarChar(8)
+  timeEnd        String?   @map("time_end") @db.VarChar(8)
 
   // Отношения
   classes        LecturesList[]
