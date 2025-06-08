@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Settings } from "lucide-react";
 import {
   Video,
@@ -17,6 +17,7 @@ import Grades from "../../components/Grades/Grades";
 import ClassSettingsModal from "../../components/ClassSettingsModal/ClassSettingsModal";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "../../utils/axios";
+import { formatDate, formatTime } from "../../utils/dateUtils";
 
 const TABS = [
   { key: "main", label: "Main Table", icon: <House size={16} /> },
@@ -36,10 +37,67 @@ const TABS = [
   },
 ];
 
-const ClassPage = ({ isEditor = true }) => {
+const transformUserData = (user, isEditor = false) => ({
+  id: user.id,
+  name: `${user.firstName} ${user.lastName}`,
+  email: user.email,
+  phone: user.phone,
+  about: user.about,
+  isEditor: isEditor,
+  role: isEditor ? "Editor" : "Participant",
+});
+
+const transformLectureData = (lecture) => {
+  // Convert status to Title Case
+  const normalizeStatus = (status) => {
+    if (!status) return "To-Do";
+    // Convert "IN_PROGRESS" or "IN PROGRESS" to "In Progress"
+    return status
+      .split(/[_ ]/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  return {
+    id: lecture.id,
+    title: lecture.title,
+    assignment: lecture.assignment,
+    description: lecture.description,
+    date: lecture.assignmentDate ? formatDate(lecture.assignmentDate) : "",
+    timeStart: lecture.timeStart ? formatTime(lecture.timeStart) : "",
+    timeEnd: lecture.timeEnd ? formatTime(lecture.timeEnd) : "",
+    status: normalizeStatus(lecture.status),
+  };
+};
+
+const transformTaskData = (task) => {
+  const normalizeStatus = (status) => {
+    if (!status) return "To-Do";
+    return status
+      .split(/[_ ]/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  return {
+    id: task.id,
+    title: task.title,
+    assignment: task.assignment,
+    description: task.description,
+    date: task.assignmentDate ? formatDate(task.assignmentDate) : "",
+    deadline: task.deadline ? formatDate(task.deadline) : "",
+    timeStart: task.timeStart || "",
+    timeEnd: task.timeEnd || "",
+    grade: task.grade,
+    status: normalizeStatus(task.status),
+  };
+};
+
+const ClassPage = () => {
   const location = useLocation();
   const initialTab = location.state?.activeTab || "main";
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [isEditor, setIsEditor] = useState(false);
   const [classData, setClassData] = useState({
     id: "",
     name: "Loading...",
@@ -57,82 +115,114 @@ const ClassPage = ({ isEditor = true }) => {
   const { classId } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchClassData = async () => {
-      if (!classId) {
-        setError("Class ID is missing");
-        setLoading(false);
-        return;
+  const fetchClassData = useCallback(async () => {
+    if (!classId) {
+      setError("Class ID is missing");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // First, get the class data
+      const classResponse = await axios.get(`/api/classes/${classId}`);
+
+      if (!classResponse.data) {
+        throw new Error("No class data received from server");
       }
 
-      try {
-        setLoading(true);
-        const response = await axios.get(`/api/classes/${classId}`);
+      console.log("Raw class data:", classResponse.data);
 
-        if (!response.data) {
-          throw new Error("No data received from server");
+      // Check if we have a token before trying to get user data
+      const token = localStorage.getItem("token");
+      let currentUserId = null;
+
+      if (token) {
+        try {
+          const userResponse = await axios.get("/api/auth/me");
+          currentUserId = userResponse.data?.id;
+        } catch (userError) {
+          console.warn("Could not fetch user data:", userError);
+          // If token is invalid, remove it
+          if (userError.response?.status === 401) {
+            localStorage.removeItem("token");
+          }
+          setIsEditor(false);
         }
-
-        const formattedData = {
-          ...response.data,
-          lectures:
-            response.data.lectures?.map((item) => ({
-              id: item.lecture.id,
-              title: item.lecture.title,
-              assignment: item.lecture.assignment,
-              description: item.lecture.description,
-              date: item.lecture.assignmentDate,
-              status: "To-Do", // Получаем из userLectureStatus если есть
-            })) || [],
-          tasks:
-            response.data.tasks?.map((item) => ({
-              id: item.task.id,
-              title: item.task.title,
-              assignment: item.task.assignment,
-              description: item.task.description,
-              date: item.task.assignmentDate,
-              deadline: item.task.deadline,
-              grade: item.task.grade,
-              status: "To-Do", // Получаем из userTaskStatus если есть
-            })) || [],
-          participants:
-            response.data.participants?.map((item) => ({
-              id: item.user.id,
-              name: `${item.user.firstName} ${item.user.lastName}`,
-              email: item.user.email,
-              phone: item.user.phone,
-              about: item.user.about,
-            })) || [],
-          editors:
-            response.data.editors?.map((item) => ({
-              id: item.user.id,
-              name: `${item.user.firstName} ${item.user.lastName}`,
-              email: item.user.email,
-              phone: item.user.phone,
-              about: item.user.about,
-            })) || [],
-        };
-
-        setClassData(formattedData);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching class data:", error);
-        const errorMessage =
-          error.response?.data?.message ||
-          error.message ||
-          "Failed to load class data";
-        setError(errorMessage);
-
-        if (error.response?.status === 404) {
-          navigate("/");
-        }
-      } finally {
-        setLoading(false);
+      } else {
+        setIsEditor(false);
       }
-    };
 
-    fetchClassData();
+      // Check if current user is an editor (if we have user data)
+      if (currentUserId) {
+        const isUserEditor = classResponse.data.editors?.some(
+          (editor) => editor.user.id === currentUserId
+        );
+        setIsEditor(isUserEditor);
+      }
+
+      const formattedData = {
+        ...classResponse.data,
+        lectures:
+          classResponse.data.lectures?.map((item) => {
+            console.log("Raw lecture item:", item);
+            const lecture = item.lecture;
+            const status = lecture.userStatuses?.[0]?.status || "To-Do";
+            console.log("Extracted lecture status:", status);
+            return transformLectureData({
+              ...lecture,
+              status: status,
+            });
+          }) || [],
+        tasks:
+          classResponse.data.tasks?.map((item) => {
+            console.log("Raw task item:", item);
+            const task = item.task;
+            const status = task.userStatuses?.[0]?.status || "To-Do";
+            console.log("Extracted task status:", status);
+            return transformTaskData({
+              ...task,
+              status: status,
+            });
+          }) || [],
+        participants:
+          classResponse.data.participants?.map((item) =>
+            transformUserData(item.user, false)
+          ) || [],
+        editors:
+          classResponse.data.editors?.map((item) =>
+            transformUserData(item.user, true)
+          ) || [],
+      };
+
+      console.log("Final formatted data:", formattedData);
+
+      setClassData(formattedData);
+    } catch (error) {
+      console.error("Error fetching class data:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to load class data";
+      setError(errorMessage);
+
+      if (error.response?.status === 404) {
+        navigate("/");
+      } else if (error.response?.status === 401) {
+        // If unauthorized, redirect to login
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [classId, navigate]);
+
+  useEffect(() => {
+    fetchClassData();
+  }, [fetchClassData]);
 
   const handleSettingsSave = async (updatedData) => {
     try {
@@ -151,22 +241,44 @@ const ClassPage = ({ isEditor = true }) => {
       setIsSettingsModalOpen(false);
     } catch (error) {
       console.error("Error updating class:", error);
-      // Here you might want to show an error message to the user
+      setError(
+        error.response?.data?.message || "Failed to update class settings"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   if (!classId) {
-    return <div className={styles.error}>Invalid class ID</div>;
+    return (
+      <div className={styles.error} role="alert">
+        Invalid class ID
+      </div>
+    );
   }
 
   if (loading) {
-    return <div className={styles.loading}>Loading...</div>;
+    return (
+      <div
+        className={styles.loading}
+        role="status"
+        aria-label="Loading class data"
+      >
+        <div className={styles.spinner}></div>
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className={styles.error}>{error}</div>;
+    return (
+      <div className={styles.error} role="alert">
+        <p>{error}</p>
+        <button onClick={fetchClassData} className={styles.retryButton}>
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -179,11 +291,18 @@ const ClassPage = ({ isEditor = true }) => {
               <button
                 className={styles.settingsButton}
                 onClick={() => setIsSettingsModalOpen(true)}
+                aria-label="Open class settings"
               >
                 <Settings size={20} />
               </button>
             )}
           </div>
+          {/*<div className={styles.classMeta}>
+            <span className={styles.classCode}>
+              Class Code: {classData.code}
+            </span>
+            {isEditor && <span className={styles.editorBadge}>Editor</span>}
+          </div>*/}
         </div>
         {classData.meetingLink && (
           <a
@@ -191,6 +310,7 @@ const ClassPage = ({ isEditor = true }) => {
             className={styles.meetingLink}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Join class meeting"
           >
             <Video />
             Join Meeting
@@ -207,7 +327,7 @@ const ClassPage = ({ isEditor = true }) => {
         />
       )}
 
-      <nav className={styles.tabs}>
+      <nav className={styles.tabs} role="tablist">
         {TABS.map(
           (tab) =>
             (!tab.restricted || isEditor) && (
@@ -217,8 +337,13 @@ const ClassPage = ({ isEditor = true }) => {
                   activeTab === tab.key ? styles.activeTab : styles.tab
                 }
                 onClick={() => setActiveTab(tab.key)}
+                role="tab"
+                aria-selected={activeTab === tab.key}
+                aria-controls={`${tab.key}-panel`}
               >
-                <span className={styles.tabIcon}>{tab.icon}</span>
+                <span className={styles.tabIcon} aria-hidden="true">
+                  {tab.icon}
+                </span>
                 <span>{tab.label}</span>
               </button>
             )
@@ -233,7 +358,18 @@ const ClassPage = ({ isEditor = true }) => {
             isEditor={isEditor}
           />
         )}
-        {activeTab === "kanban" && <KanbanBoard tasks={classData.tasks} />}
+        {activeTab === "kanban" && (
+          <KanbanBoard
+            tasks={classData.tasks}
+            lectures={classData.lectures}
+            classes={[
+              {
+                id: classData.id,
+                name: classData.name,
+              },
+            ]}
+          />
+        )}
         {activeTab === "calendar" && (
           <Calendar
             events={[

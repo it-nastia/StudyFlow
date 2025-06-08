@@ -144,7 +144,7 @@ option {
   border-radius: 0;
 }
 
-.statusSelect option[value="Done"],
+/* .statusSelect option[value="Done"],
 .statusSelect.Done {
   background-color: #4caf50;
 }
@@ -157,11 +157,53 @@ option {
 .statusSelect option[value="In Progress"],
 .statusSelect.In-Progress {
   background-color: #ffa726;
-}
+} */
 
 .emptyState {
   text-align: center;
   padding: 20px !important;
   color: var(--secondary-text-color);
   font-style: italic;
+}
+
+/* Status colors */
+.statusSelect option[value="To-Do"],
+.statusSelect.To-Do {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.statusSelect option[value="In Progress"],
+.statusSelect.In-Progress {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.statusSelect option[value="Done"],
+.statusSelect.Done {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+/* Selected status colors */
+.statusSelect option[value="To-Do"],
+.statusSelect.To-Do {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-color: #ef5350;
+  font-weight: bold;
+}
+.statusSelect option[value="In Progress"],
+.statusSelect.In-Progress {
+  background-color: #fff3e0;
+  color: #f57c00;
+  border-color: #ffa726;
+  font-weight: bold;
+}
+.statusSelect option[value="Done"],
+.statusSelect.Done {
+  background-color: #e8f5e9;
+  color: #388e3c;
+  border-color: #66bb6a;
+  font-weight: bold;
 }

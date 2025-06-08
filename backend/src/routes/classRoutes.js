@@ -93,12 +93,34 @@ router.get("/:classId", auth, async (req, res) => {
         ? {
             lectures: {
               include: {
-                lecture: true,
+                lecture: {
+                  include: {
+                    userStatuses: {
+                      where: {
+                        userId: userId,
+                      },
+                      select: {
+                        status: true,
+                      },
+                    },
+                  },
+                },
               },
             },
             tasks: {
               include: {
-                task: true,
+                task: {
+                  include: {
+                    userStatuses: {
+                      where: {
+                        userId: userId,
+                      },
+                      select: {
+                        status: true,
+                      },
+                    },
+                  },
+                },
               },
             },
             participants: {
@@ -147,6 +169,25 @@ router.get("/:classId", auth, async (req, res) => {
 
     if (!classData) {
       return res.status(404).json({ message: "Class not found" });
+    }
+
+    // Transform the data to include status
+    if (includeDetails === "true") {
+      classData.lectures = classData.lectures.map((lectureItem) => ({
+        ...lectureItem,
+        lecture: {
+          ...lectureItem.lecture,
+          status: lectureItem.lecture.userStatuses[0]?.status || "To-Do",
+        },
+      }));
+
+      classData.tasks = classData.tasks.map((taskItem) => ({
+        ...taskItem,
+        task: {
+          ...taskItem.task,
+          status: taskItem.task.userStatuses[0]?.status || "To-Do",
+        },
+      }));
     }
 
     res.json(classData);

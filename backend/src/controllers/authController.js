@@ -8,6 +8,13 @@ const authController = {
     try {
       const { email, password, firstName, lastName, phone, about } = req.body;
 
+      console.log("[authController] Registration attempt for:", {
+        email,
+        firstName,
+        lastName,
+        phone,
+      });
+
       // Проверяем, существует ли пользователь
       const existingUser = await prisma.user.findFirst({
         where: {
@@ -16,6 +23,7 @@ const authController = {
       });
 
       if (existingUser) {
+        console.log("[authController] User already exists:", { email, phone });
         return res.status(400).json({
           error: "User with this email or phone already exists",
         });
@@ -115,6 +123,48 @@ const authController = {
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ error: "Error getting user information" });
+    }
+  },
+  // Обновление информации о пользователе
+  async updateProfile(req, res) {
+    try {
+      const { email, phone, about } = req.body;
+
+      // Проверяем, не занят ли email другим пользователем
+      if (email) {
+        const existingUser = await prisma.user.findFirst({
+          where: {
+            email,
+            id: { not: req.user.id },
+          },
+        });
+
+        if (existingUser) {
+          return res.status(400).json({ error: "Email is already taken" });
+        }
+      }
+
+      const updatedUser = await prisma.user.update({
+        where: { id: req.user.id },
+        data: {
+          email,
+          phone,
+          about,
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          about: true,
+        },
+      });
+
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ error: "Error updating profile" });
     }
   },
 };

@@ -1,7 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Plus } from "lucide-react";
 import styles from "./Table.module.css";
+import axios from "../../utils/axios";
+
+const formatTime = (timeString) => {
+  if (!timeString) return "";
+  // Convert ISO time string to local time format
+  const time = new Date(`1970-01-01T${timeString}`);
+  return time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+};
 
 const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
   const navigate = useNavigate();
@@ -9,16 +17,38 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
   const [lectures, setLectures] = useState(initialLectures);
   const statusOptions = ["To-Do", "In Progress", "Done"];
 
-  const handleStatusChange = (id, newStatus) => {
-    setLectures((prevLectures) =>
-      prevLectures.map((lecture) =>
-        lecture.id === id ? { ...lecture, status: newStatus } : lecture
-      )
-    );
+  console.log("LectureTable received lectures:", initialLectures);
+
+  useEffect(() => {
+    console.log("Updating lectures state:", initialLectures);
+    setLectures(initialLectures);
+  }, [initialLectures]);
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      // Convert status to server format (uppercase with underscore)
+      const serverStatus = newStatus.toUpperCase().replace(" ", "_");
+
+      await axios.patch(`/api/lectures/${id}/status`, {
+        status: serverStatus,
+      });
+
+      setLectures((prevLectures) =>
+        prevLectures.map((lecture) =>
+          lecture.id === id ? { ...lecture, status: newStatus } : lecture
+        )
+      );
+    } catch (err) {
+      console.error("Error updating lecture status:", err);
+    }
   };
 
   const handleAddLecture = () => {
     navigate(`/class/${classId}/lecture/new/edit`);
+  };
+
+  const getLectureLink = (lectureId) => {
+    return `/class/${classId}/lecture/${lectureId}/view`;
   };
 
   return (
@@ -36,58 +66,63 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
         <tbody>
           {lectures.length === 0 ? (
             <tr>
-              <td colSpan="5" className={styles.emptyState}>
+              <td colSpan="6" className={styles.emptyState}>
                 {isEditor
                   ? 'No lectures available yet. Click "Add Lecture" to create your first lecture.'
                   : "No lectures available yet."}
               </td>
             </tr>
           ) : (
-            lectures.map((lecture) => (
-              <tr key={lecture.id}>
-                <td className={styles.truncate}>
-                  <Link
-                    to={`/class/${classId}/lecture/${lecture.id}/edit`}
-                    className={styles.link}
-                  >
-                    {lecture.assignment}
-                  </Link>
-                </td>
-                <td className={styles.truncate}>
-                  <Link
-                    to={`/class/${classId}/lecture/${lecture.id}/edit`}
-                    className={styles.link}
-                  >
-                    {lecture.title}
-                  </Link>
-                </td>
-                <td className={styles.dateCell}>
-                  <time dateTime={lecture.date}>{lecture.date}</time>
-                </td>
-                <td className={styles.dateCell}>
-                  <time dateTime={lecture.timeStart}>{lecture.timeStart}</time>
-                  {" - "}
-                  <time dateTime={lecture.timeEnd}>{lecture.timeEnd}</time>
-                </td>
-                <td>
-                  <select
-                    value={lecture.status}
-                    onChange={(e) =>
-                      handleStatusChange(lecture.id, e.target.value)
-                    }
-                    className={`${styles.statusSelect} ${
-                      styles[lecture.status.replace(" ", "-")]
-                    }`}
-                  >
-                    {statusOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-              </tr>
-            ))
+            lectures.map((lecture) => {
+              console.log("Rendering lecture row:", lecture);
+              return (
+                <tr key={lecture.id}>
+                  <td>
+                    <Link
+                      to={`/class/${classId}/lecture/${lecture.id}/view`}
+                      className={styles.link}
+                    >
+                      {lecture.assignment}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link
+                      to={`/class/${classId}/lecture/${lecture.id}/view`}
+                      className={styles.link}
+                    >
+                      {lecture.title}
+                    </Link>
+                  </td>
+                  <td>
+                    <time dateTime={lecture.date}>{lecture.date}</time>
+                  </td>
+                  <td>
+                    <time dateTime={lecture.timeStart}>
+                      {lecture.timeStart}
+                    </time>
+                    {" - "}
+                    <time dateTime={lecture.timeEnd}>{lecture.timeEnd}</time>
+                  </td>
+                  <td>
+                    <select
+                      value={lecture.status || "To-Do"}
+                      onChange={(e) =>
+                        handleStatusChange(lecture.id, e.target.value)
+                      }
+                      className={`${styles.statusSelect} ${
+                        styles[(lecture.status || "To-Do").replace(" ", "-")]
+                      }`}
+                    >
+                      {statusOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              );
+            })
           )}
         </tbody>
       </table>

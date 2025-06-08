@@ -22,4 +22,7 @@ router.post("/login", validateLogin, validate, authController.login);
 // Получение информации о текущем пользователе
 router.get("/me", auth, authController.getMe);
 
+// Обновление профиля
+router.put("/profile", auth, authController.updateProfile);
+
 module.exports = router;

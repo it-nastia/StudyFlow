@@ -1,84 +1,109 @@
 .card {
-  background-color: #f0f4f8;
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 0 0 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #5bb4ba;
   display: flex;
-  gap: 2rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--primary-background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 0 2px 8px 0 rgba(26, 75, 140, 0.27);
+  border-color: var(--accent-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card__content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex: 1 0 0 auto;
-  gap: 0.75rem;
+  flex-grow: 1;
+}
+
+.card__link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.card__link:hover .card__assignment,
+.card__link:hover .card__title {
+  color: var(--accent-color);
 }
 
 .card__assignment {
-  font-weight: 500;
   font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s;
 }
 
 .card__info {
-  font-size: 0.9rem;
   display: flex;
-  gap: 0.5rem;
   align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
 }
 
 .card__title {
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.card__devider {
+  color: var(--border-color);
 }
 
 .card__description {
-}
-
-.card__details {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #a5a1aa;
-}
-
-.card__eventDate,
-.card__deadline {
-  font-size: 0.8rem;
   color: var(--secondary-text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__eventDate {
   display: flex;
-  gap: 0.5rem;
   align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary-text-color);
+  font-size: 0.9rem;
 }
 
 .card__icon {
-  stroke: var(--secondary-text-color);
-  width: 1rem;
-  height: 1rem;
+  width: 16px;
+  height: 16px;
+}
+
+.card__date {
+  font-weight: 500;
+}
+
+.card__time {
+  color: var(--secondary-text-color);
+}
+
+.card__aside {
+  margin-left: 1rem;
 }
 
 .card__joinButton {
-  background-color: #3f4c75;
-  color: white;
-  padding: 0.5rem 1rem;
-  text-align: center;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: 500;
   display: flex;
-  gap: 0.5rem;
-  justify-content: center;
   align-items: center;
-  font-size: 1rem;
-  transition: all 0.3s ease, color 0.3s ease;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
 }
 
 .card__joinButton:hover {
-  background-color: #5a6fa6;
+  background-color: var(--accent-hover-color);
 }
 
 .video-icon {

@@ -107,6 +107,8 @@ model Lecture {
   title          String   @db.Text
   description    String?  @db.Text
   assignmentDate DateTime? @map("assignment_date") @db.Date
+  timeStart      DateTime? @map("time_start") @db.Timestamp()
+  timeEnd        DateTime? @map("time_end") @db.Timestamp()
 
   // Отношения
   classes        LecturesList[]
@@ -148,9 +150,11 @@ model Task {
   assignment     String    @db.VarChar(255)
   title          String    @db.VarChar(100)
   description    String?   @db.Text
-  assignmentDate DateTime? @map("assignment_date") @db.Date
-  deadline       DateTime? @db.Date
-  grade         Decimal?    @db.Decimal(5,2)
+  assignmentDate DateTime? @map("assignment_date") @db.Timestamp()
+  deadline       DateTime? @db.Timestamp()
+  timeStart      String?   @map("time_start") @db.VarChar(8)
+  timeEnd        String?   @map("time_end") @db.VarChar(8)
+  grade          Decimal?  @db.Decimal(5,2)
 
   // Отношения
   classes      TasksList[]

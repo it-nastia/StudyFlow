@@ -191,6 +191,8 @@ const LectureEdit = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("edit");
   const [assignmentDate, setAssignmentDate] = useState("");
+  const [timeStart, setTimeStart] = useState("");
+  const [timeEnd, setTimeEnd] = useState("");
   const [status, setStatus] = useState("To-Do");
   const [classData, setClassData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -200,6 +202,7 @@ const LectureEdit = () => {
   const [assignment, setAssignment] = useState("");
   const [attachments, setAttachments] = useState([]);
   const fileInputRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -258,6 +261,8 @@ const LectureEdit = () => {
           setDescription(lecture.description || "");
           setStatus(lecture.status || "To-Do");
           setAssignmentDate(lecture.assignmentDate || "");
+          setTimeStart(lecture.timeStart || "");
+          setTimeEnd(lecture.timeEnd || "");
           setAttachments(lecture.attachments || []);
 
           // Update editor content if it exists
@@ -276,50 +281,6 @@ const LectureEdit = () => {
     fetchData();
   }, [classId, lectureId, editor]);
 
-  const handleFileSelect = async (event) => {
-    const files = Array.from(event.target.files);
-
-    for (const file of files) {
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await axios.post("/api/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        setAttachments((prev) => [
-          ...prev,
-          {
-            id: response.data.id,
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            url: response.data.url,
-          },
-        ]);
-      } catch (err) {
-        console.error("Error uploading file:", err);
-        // Можно добавить отображение ошибки пользователю
-      }
-    }
-
-    // Очищаем input для возможности повторной загрузки того же файла
-    event.target.value = "";
-  };
-
-  const handleRemoveFile = async (fileId) => {
-    try {
-      await axios.delete(`/api/files/${fileId}`);
-      setAttachments((prev) => prev.filter((file) => file.id !== fileId));
-    } catch (err) {
-      console.error("Error removing file:", err);
-      // Можно добавить отображение ошибки пользователю
-    }
-  };
-
   const formatFileSize = (bytes) => {
     if (bytes === 0) return "0 Bytes";
     const k = 1024;
@@ -328,32 +289,108 @@ const LectureEdit = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const handleFileSelect = (event) => {
+    const files = Array.from(event.target.files);
+    const newAttachments = files.map((file) => ({
+      id: Math.random().toString(36).substr(2, 9), // временный ID для управления файлами
+      file: file,
+      name: file.name,
+      size: file.size,
+    }));
+    setAttachments((prev) => [...prev, ...newAttachments]);
+    // Очищаем input, чтобы можно было загрузить тот же файл повторно
+    event.target.value = "";
+  };
+
+  const handleRemoveFile = (fileId) => {
+    setAttachments((prev) => prev.filter((file) => file.id !== fileId));
+  };
+
+  const formatTimeForDB = (timeString) => {
+    if (!timeString) return null;
+    // Add seconds to the time string
+    return `${timeString}:00`;
+  };
+
   const handleSave = async () => {
     try {
-      const lectureData = {
-        title,
-        assignment,
-        description,
-        status,
-        assignmentDate,
-        attachments,
-        classId,
+      setIsLoading(true);
+
+      // Форматирование времени
+      const formatTime = (time) => {
+        if (!time) return null;
+        // Проверяем, является ли time строкой
+        if (typeof time === "string") {
+          return time;
+        }
+        // Если это объект Date
+        if (time instanceof Date) {
+          return time.toTimeString().split(" ")[0];
+        }
+        // Если это объект moment или dayjs
+        if (typeof time.format === "function") {
+          return time.format("HH:mm:ss");
+        }
+        return null;
       };
 
-      if (lectureId === "new") {
-        await axios.post("/api/lectures", lectureData);
+      // Подготовка данных лекции
+      const lectureData = {
+        assignment: assignment,
+        title: title,
+        description: description || null,
+        assignmentDate: assignmentDate || null,
+        timeStart: formatTime(timeStart),
+        timeEnd: formatTime(timeEnd),
+        classId: classId,
+      };
+
+      let savedLecture;
+
+      if (lectureId && lectureId !== "new") {
+        // Обновление существующей лекции
+        const response = await axios.put(
+          `/api/lectures/${lectureId}`,
+          lectureData
+        );
+        savedLecture = response.data;
       } else {
-        await axios.put(`/api/lectures/${lectureId}`, lectureData);
+        // Создание новой лекции
+        const response = await axios.post("/api/lectures", lectureData);
+        savedLecture = response.data;
       }
 
-      navigate(`/class/${classId}`);
-    } catch (err) {
-      setError(err.message);
+      // Загрузка файлов, если они есть
+      if (attachments.length > 0) {
+        const formData = new FormData();
+        attachments.forEach((attachment) => {
+          formData.append("files", attachment.file);
+        });
+
+        // Загрузка файлов
+        const filesResponse = await axios.post("/api/files/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        // Связывание файлов с лекцией
+        await axios.post(`/api/lectures/${savedLecture.id}/files`, {
+          fileIds: filesResponse.data.map((file) => file.id),
+        });
+      }
+
+      setIsLoading(false);
+      navigate(`/class/${classId}/lecture/${savedLecture.id}/view`);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error saving lecture:", error);
+      // Здесь можно добавить отображение ошибки пользователю
     }
   };
 
   const handleTabClick = (tabId) => {
-    if (tabId !== "edit" && tabId !== "reports") {
+    if (tabId !== "edit") {
       navigate(`/class/${classId}`, { state: { activeTab: tabId } });
     } else {
       setActiveTab(tabId);
@@ -373,12 +410,6 @@ const LectureEdit = () => {
     { id: "kanban", label: "Kanban", icon: <SquareKanban size={16} /> },
     { id: "calendar", label: "Calendar", icon: <CalendarDays size={16} /> },
     { id: "edit", label: "Edit", icon: <SquarePen size={16} /> },
-    {
-      id: "reports",
-      label: "Reports",
-      icon: <FileText size={16} />,
-      disabled: true, // Disable this tab for now
-    },
   ];
 
   return (
@@ -390,7 +421,7 @@ const LectureEdit = () => {
             {classData?.name || "Loading..."}
           </Link>
           {<ChevronRight size={22} />}
-          <span>{lectureId === "new" ? "New Lecture" : "Edit Lecture"}</span>
+          <span>{lectureId === "new" ? "New Lecture" : assignment}</span>
         </h1>
         <button className={styles.meetingLink}>
           <Video size={16} />
@@ -407,7 +438,6 @@ const LectureEdit = () => {
               activeTab === tab.id ? styles.activeTab : ""
             }`}
             onClick={() => handleTabClick(tab.id)}
-            disabled={tab.disabled}
           >
             <span className={styles.tabIcon}>{tab.icon}</span>
             <span>{tab.label}</span>
@@ -462,6 +492,26 @@ const LectureEdit = () => {
           </div>
 
           <div className={styles.formGroup}>
+            <label className={styles.label}>Start Time</label>
+            <input
+              type="time"
+              className={styles.input}
+              value={timeStart}
+              onChange={(e) => setTimeStart(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>End Time</label>
+            <input
+              type="time"
+              className={styles.input}
+              value={timeEnd}
+              onChange={(e) => setTimeEnd(e.target.value)}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
             <label className={styles.label}>Status</label>
             <select
               className={`${styles.select} ${styles[status.replace(" ", "-")]}`}
@@ -486,9 +536,9 @@ const LectureEdit = () => {
                       <div className={styles.fileInfo}>
                         <Paperclip size={16} className={styles.fileIcon} />
                         <span className={styles.fileName}>{file.name}</span>
-                        <span className={styles.fileSize}>
+                        {/* <span className={styles.fileSize}>
                           ({formatFileSize(file.size)})
-                        </span>
+                        </span> */}
                       </div>
                       <button
                         className={styles.removeFile}
@@ -510,6 +560,7 @@ const LectureEdit = () => {
               multiple
             />
             <button
+              type="button"
               className={styles.addFileButton}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -531,8 +582,9 @@ const LectureEdit = () => {
         <button
           className={`${styles.button} ${styles.saveButton}`}
           onClick={handleSave}
+          disabled={isLoading}
         >
-          Save
+          {isLoading ? "Saving..." : "Save"}
         </button>
       </div>
     </div>

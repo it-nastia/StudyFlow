@@ -19,6 +19,8 @@
   "homepage": "https://github.com/it-nastia/StudyFlow#readme",
   "dependencies": {
     "@arcjet/node": "^1.0.0-beta.8",
+    "@azure/identity": "^4.10.0",
+    "@azure/storage-blob": "^12.27.0",
     "@neondatabase/serverless": "^1.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -26,7 +28,9 @@
     "helmet": "^8.1.0",
     "morgan": "^1.10.0",
     "pg": "^8.16.0",
-    "react-router-dom": "^7.6.2"
+    "react-router-dom": "^7.6.2",
+    "tippy.js": "^6.3.7",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

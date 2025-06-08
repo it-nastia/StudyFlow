@@ -14,7 +14,11 @@ import KanbanPage from "./pages/KanbanPage/KanbanPage";
 import WorkspacePage from "./pages/WorkspacePage/WorkspacePage";
 import ClassPage from "./pages/ClassPage/ClassPage";
 import LectureEdit from "./pages/LectureEditPage/LectureEdit";
+import LecturePage from "./pages/LecturePage/LecturePage";
+import TaskEdit from "./pages/TaskEditPage/TaskEdit";
+import TaskPage from "./pages/TaskPage/TaskPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./pages/Profile/Profile";
 import "./styles/variables.css";
 
 const App = () => {
@@ -43,6 +47,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
@@ -79,10 +91,44 @@ const App = () => {
           }
         />
         <Route
+          path="/class/:classId/lecture/:lectureId/view"
+          element={
+            <ProtectedRoute>
+              <LecturePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/class/:classId/lecture/:lectureId"
+          element={
+            <Navigate to="/class/:classId/lecture/:lectureId/view" replace />
+          }
+        />
+        <Route
           path="/class/:classId/lecture/:lectureId/edit"
           element={
             <ProtectedRoute>
               <LectureEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/class/:classId/task/:taskId/view"
+          element={
+            <ProtectedRoute>
+              <TaskPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/class/:classId/task/:taskId"
+          element={<Navigate to="/class/:classId/task/:taskId/view" replace />}
+        />
+        <Route
+          path="/class/:classId/task/:taskId/edit"
+          element={
+            <ProtectedRoute>
+              <TaskEdit />
             </ProtectedRoute>
           }
         />

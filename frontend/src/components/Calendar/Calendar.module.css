@@ -1,0 +1,69 @@
+.calendarContainer {
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: calc(100vh - 200px);
+}
+
+.calendarContainer :global(.fc) {
+  height: 100%;
+}
+
+/* Event styles */
+.eventContent {
+  padding: 2px 4px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.eventTime {
+  font-size: 0.85em;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.eventTitle {
+  font-size: 0.9em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tooltip styles */
+.tooltip {
+  padding: 8px;
+  max-width: 300px;
+}
+
+.tooltip strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.tooltip p {
+  margin: 4px 0;
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Make sure events are clickable */
+:global(.fc-event) {
+  cursor: pointer;
+}
+
+/* Ensure proper spacing in month view */
+:global(.fc-daygrid-event) {
+  margin: 1px 2px;
+}
+
+/* Week view specific styles */
+:global(.fc-timegrid-event) {
+  min-height: 25px;
+}
+
+/* Hover effect */
+:global(.fc-event:hover) {
+  filter: brightness(0.95);
+}

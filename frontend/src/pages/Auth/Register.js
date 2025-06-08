@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
+import { IMaskInput } from "react-imask";
 import { API_ENDPOINTS } from "../../config/api";
 import logo from "../../images/logo.svg";
 import styles from "./Auth.module.css";
@@ -51,7 +52,7 @@ const Register = () => {
     const phoneRegex = /^\+?[\d\s-()]{10,}$/;
     if (!formData.phone) {
       newErrors.phone = "Phone number is required";
-    } else if (!phoneRegex.test(formData.phone)) {
+    } else if (formData.phone.replace(/\D/g, "").length < 10) {
       newErrors.phone = "Please enter a valid phone number";
     }
 
@@ -91,20 +92,75 @@ const Register = () => {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (validateForm()) {
+  //     setIsSubmitting(true);
+  //     try {
+  //       console.log("Starting registration process...");
+  //       console.log("API endpoint:", API_ENDPOINTS.AUTH.REGISTER);
+
+  //       const { confirmPassword, ...registrationData } = formData;
+  //       console.log("Request data:", {
+  //         ...registrationData,
+  //         password: "[REDACTED]",
+  //       });
+
+  //       const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify(registrationData),
+  //       });
+
+  //       console.log("Response status:", response.status);
+  //       console.log(
+  //         "Response headers:",
+  //         Object.fromEntries(response.headers.entries())
+  //       );
+
+  //       const data = await response.json();
+  //       console.log("Response data:", data);
+
+  //       if (!response.ok) {
+  //         throw new Error(data.error || "Registration failed");
+  //       }
+
+  //       localStorage.setItem("token", data.token);
+  //       alert("Registration successful! Please log in.");
+  //       navigate("/login");
+  //     } catch (error) {
+  //       console.error("Registration error details:", {
+  //         message: error.message,
+  //         stack: error.stack,
+  //         name: error.name,
+  //       });
+  //       setErrors((prev) => ({
+  //         ...prev,
+  //         submit: error.message || "Registration failed. Please try again.",
+  //       }));
+  //     } finally {
+  //       setIsSubmitting(false);
+  //     }
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        console.log("Starting registration process...");
+        console.log("=== Registration Process Started ===");
+        console.log("Form validation passed");
         console.log("API endpoint:", API_ENDPOINTS.AUTH.REGISTER);
 
         const { confirmPassword, ...registrationData } = formData;
-        console.log("Request data:", {
+        console.log("Registration data (excluding password):", {
           ...registrationData,
           password: "[REDACTED]",
         });
 
+        console.log("Sending registration request...");
         const response = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
           method: "POST",
           headers: {
@@ -113,35 +169,47 @@ const Register = () => {
           body: JSON.stringify(registrationData),
         });
 
-        console.log("Response status:", response.status);
-        console.log(
-          "Response headers:",
-          Object.fromEntries(response.headers.entries())
-        );
+        console.log("=== Response Details ===");
+        console.log("Status:", response.status);
+        console.log("Status Text:", response.statusText);
+        console.log("Headers:", Object.fromEntries(response.headers.entries()));
 
         const data = await response.json();
         console.log("Response data:", data);
 
         if (!response.ok) {
-          throw new Error(data.error || "Registration failed");
+          console.error("Registration failed with status:", response.status);
+          console.error("Error response:", data);
+          throw new Error(data.error || data.message || "Registration failed");
         }
+
+        console.log("Registration successful!");
+        console.log("Token received:", data.token ? "Yes" : "No");
 
         localStorage.setItem("token", data.token);
         alert("Registration successful! Please log in.");
         navigate("/login");
       } catch (error) {
-        console.error("Registration error details:", {
-          message: error.message,
-          stack: error.stack,
-          name: error.name,
-        });
+        console.error("=== Registration Error Details ===");
+        console.error("Error name:", error.name);
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+
+        if (error.response) {
+          console.error("Error response status:", error.response.status);
+          console.error("Error response data:", error.response.data);
+        }
+
         setErrors((prev) => ({
           ...prev,
           submit: error.message || "Registration failed. Please try again.",
         }));
       } finally {
+        console.log("=== Registration Process Ended ===");
         setIsSubmitting(false);
       }
+    } else {
+      console.log("Form validation failed:", errors);
     }
   };
 
@@ -221,11 +289,23 @@ const Register = () => {
             <label htmlFor="phone" className={styles.label}>
               Phone*
             </label>
-            <input
-              type="tel"
+            <IMaskInput
+              mask="+38(000)000-00-00"
+              unmask={true}
               name="phone"
               value={formData.phone}
-              onChange={handleChange}
+              onAccept={(value) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  phone: value,
+                }));
+                if (errors.phone) {
+                  setErrors((prev) => ({
+                    ...prev,
+                    phone: "",
+                  }));
+                }
+              }}
               placeholder="Phone number"
               className={errors.phone ? styles.errorInput : ""}
             />

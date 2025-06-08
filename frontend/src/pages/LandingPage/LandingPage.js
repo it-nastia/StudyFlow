@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Calendar,
   Columns,
@@ -17,6 +17,36 @@ import logo from "../../images/logo.svg";
 import styles from "./LandingPage.module.css";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const isAuthenticated = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUserData();
+    }
+  }, [isAuthenticated]);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+    }
+  };
+
   const features = [
     {
       icon: <Calendar size={32} />,
@@ -76,28 +106,67 @@ const LandingPage = () => {
     },
   ];
 
+  const handleStartWork = () => {
+    navigate("/home");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
     <div className={styles.landingPage}>
       {/* Header */}
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          <Link to="/" className={styles.logo}>
-            <img src={logo} alt="StudyFlow Logo" className={styles.logoImg} />
-            <span className={styles.logoName}>StudyFlow</span>
-          </Link>
-          <nav className={styles.navigation}>
+          <div className={styles.logo}>
+            <Link to="/" className={styles.logoLink}>
+              <img src={logo} alt="StudyFlow Logo" className={styles.logoImg} />
+              <span className={styles.logoName}>StudyFlow</span>
+            </Link>
+          </div>
+          <nav className={styles.nav}>
             <a href="#features">Features</a>
             <a href="#audiences">Audiences</a>
             <a href="#workflow">Workflow</a>
           </nav>
-          <div className={styles.authButtons}>
-            <Link to="/login" className={styles.loginButton}>
-              Log In
-            </Link>
-            <Link to="/register" className={styles.registerButton}>
-              Sign Up
-            </Link>
-          </div>
+          {isAuthenticated ? (
+            <div className={styles.userSection}>
+              <button
+                className={styles.startWorkButton}
+                onClick={handleStartWork}
+              >
+                Start Work
+              </button>
+              <div className={styles.userInfo}>
+                <img
+                  src={
+                    user?.avatar ||
+                    "https://i.pinimg.com/736x/cb/87/1e/cb871e4708cba30bbdc95b300abb9fab.jpg"
+                  }
+                  alt="Profile"
+                  className={styles.avatar}
+                />
+                <span className={styles.userName}>
+                  {user?.firstName} {user?.lastName}
+                </span>
+                <button className={styles.logoutButton} onClick={handleLogout}>
+                  Log Out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.authButtons}>
+              <Link to="/login" className={styles.loginButton}>
+                Log In
+              </Link>
+              <Link to="/register" className={styles.registerButton}>
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 
@@ -108,9 +177,15 @@ const LandingPage = () => {
           <p>
             Web application for student-teacher interaction in distance learning
           </p>
-          <Link to="/register" className={styles.ctaButton}>
-            Get Started Free
-          </Link>
+          {isAuthenticated ? (
+            <button className={styles.ctaButton} onClick={handleStartWork}>
+              Start Work
+            </button>
+          ) : (
+            <Link to="/register" className={styles.ctaButton}>
+              Get Started Free
+            </Link>
+          )}
         </div>
         <div className={styles.heroImage}>
           {/* You'll need to add your app interface image here */}

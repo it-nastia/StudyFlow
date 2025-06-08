@@ -7,6 +7,9 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const workspaceRoutes = require("./routes/workspace");
 const classRoutes = require("./routes/classRoutes");
+const lectureRoutes = require("./routes/lectureRoutes");
+const taskRoutes = require("./routes/taskRoutes");
+const fileRoutes = require("./routes/fileRoutes");
 
 const app = express();
 
@@ -58,6 +61,13 @@ app.get("/", (req, res) => {
         getAllWorkspaces: "GET /api/workspaces",
         getWorkspace: "GET /api/workspaces/:id",
       },
+      tasks: {
+        getTask: "GET /api/tasks/:id",
+        createTask: "POST /api/tasks",
+        updateTask: "PUT /api/tasks/:id",
+        updateTaskStatus: "PATCH /api/tasks/:id/status",
+        addFiles: "POST /api/tasks/:id/files",
+      },
     },
     health: "GET /api/health",
   });
@@ -68,6 +78,9 @@ app.use("/api/auth", authRoutes); // Аутентификация и регис�
 app.use("/api/users", userRoutes); // Операции с пользователями
 app.use("/api/workspaces", workspaceRoutes); // Операции с рабочими пространствами
 app.use("/api/classes", classRoutes); // Операции с классами
+app.use("/api/lectures", lectureRoutes); // Операции с лекциями
+app.use("/api/tasks", taskRoutes); // Операции с задачами
+app.use("/api/files", fileRoutes); // Операции с файлами
 
 // Базовый маршрут для проверки работоспособности API
 app.get("/api/health", (req, res) => {

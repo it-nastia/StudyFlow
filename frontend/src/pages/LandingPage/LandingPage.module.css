@@ -2,6 +2,7 @@
   min-height: 100vh;
   background-color: var(--primary-background-color);
   overflow: hidden;
+  text-align: center;
 }
 
 /* Header Styles */
@@ -23,50 +24,115 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-align: center;
 }
 
 .logo {
   display: flex;
   align-items: center;
+  gap: 10px;
+}
+
+.logoLink {
   text-decoration: none;
   color: var(--primary-text-color);
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .logoImg {
-  height: 32px;
-  margin-right: 0.5rem;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .logoName {
-  font-size: 1.5rem;
-  font-weight: 600;
+  display: inline-block;
+  vertical-align: middle;
 }
 
-.navigation {
+.nav {
   display: flex;
-  gap: 2rem;
+  gap: 30px;
+  justify-content: center;
+  flex: 1;
 }
 
-.navigation a {
+.nav a {
   text-decoration: none;
   color: var(--primary-text-color);
-  font-weight: 500;
+  font-size: 16px;
   transition: color 0.3s ease;
 }
 
-.navigation a:hover {
+.nav a:hover {
   color: var(--accent-color);
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: flex-end;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  background-color: var(--secondary-background-color);
+  border-radius: 20px;
+  height: 40px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-text-color);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.logoutButton {
+  background: none;
+  border: none;
+  color: var(--secondary-text-color);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.logoutButton:hover {
+  background-color: var(--hover-background-color);
+  color: var(--primary-text-color);
 }
 
 .authButtons {
   display: flex;
-  gap: 1rem;
+  gap: 15px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .loginButton,
-.registerButton {
-  padding: 0.5rem 1.5rem;
+.signupButton {
+  padding: 8px 20px;
   border-radius: 4px;
+  font-size: 14px;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -74,8 +140,8 @@
 
 .loginButton {
   color: var(--accent-color);
+  background: none;
   border: 1px solid var(--accent-color);
-  background-color: var(--primary-background-color);
 }
 
 .loginButton:hover {
@@ -83,16 +149,30 @@
   color: white;
 }
 
-.registerButton {
-  background-color: var(--accent-color);
+.signupButton {
   color: white;
-  border: 1px solid var(--accent-color);
+  background-color: var(--accent-color);
+  border: none;
 }
 
-.registerButton:hover {
-  color: var(--accent-color);
+.signupButton:hover {
+  background-color: var(--accent-hover-color);
+}
 
-  background-color: var(--primary-background-color);
+.startWorkButton {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  border: 1px solid var(--accent-color);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.startWorkButton:hover {
+  background-color: var(--accent-hover-color);
+  color: var(--accent-color);
 }
 
 /* Hero Section */
@@ -111,6 +191,7 @@
   flex: 1;
   max-width: 600px;
   position: relative;
+  text-align: center;
 }
 
 .hero::after {
@@ -205,6 +286,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease;
+  text-align: center;
 }
 
 .featureCard:hover {
@@ -414,8 +496,26 @@
     padding: 1rem;
   }
 
-  .navigation {
+  .nav {
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
+  }
+
+  .userSection {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .authButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .loginButton,
+  .signupButton {
+    width: 100%;
+    text-align: center;
   }
 
   .features h2,
@@ -439,16 +539,5 @@
 
   .heroContent p {
     font-size: 1.1rem;
-  }
-
-  .authButtons {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .loginButton,
-  .registerButton {
-    width: 100%;
-    text-align: center;
   }
 }

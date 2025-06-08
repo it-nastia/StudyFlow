@@ -1,5 +1,5 @@
 .container {
-  height: 100%;
+  /* height: 100%; */
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -139,23 +139,23 @@
   width: 270px;
   /* flex-grow: 1; */
 
-  padding: 1rem 1rem 0 1rem;
+  padding: 1rem 1rem 1rem 1rem;
   background-color: #eff4f9;
   border-radius: 8px;
   border: 1px solid var(--border-color);
 }
 
 .attachmentBox {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
-  padding: 1rem;
-  min-height: 100px;
+  padding: 5px;
+  /* min-height: 50px; */
   margin-bottom: 0.5rem;
   background-color: white;
 }
 
 .noFiles {
-  color: #94a3b8;
+  color: var(--secondary-text-color);
   text-align: center;
   margin: 0;
 }
@@ -164,65 +164,58 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow-y: auto;
 }
 
 .fileItem {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 0.5rem;
-  border-radius: 0.25rem;
+  border-radius: 4px;
   margin-bottom: 0.5rem;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-}
-
-.fileItem:last-child {
-  margin-bottom: 0;
+  background: var(--background-color-light);
+  border: 1px solid var(--border-color);
 }
 
 .fileInfo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  overflow: hidden;
 }
 
 .fileIcon {
-  color: #64748b;
-  flex-shrink: 0;
+  color: var(--secondary-text-color);
 }
 
 .fileName {
-  font-size: 0.875rem;
-  color: #1e293b;
-  white-space: nowrap;
+  text-wrap: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .fileSize {
-  font-size: 0.75rem;
-  color: #64748b;
-  white-space: nowrap;
+  color: var(--secondary-text-color);
+  font-size: 0.7rem;
+  text-wrap: nowrap;
 }
 
 .removeFile {
-  padding: 0.25rem;
-  border: none;
   background: none;
-  color: #94a3b8;
+  border: none;
+  color: var(--secondary-text-color);
   cursor: pointer;
-  border-radius: 0.25rem;
+  padding: 4px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
 }
 
 .removeFile:hover {
-  color: #ef4444;
-  background-color: #fee2e2;
+  background: var(--hover-color);
+  color: var(--error-color);
 }
 
 .hiddenInput {
@@ -238,7 +231,7 @@
   padding: 0.5rem;
   border: 2px dashed #64748b;
   background: none;
-  color: #64748b;
+  color: var(--primary-text-color);
   border-radius: 0.375rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -343,14 +336,14 @@
 }
 
 .editorWrapper {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
   overflow: hidden;
 }
 
 .menuBar {
   padding: 0.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
   background-color: #f8fafc;
   display: flex;
   gap: 0.5rem;
@@ -361,7 +354,7 @@
   display: flex;
   gap: 0.25rem;
   padding: 0 0.25rem;
-  border-right: 1px solid #e2e8f0;
+  border-right: 1px solid var(--border-color);
 }
 
 .menuGroup:last-child {
@@ -382,7 +375,7 @@
 }
 
 .menuBar button:hover:not(:disabled) {
-  background-color: #e2e8f0;
+  background-color: var(--border-color);
   color: #0f172a;
 }
 
@@ -392,7 +385,7 @@
 }
 
 .menuBar button.isActive {
-  background-color: #e2e8f0;
+  background-color: var(--border-color);
   color: #0f172a;
 }
 
@@ -464,7 +457,7 @@
 
 /* Остальные стили */
 .editor :global(.ProseMirror blockquote) {
-  border-left: 3px solid #e2e8f0;
+  border-left: 3px solid var(--border-color);
   padding-left: 1rem;
   margin: 1em 0;
   color: #64748b;
@@ -494,6 +487,68 @@
 
 .editor :global(.ProseMirror hr) {
   border: none;
-  border-top: 2px solid #e2e8f0;
+  border-top: 2px solid var(--border-color);
   margin: 1em 0;
 }
+
+.readOnlyField {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 0.875rem;
+  min-height: 38px;
+  width: 100%;
+  line-height: 1.5;
+}
+
+.fileName {
+  text-decoration: none;
+  color: #2563eb;
+}
+
+.fileName:hover {
+  text-decoration: underline;
+}
+
+.formGroupTime {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.formGroupTime label {
+  flex-grow: 1;
+  text-wrap: nowrap;
+}
+.formGroupTime time {
+  flex-grow: 0;
+  /* max-width: 100px; */
+}
+
+.heading {
+  font-size: 1.3rem;
+  font-weight: 500;
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+}
+
+.mainContent {
+  background-color: #ffffff;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  margin-right: 1rem;
+}
+/* 
+.headingLabel {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.headingValue {
+  flex-grow: 0;
+} */
