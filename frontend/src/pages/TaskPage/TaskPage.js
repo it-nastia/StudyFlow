@@ -303,6 +303,41 @@ const TaskPage = () => {
                 <EditorContent editor={editor} className={styles.editor} />
               </div>
             </div>
+
+            {/* Attachments Section */}
+            <div className={styles.attachmentsSection}>
+              <h2 className={styles.attachmentsTitle}>
+                <Paperclip size={20} />
+                Attachments
+              </h2>
+              <div className={styles.attachmentsGrid}>
+                {attachments.length === 0 ? (
+                  <p className={styles.noFiles}>No files attached</p>
+                ) : (
+                  attachments.map((file) => (
+                    <a
+                      key={file.id}
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.attachmentCard}
+                    >
+                      <div className={styles.attachmentIcon}>
+                        <FileText size={24} />
+                      </div>
+                      <div className={styles.attachmentDetails}>
+                        <span className={styles.attachmentName}>
+                          {file.name}
+                        </span>
+                        <span className={styles.attachmentSize}>
+                          {formatFileSize(file.size)}
+                        </span>
+                      </div>
+                    </a>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Side Panel */}
@@ -355,36 +390,6 @@ const TaskPage = () => {
                 <option value="In Progress">In Progress</option>
                 <option value="Done">Done</option>
               </select>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Attachments</label>
-              <div className={styles.attachmentBox}>
-                {attachments.length === 0 ? (
-                  <p className={styles.noFiles}>No files attached</p>
-                ) : (
-                  <ul className={styles.fileList}>
-                    {attachments.map((file) => (
-                      <li key={file.id} className={styles.fileItem}>
-                        <div className={styles.fileInfo}>
-                          <Paperclip size={16} className={styles.fileIcon} />
-                          <a
-                            href={file.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={styles.fileName}
-                          >
-                            {file.name}
-                          </a>
-                          <span className={styles.fileSize}>
-                            ({formatFileSize(file.size)})
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
             </div>
           </div>
         </div>
