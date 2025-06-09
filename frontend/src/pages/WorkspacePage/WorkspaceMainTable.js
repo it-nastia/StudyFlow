@@ -3,10 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { PanelsTopLeft, LogOut, Plus, Terminal } from "lucide-react";
 import styles from "./WorkspaceMainTable.module.css";
 import CreateClassModal from "../../components/CreateClassModal/CreateClassModal";
+import JoinClassModal from "../../components/JoinClassModal/JoinClassModal";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 
-const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
+const WorkspaceMainTable = ({ classes = [], onJoin, onCreate, onLeave }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [selectedClass, setSelectedClass] = useState(null);
   const navigate = useNavigate();
 
   const handleCreateClass = async (formData) => {
@@ -20,6 +25,42 @@ const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
     }
   };
 
+  const handleJoinSuccess = (classData) => {
+    console.log("Successfully joined class:", classData);
+  };
+
+  const handleJoinClick = () => {
+    setIsJoinModalOpen(true);
+  };
+
+  const handleJoinClass = async (classCode) => {
+    await onJoin(classCode);
+    setIsJoinModalOpen(false);
+  };
+
+  const handleLeaveClick = (classItem) => {
+    setSelectedClass(classItem);
+    setIsLeaveModalOpen(true);
+  };
+
+  const handleLeaveConfirm = async () => {
+    if (selectedClass) {
+      try {
+        await onLeave(selectedClass.id);
+        setIsLeaveModalOpen(false);
+        setSelectedClass(null);
+      } catch (error) {
+        console.error("Error leaving class:", error);
+        setError(error.message || "Failed to leave class");
+      }
+    }
+  };
+
+  const handleLeaveCancel = () => {
+    setIsLeaveModalOpen(false);
+    setSelectedClass(null);
+  };
+
   return (
     <div className={styles.mainTable}>
       {error && <div className={styles.error}>{error}</div>}
@@ -28,7 +69,7 @@ const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
           <p>You don't have any classes in this workspace yet</p>
           <p>Create your first class or join an existing one to get started!</p>
           <div className={styles.emptyStateActions}>
-            <button className={styles.actionBtn} onClick={onJoin}>
+            <button className={styles.actionBtn} onClick={handleJoinClick}>
               <Terminal className={styles.icon} />
               Join Class by Code
             </button>
@@ -55,20 +96,26 @@ const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
                     {classItem.name}
                   </Link>
                 </div>
-                <button className={styles.exitBtn} title="Leave Class">
+                <button
+                  className={styles.exitBtn}
+                  title="Leave Class"
+                  onClick={() => handleLeaveClick(classItem)}
+                >
                   <LogOut className={styles.exitIcon} />
                 </button>
               </li>
             ))}
           </ul>
           <div className={styles.actions}>
-            <button className={styles.actionBtn} onClick={onJoin}>
-              Join Class
+            <button className={styles.actionBtn} onClick={handleJoinClick}>
+              <Terminal className={styles.icon} />
+              Join Class by Code
             </button>
             <button
               className={styles.actionBtn}
               onClick={() => setIsCreateModalOpen(true)}
             >
+              <Plus className={styles.icon} />
               Create Class
             </button>
           </div>
@@ -79,6 +126,26 @@ const WorkspaceMainTable = ({ classes = [], onJoin, onCreate }) => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateClass}
+      />
+
+      <JoinClassModal
+        isOpen={isJoinModalOpen}
+        onClose={() => setIsJoinModalOpen(false)}
+        onJoin={handleJoinClass}
+      />
+
+      <ConfirmationModal
+        isOpen={isLeaveModalOpen}
+        onClose={handleLeaveCancel}
+        onConfirm={handleLeaveConfirm}
+        title="Leave Class"
+        message={
+          selectedClass
+            ? `Are you sure you want to leave "${selectedClass.name}"?`
+            : ""
+        }
+        confirmText="Leave"
+        cancelText="Cancel"
       />
     </div>
   );

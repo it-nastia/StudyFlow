@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import styles from "./Table.module.css";
 import axios from "../../utils/axios";
+import DeleteConfirmationModal from "../Modal/DeleteConfirmationModal";
 
 const formatTime = (timeString) => {
   if (!timeString) return "";
@@ -14,6 +15,8 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
   const { classId } = useParams();
   const [lectures, setLectures] = useState(initialLectures);
   const statusOptions = ["To-Do", "In Progress", "Done"];
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [lectureToDelete, setLectureToDelete] = useState(null);
 
   // Map display status to server status and vice versa
   const statusMapping = {
@@ -29,10 +32,10 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
     },
   };
 
-  console.log("LectureTable received lectures:", initialLectures);
+  //console.log("LectureTable received lectures:", initialLectures);
 
   useEffect(() => {
-    console.log("Updating lectures state:", initialLectures);
+    //console.log("Updating lectures state:", initialLectures);
     setLectures(initialLectures);
   }, [initialLectures]);
 
@@ -40,7 +43,7 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
     try {
       // Convert display status to server status
       const serverStatus = statusMapping.display[newDisplayStatus];
-      console.log("Sending status to server:", serverStatus);
+      //console.log("Sending status to server:", serverStatus);
 
       await axios.patch(`/api/lectures/${id}/status`, {
         status: serverStatus,
@@ -73,6 +76,29 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
     return `/class/${classId}/lecture/${lectureId}/view`;
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/lectures/${id}`);
+      setLectures((prevLectures) =>
+        prevLectures.filter((lecture) => lecture.id !== id)
+      );
+      setDeleteModalOpen(false);
+      setLectureToDelete(null);
+    } catch (err) {
+      console.error("Error deleting lecture:", err);
+    }
+  };
+
+  const openDeleteModal = (lecture) => {
+    setLectureToDelete(lecture);
+    setDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setLectureToDelete(null);
+  };
+
   return (
     <div className={styles.tableContainer}>
       <table className={styles.table}>
@@ -83,12 +109,13 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
             <th>Date</th>
             <th>Time</th>
             <th>Status</th>
+            {isEditor && <th>Delete</th>}
           </tr>
         </thead>
         <tbody>
           {lectures.length === 0 ? (
             <tr>
-              <td colSpan="6" className={styles.emptyState}>
+              <td colSpan={isEditor ? "6" : "5"} className={styles.emptyState}>
                 {isEditor
                   ? 'No lectures available yet. Click "Add Lecture" to create your first lecture.'
                   : "No lectures available yet."}
@@ -97,12 +124,12 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
           ) : (
             lectures.map((lecture) => {
               const displayStatus = getDisplayStatus(lecture.status);
-              console.log(
-                "Lecture status:",
-                lecture.status,
-                "Display status:",
-                displayStatus
-              );
+              // console.log(
+              //   "Lecture status:",
+              //   lecture.status,
+              //   "Display status:",
+              //   displayStatus
+              // );
 
               return (
                 <tr key={lecture.id}>
@@ -149,6 +176,16 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
                       ))}
                     </select>
                   </td>
+                  {isEditor && (
+                    <td>
+                      <button
+                        onClick={() => openDeleteModal(lecture)}
+                        className={styles.deleteButton}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })
@@ -160,6 +197,12 @@ const LectureTable = ({ lectures: initialLectures = [], isEditor = false }) => {
           <Plus size={16} /> <span>Add Lecture</span>
         </button>
       )}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={() => lectureToDelete && handleDelete(lectureToDelete.id)}
+        itemType="lecture"
+      />
     </div>
   );
 };

@@ -207,3 +207,28 @@ option {
   border-color: #66bb6a;
   font-weight: bold;
 }
+
+.deleteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #ef4444;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.deleteButton:hover {
+  background-color: #fee2e2;
+}
+
+/* Add styles for the delete button cell */
+.table td:last-child {
+  text-align: center;
+  vertical-align: middle;
+  width: 60px;
+}

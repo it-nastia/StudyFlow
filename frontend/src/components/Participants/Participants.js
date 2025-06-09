@@ -8,8 +8,8 @@ const Participants = ({
   editors = [],
   onRemoveParticipant,
 }) => {
-  const [modalOpen, setModalOpen] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddEditor = () => {
     // TODO: Implement adding editor functionality
@@ -23,19 +23,19 @@ const Participants = ({
 
   const handleDeleteClick = (participant) => {
     setSelectedParticipant(participant);
-    setModalOpen(true);
+    setIsModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
     if (selectedParticipant) {
       onRemoveParticipant(selectedParticipant.id);
     }
-    setModalOpen(false);
+    setIsModalOpen(false);
     setSelectedParticipant(null);
   };
 
   const handleCloseModal = () => {
-    setModalOpen(false);
+    setIsModalOpen(false);
     setSelectedParticipant(null);
   };
 
@@ -114,7 +114,7 @@ const Participants = ({
       </div>
 
       <ConfirmationModal
-        isOpen={modalOpen}
+        isOpen={isModalOpen}
         onClose={handleCloseModal}
         onConfirm={handleConfirmDelete}
         title="Remove Participant"

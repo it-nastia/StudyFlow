@@ -47,20 +47,43 @@ const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
     return classes.find((c) => c.id === classId) || { name: "" };
   };
 
+  // Function to group items by class and workspace
+  const groupItems = (items) => {
+    const groups = {};
+
+    items.forEach((item) => {
+      const classInfo = getClassInfo(item.classId);
+      const workspaceId = item.workspaceId || "default";
+      const groupKey = `${workspaceId}-${item.classId}`;
+
+      if (!groups[groupKey]) {
+        groups[groupKey] = {
+          workspaceId,
+          classId: item.classId,
+          className: classInfo.name,
+          items: [],
+        };
+      }
+
+      groups[groupKey].items.push(item);
+    });
+
+    return Object.values(groups);
+  };
+
   // Combine and process tasks and lectures
-  const renderCard = (item, type) => {
-    const isTask = type === "task";
+  const renderCard = (item) => {
+    const isTask = item.type === "task";
     const link = isTask
       ? `/class/${item.classId}/task/${item.id}/view`
       : `/class/${item.classId}/lecture/${item.id}/view`;
 
-    const classInfo = getClassInfo(item.classId);
-
     return (
-      <div key={`${type}-${item.id}`} className={styles.card}>
-        <NavLink to={`/class/${item.classId}`} className={styles.classLink}>
-          {classInfo.name}
-        </NavLink>
+      <div
+        key={`${item.type}-${item.id}`}
+        className={styles.card}
+        data-class-id={item.classId}
+      >
         <NavLink to={link} className={styles.taskLink}>
           <div className={styles.assignment}>
             {item.assignment || item.title}
@@ -83,21 +106,45 @@ const KanbanBoard = ({ tasks = [], lectures = [], classes = [] }) => {
     );
   };
 
+  // Group all items
+  const allItems = [
+    ...tasks.map((task) => ({ ...task, type: "task" })),
+    ...lectures.map((lecture) => ({ ...lecture, type: "lecture" })),
+  ];
+  const groupedItems = groupItems(allItems);
+
   return (
     <div className={styles.kanbanBoard}>
       {COLUMNS.map((col) => (
         <div key={col.key} className={styles.column}>
           <div className={styles.columnHeader}>{col.label}</div>
           <div className={styles.cards}>
-            {/* Render tasks */}
-            {tasks
-              .filter((t) => normalizeStatus(t.status) === col.key)
-              .map((task) => renderCard(task, "task"))}
+            {groupedItems.map((group) => {
+              const filteredItems = group.items.filter(
+                (item) => normalizeStatus(item.status) === col.key
+              );
 
-            {/* Render lectures */}
-            {lectures
-              .filter((l) => normalizeStatus(l.status) === col.key)
-              .map((lecture) => renderCard(lecture, "lecture"))}
+              if (filteredItems.length === 0) return null;
+
+              return (
+                <div
+                  key={`${group.workspaceId}-${group.classId}`}
+                  className={styles.groupContainer}
+                >
+                  <div className={styles.groupHeader}>
+                    <NavLink
+                      to={`/class/${group.classId}`}
+                      className={styles.classLink}
+                    >
+                      {group.className}
+                    </NavLink>
+                  </div>
+                  <div className={styles.groupCards}>
+                    {filteredItems.map((item) => renderCard(item))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       ))}

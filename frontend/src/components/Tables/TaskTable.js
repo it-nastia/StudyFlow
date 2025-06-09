@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import styles from "./Table.module.css";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import axios from "../../utils/axios";
+import DeleteConfirmationModal from "../Modal/DeleteConfirmationModal";
 
 const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
   const navigate = useNavigate();
   const { classId } = useParams();
   const [tasks, setTasks] = useState(initialTasks);
   const statusOptions = ["To-Do", "In Progress", "Done"];
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   // Map display status to server status and vice versa
   const statusMapping = {
@@ -24,10 +27,10 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
     },
   };
 
-  console.log("TaskTable received tasks:", initialTasks);
+  // console.log("TaskTable received tasks:", initialTasks);
 
   useEffect(() => {
-    console.log("Tasks updated:", initialTasks);
+    //console.log("Tasks updated:", initialTasks);
     setTasks(initialTasks);
   }, [initialTasks]);
 
@@ -35,7 +38,7 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
     try {
       // Convert display status to server status
       const serverStatus = statusMapping.display[newDisplayStatus];
-      console.log("Sending status to server:", serverStatus);
+      //console.log("Sending status to server:", serverStatus);
 
       await axios.patch(`/api/tasks/${id}/status`, {
         status: serverStatus,
@@ -53,6 +56,27 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
 
   const handleAddTask = () => {
     navigate(`/class/${classId}/task/new/edit`);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/api/tasks/${id}`);
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+      setDeleteModalOpen(false);
+      setTaskToDelete(null);
+    } catch (err) {
+      console.error("Error deleting task:", err);
+    }
+  };
+
+  const openDeleteModal = (task) => {
+    setTaskToDelete(task);
+    setDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setTaskToDelete(null);
   };
 
   const getDisplayStatus = (serverStatus) => {
@@ -76,12 +100,13 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
             <th>Time</th>
             <th>Status</th>
             <th>Grade</th>
+            {isEditor && <th>Delete</th>}
           </tr>
         </thead>
         <tbody>
           {tasks.length === 0 ? (
             <tr>
-              <td colSpan="7" className={styles.emptyState}>
+              <td colSpan={isEditor ? "8" : "7"} className={styles.emptyState}>
                 {isEditor
                   ? 'No tasks available yet. Click "Add Task" to create your first task.'
                   : "No tasks available yet."}
@@ -90,12 +115,12 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
           ) : (
             tasks.map((task) => {
               const displayStatus = getDisplayStatus(task.status);
-              console.log(
-                "Task status:",
-                task.status,
-                "Display status:",
-                displayStatus
-              );
+              // console.log(
+              //   "Task status:",
+              //   task.status,
+              //   "Display status:",
+              //   displayStatus
+              // );
 
               return (
                 <tr key={task.id}>
@@ -142,6 +167,16 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
                     </select>
                   </td>
                   <td className={styles.smallCell}>{task.grade}</td>
+                  {isEditor && (
+                    <td>
+                      <button
+                        onClick={() => openDeleteModal(task)}
+                        className={styles.deleteButton}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })
@@ -153,6 +188,12 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
           <Plus size={16} /> <span>Add Task</span>
         </button>
       )}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={() => taskToDelete && handleDelete(taskToDelete.id)}
+        itemType="task"
+      />
     </div>
   );
 };

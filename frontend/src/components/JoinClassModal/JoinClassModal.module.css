@@ -57,19 +57,64 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--primary-text-color);
-  margin: 0 0 16px 0;
+  margin: 0 0 8px 0;
 }
 
-.modalMessage {
+.modalDescription {
   color: var(--secondary-text-color);
   margin: 0 0 24px 0;
   line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary-text-color);
+}
+
+.input {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--primary-text-color);
+  background: var(--primary-background-color);
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.input::placeholder {
+  color: var(--secondary-text-color);
+}
+
+.error {
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 4px;
 }
 
 .modalActions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  margin-top: 8px;
 }
 
 .button {
@@ -79,6 +124,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
+  font-size: 0.9rem;
 }
 
 .cancelButton {
@@ -90,11 +136,11 @@
   background-color: var(--hover-background-color);
 }
 
-.confirmButton {
-  background-color: #ef4444;
+.joinButton {
+  background-color: var(--accent-color);
   color: white;
 }
 
-.confirmButton:hover {
-  background-color: #dc2626;
+.joinButton:hover {
+  background-color: var(--accent-color-dark);
 }

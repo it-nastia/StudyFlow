@@ -55,7 +55,7 @@ const Calendar = ({ events = [] }) => {
       allowHTML: true,
       placement: "top",
       arrow: true,
-      theme: "light",
+      theme: "dark",
     });
   };
 

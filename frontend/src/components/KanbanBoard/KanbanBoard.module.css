@@ -9,7 +9,7 @@
   flex: 1 1 0;
   min-width: 260px;
   min-height: 60vh;
-  padding: 10px 8px 20px 8px;
+  padding: 0px 8px 20px 8px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -19,8 +19,11 @@
   font-size: 1.4rem;
   font-weight: 500;
   text-align: center;
-  margin-bottom: 12px;
-  padding: 5px 0 13px 0;
+  margin: 0px -7px 5px;
+  background-color: #fcfeff8e;
+  padding: 10px 0 13px 0;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -40,6 +43,27 @@
   flex: 1 1 0;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.groupContainer {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.groupHeader {
+  padding: 8px 12px;
+  background: var(--table-header-background-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.groupCards {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
   gap: 7px;
 }
 
@@ -53,6 +77,59 @@
   gap: 3px;
   border: 1px solid #bfc6ce;
   transition: box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+.card[data-class-id="1"]::before {
+  background-color: #ff6b6b;
+}
+
+.card[data-class-id="2"]::before {
+  background-color: #4ecdc4;
+}
+
+.card[data-class-id="3"]::before {
+  background-color: #45b7d1;
+}
+
+.card[data-class-id="4"]::before {
+  background-color: #96ceb4;
+}
+
+.card[data-class-id="5"]::before {
+  background-color: #ffeead;
+}
+
+.card[data-class-id="6"]::before {
+  background-color: #d4a5a5;
+}
+
+.card[data-class-id="7"]::before {
+  background-color: #9b59b6;
+}
+
+.card[data-class-id="8"]::before {
+  background-color: #3498db;
+}
+
+.card[data-class-id="9"]::before {
+  background-color: #e67e22;
+}
+
+.card[data-class-id="10"]::before {
+  background-color: #2ecc71;
 }
 
 .card:hover {

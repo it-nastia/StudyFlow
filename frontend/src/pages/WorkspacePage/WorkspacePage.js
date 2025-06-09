@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { House, SquareKanban, CalendarDays } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styles from "./WorkspacePage.module.css";
 import WorkspaceMainTable from "./WorkspaceMainTable";
 import KanbanBoard from "../../components/KanbanBoard/KanbanBoard";
 import Calendar from "../../components/Calendar/Calendar";
-import { API_ENDPOINTS } from "../../config/api";
+import {
+  fetchWorkspaceData,
+  fetchClassData,
+  createClass,
+  getAuthHeaders,
+  transformLectureData,
+  transformTaskData,
+} from "../../services/workspaceService";
+import { formatDate, formatTime } from "../../utils/dateUtils";
 
 const TABS = [
   { key: "main", label: "Main Table", icon: <House size={16} /> },
@@ -13,89 +21,142 @@ const TABS = [
   { key: "calendar", label: "Calendar", icon: <CalendarDays size={16} /> },
 ];
 
+const VALID_STATUSES = ["To-Do", "In Progress", "Done"];
+
+const normalizeStatus = (status) => {
+  if (!status) return "To-Do";
+
+  // Handle different status formats
+  let normalized = status;
+
+  // If status is in uppercase with underscores
+  if (status.includes("_")) {
+    normalized = status
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  }
+
+  // If status is in lowercase
+  if (status === status.toLowerCase()) {
+    normalized = status
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  // Special case for "in progress"
+  if (normalized.toLowerCase() === "in progress") {
+    normalized = "In Progress";
+  }
+
+  // Ensure the status is one of the valid values
+  if (!VALID_STATUSES.includes(normalized)) {
+    console.warn(`Invalid status "${status}" normalized to "To-Do"`);
+    return "To-Do";
+  }
+
+  return normalized;
+};
+
 const WorkspacePage = () => {
   const [activeTab, setActiveTab] = useState("main");
   const [workspace, setWorkspace] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoadingKanban, setIsLoadingKanban] = useState(false);
+  const [kanbanError, setKanbanError] = useState(null);
+  const [classErrors, setClassErrors] = useState([]);
+  const [allTasks, setAllTasks] = useState([]);
+  const [allLectures, setAllLectures] = useState([]);
   const { id } = useParams();
 
-  useEffect(() => {
-    fetchWorkspaceData();
-  }, [id]);
-
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      throw new Error("No authentication token found");
-    }
-    return {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
-  };
-
-  const fetchWorkspaceData = async () => {
+  const fetchWorkspaceAndClassData = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
+      setKanbanError(null);
+      setClassErrors([]);
 
-      const response = await fetch(
-        `${API_ENDPOINTS.BASE_URL}/workspaces/${id}`,
-        {
-          headers: getAuthHeaders(),
-        }
+      const workspaceData = await fetchWorkspaceData(id);
+      setWorkspace(workspaceData);
+
+      setIsLoadingKanban(true);
+      const classesData = await Promise.all(
+        workspaceData.classes.map(async (classItem) => {
+          try {
+            return await fetchClassData(classItem);
+          } catch (error) {
+            setClassErrors((prev) => [
+              ...prev,
+              {
+                className: classItem.name,
+                error: error.message,
+              },
+            ]);
+            return { tasks: [], lectures: [] };
+          }
+        })
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch workspace data");
+      const allTasks = classesData.flatMap((data) => data.tasks);
+      const allLectures = classesData.flatMap((data) => data.lectures);
+
+      if (allTasks.length === 0 && allLectures.length === 0) {
+        setKanbanError("No tasks or lectures found in any class");
       }
 
-      const data = await response.json();
-      setWorkspace(data);
-    } catch (error) {
-      console.error("Error fetching workspace:", error);
-      setError(error.message);
+      if (classErrors.length > 0) {
+        setKanbanError(
+          `Failed to load data for some classes:\n${classErrors
+            .map((err) => `- ${err.className}: ${err.error}`)
+            .join("\n")}`
+        );
+      }
+
+      setAllTasks(allTasks);
+      setAllLectures(allLectures);
+    } catch (err) {
+      console.error("Error in fetchWorkspaceAndClassData:", err);
+      setError(err.message);
+      if (!classErrors.length) {
+        setKanbanError(err.message);
+      }
     } finally {
       setIsLoading(false);
+      setIsLoadingKanban(false);
     }
-  };
+  }, [id]);
 
-  const handleJoinClass = () => {
+  useEffect(() => {
+    fetchWorkspaceAndClassData();
+  }, [fetchWorkspaceAndClassData]);
+
+  const handleJoinClass = useCallback(() => {
     // TODO: Implement class joining functionality
-  };
+  }, []);
 
-  const handleCreateClass = async (classData) => {
-    try {
-      const response = await fetch(
-        `${API_ENDPOINTS.BASE_URL}/workspaces/${id}/classes`,
-        {
-          method: "POST",
-          headers: getAuthHeaders(),
-          body: JSON.stringify(classData),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create class");
+  const handleCreateClass = useCallback(
+    async (classData) => {
+      try {
+        const newClass = await createClass(id, classData, getAuthHeaders());
+        setWorkspace((prevWorkspace) => ({
+          ...prevWorkspace,
+          classes: [...(prevWorkspace.classes || []), newClass],
+        }));
+        return newClass;
+      } catch (error) {
+        console.error("Error creating class:", error);
+        throw error;
       }
+    },
+    [id]
+  );
 
-      const newClass = await response.json();
-
-      // Update workspace data with the new class
-      setWorkspace((prevWorkspace) => ({
-        ...prevWorkspace,
-        classes: [...(prevWorkspace.classes || []), newClass],
-      }));
-
-      return newClass;
-    } catch (error) {
-      console.error("Error creating class:", error);
-      throw error;
-    }
-  };
+  const calendarEvents = useMemo(
+    () => [...allLectures, ...allTasks],
+    [allLectures, allTasks]
+  );
 
   if (isLoading) {
     return <div className={styles.loading}>Loading workspace...</div>;
@@ -108,115 +169,6 @@ const WorkspacePage = () => {
   if (!workspace) {
     return <div className={styles.error}>Workspace not found</div>;
   }
-
-  const TASKS = [
-    {
-      id: 1,
-      classId: 1,
-      className: "English",
-      assignment: "Gramma exercise 1",
-      date: "10.09.2024",
-      deadline: "16.09.2024",
-      status: "todo",
-    },
-    {
-      id: 2,
-      classId: 3,
-      className: "AI",
-      assignment: "Lab work 3",
-      date: "12.09.2024",
-      deadline: "15.09.2024",
-      status: "todo",
-    },
-    {
-      id: 3,
-      classId: 2,
-      className: "Mathematics",
-      assignment: "Task 3",
-      date: "12.09.2024",
-      deadline: "15.09.2024",
-      status: "inprogress",
-    },
-    {
-      id: 4,
-      classId: 3,
-      className: "AI",
-      assignment: "Lab work 1",
-      date: "12.09.2024",
-      deadline: "15.09.2024",
-      status: "done",
-    },
-    {
-      id: 5,
-      classId: 3,
-      className: "AI",
-      assignment: "Lab work 2",
-      date: "12.09.2024",
-      deadline: "15.09.2024",
-      status: "done",
-    },
-    {
-      id: 6,
-      classId: 2,
-      className: "Mathematics",
-      assignment: "Task 1",
-      date: "12.09.2024",
-      deadline: "15.09.2024",
-      status: "done",
-    },
-    {
-      id: 7,
-      classId: 2,
-      className: "Mathematics",
-      assignment: "Task 2",
-      date: "12.09.2024",
-      deadline: "15.09.2024",
-      status: "done",
-    },
-  ];
-
-  const EVENTS = [
-    {
-      title: "English",
-      start: "2025-10-07T08:30:00",
-      end: "2025-10-07T09:40:00",
-    },
-    {
-      title: "Mathematics",
-      start: "2025-10-08T08:30:00",
-      end: "2025-10-08T09:40:00",
-    },
-    {
-      title: "AI",
-      start: "2025-05-20T10:05:00",
-      end: "2025-05-20T11:20:00",
-    },
-    {
-      title: "Java",
-      start: "2025-10-10T14:00:00",
-      end: "2025-10-10T15:20:00",
-    },
-    {
-      title: "English",
-      start: "2025-05-28T10:30:00",
-      end: "2024-05-28T11:40:00",
-    },
-    {
-      title: "Java",
-      start: "2025-05-28T08:30:00",
-      end: "2024-05-28T09:40:00",
-    },
-    {
-      title: "English",
-      start: "2024-10-12T08:30:00",
-      end: "2024-10-12T09:40:00",
-    },
-    {
-      title: "Design",
-      start: "2024-10-13T10:05:00",
-      end: "2024-10-13T11:20:00",
-    },
-  ];
 
   return (
     <div className={styles.workspacePage}>
@@ -244,8 +196,24 @@ const WorkspacePage = () => {
             onCreate={handleCreateClass}
           />
         )}
-        {activeTab === "kanban" && <KanbanBoard tasks={TASKS} />}
-        {activeTab === "calendar" && <Calendar events={EVENTS} />}
+        {activeTab === "kanban" && (
+          <>
+            {isLoadingKanban ? (
+              <div className={styles.loading}>
+                Loading tasks and lectures...
+              </div>
+            ) : kanbanError ? (
+              <div className={styles.error}>{kanbanError}</div>
+            ) : (
+              <KanbanBoard
+                tasks={allTasks}
+                lectures={allLectures}
+                classes={workspace.classes}
+              />
+            )}
+          </>
+        )}
+        {activeTab === "calendar" && <Calendar events={calendarEvents} />}
       </div>
     </div>
   );
