@@ -12,6 +12,7 @@ import {
   Paperclip,
   SquarePen,
   FileText,
+  Send,
 } from "lucide-react";
 
 // TipTap imports
@@ -101,18 +102,7 @@ const TaskPage = () => {
 
   const formatTime = (timeString) => {
     if (!timeString) return "";
-    try {
-      const matches = timeString.match(/T(\d{2}):(\d{2})/);
-      if (!matches) return "";
-
-      const hours = matches[1];
-      const minutes = matches[2];
-
-      return `${hours}:${minutes}`;
-    } catch (error) {
-      console.error("Error formatting time:", error, "timeString:", timeString);
-      return "";
-    }
+    return timeString;
   };
 
   const formatDate = (dateString) => {
@@ -358,15 +348,15 @@ const TaskPage = () => {
 
             <div className={styles.formGroup + " " + styles.formGroupTime}>
               <label className={styles.label}>Start Time:</label>
-              <time className={styles.readOnlyField} dateTime={timeStart}>
-                {formatTime(timeStart)}
+              <time className={styles.readOnlyField}>
+                {timeStart || "Not set"}
               </time>
             </div>
 
             <div className={styles.formGroup + " " + styles.formGroupTime}>
               <label className={styles.label}>End Time:</label>
-              <time className={styles.readOnlyField} dateTime={timeEnd}>
-                {formatTime(timeEnd)}
+              <time className={styles.readOnlyField}>
+                {timeEnd || "Not set"}
               </time>
             </div>
 
@@ -391,6 +381,56 @@ const TaskPage = () => {
                 <option value="Done">Done</option>
               </select>
             </div>
+
+            {/* <div className={styles.formGroup}>
+              <label className={styles.label}>Attach Report</label>
+              <div className={styles.attachmentBox}>
+                {attachments.length === 0 ? (
+                  <p className={styles.noFiles}>No files attached</p>
+                ) : (
+                  <ul className={styles.fileList}>
+                    {attachments.map((file) => (
+                      <li key={file.id} className={styles.fileItem}>
+                        <div className={styles.fileInfo}>
+                          <Paperclip size={16} className={styles.fileIcon} />
+                          <span className={styles.fileName}>{file.name}</span>
+                        </div>
+                        <button
+                          className={styles.removeFile}
+                          onClick={() => handleRemoveFile(file.id)}
+                          title="Remove file"
+                        >
+                          <X size={16} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                className={styles.hiddenInput}
+                multiple
+              />
+              <button
+                type="button"
+                className={styles.addFileButton}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Plus size={19} />
+                <span>Add Report</span>
+              </button>
+              <button
+                type="button"
+                className={styles.addFileButton}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Send size={19} />
+                <span>Send Report</span>
+              </button>
+            </div> */}
           </div>
         </div>
       )}
