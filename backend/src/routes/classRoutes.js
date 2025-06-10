@@ -1,6 +1,7 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 const auth = require("../middleware/auth");
+const { sendClassInvitation } = require("../services/emailService");
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -204,17 +205,36 @@ router.get("/:classId", auth, async (req, res) => {
 router.post("/", auth, async (req, res) => {
   try {
     const { name, meetingLink, description } = req.body;
+    const userId = req.user.id;
 
     if (!name || !meetingLink || !description) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const newClass = await prisma.class.create({
-      data: {
-        name,
-        meetingLink,
-        about: description,
-      },
+    // Generate a unique class code
+    const classCode = `${Math.random().toString(36).substring(2, 6)}-${Math.random().toString(36).substring(2, 3)}`;
+
+    // Create the class and add the creator as an editor in a transaction
+    const newClass = await prisma.$transaction(async (prisma) => {
+      // Create the class
+      const createdClass = await prisma.class.create({
+        data: {
+          name,
+          meetingLink,
+          about: description,
+          code: classCode,
+        },
+      });
+
+      // Add the creator as an editor
+      await prisma.classEditorList.create({
+        data: {
+          userId: userId,
+          classId: createdClass.id,
+        },
+      });
+
+      return createdClass;
     });
 
     res.status(201).json(newClass);
@@ -270,5 +290,120 @@ router.delete("/:classId", auth, async (req, res) => {
     });
   }
 });
+
+// Route to invite a participant to a class
+router.post("/:classId/invite", auth, async (req, res) => {
+  try {
+    const classId = parseInt(req.params.classId);
+    const userId = req.user.id;
+    const { email } = req.body;
+
+    console.log("Invitation request:", { classId, userId, email });
+
+    // Check if the user is an editor of the class
+    const userClass = await prisma.class.findFirst({
+      where: {
+        id: classId,
+        editors: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    console.log("Found class:", userClass);
+
+    if (!userClass) {
+      return res
+        .status(403)
+        .json({ message: "Access denied or class not found" });
+    }
+
+    // Check if the email is already a participant
+    const isAlreadyParticipant = userClass.participants.some(
+      (p) => p.user.email === email
+    );
+
+    if (isAlreadyParticipant) {
+      return res.status(400).json({ message: "User is already a participant" });
+    }
+
+    console.log("Sending invitation email...");
+    // Send invitation email
+    await sendClassInvitation(email, userClass.name, userClass.code);
+    console.log("Invitation email sent successfully");
+
+    res.status(200).json({
+      message: "Invitation sent successfully",
+      participantEmail: email,
+    });
+  } catch (error) {
+    console.error("Error sending invitation:", error);
+    res.status(500).json({
+      message: "Failed to send invitation",
+      details: error.message,
+    });
+  }
+});
+
+// Route to remove a participant from a class
+router.delete(
+  "/:classId/participants/:participantId",
+  auth,
+  async (req, res) => {
+    try {
+      const classId = parseInt(req.params.classId);
+      const participantId = parseInt(req.params.participantId);
+      const userId = req.user.id;
+
+      // Check if the user is an editor of the class
+      const userClass = await prisma.class.findFirst({
+        where: {
+          id: classId,
+          editors: {
+            some: {
+              userId: userId,
+            },
+          },
+        },
+      });
+
+      if (!userClass) {
+        return res
+          .status(403)
+          .json({ message: "Access denied or class not found" });
+      }
+
+      // Remove the participant
+      await prisma.classParticipant.delete({
+        where: {
+          userId_classId: {
+            userId: participantId,
+            classId: classId,
+          },
+        },
+      });
+
+      res.status(200).json({ message: "Participant removed successfully" });
+    } catch (error) {
+      console.error("Error removing participant:", error);
+      res.status(500).json({
+        message: "Failed to remove participant",
+        details: error.message,
+      });
+    }
+  }
+);
 
 module.exports = router;

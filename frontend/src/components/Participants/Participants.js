@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { UserRoundPlus, Trash2 } from "lucide-react";
 import styles from "./Participants.module.css";
 import ConfirmationModal from "../ConfirmationModal/ConfirmationModal";
+import InviteParticipantModal from "../InviteParticipantModal/InviteParticipantModal";
 
 const Participants = ({
   participants = [],
   editors = [],
   onRemoveParticipant,
+  onInviteParticipant,
 }) => {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const handleAddEditor = () => {
     // TODO: Implement adding editor functionality
@@ -17,25 +20,29 @@ const Participants = ({
   };
 
   const handleAddParticipant = () => {
-    // TODO: Implement adding participant functionality
-    console.log("Add participant clicked");
+    setIsInviteModalOpen(true);
+  };
+
+  const handleInviteParticipant = (email) => {
+    onInviteParticipant(email);
+    setIsInviteModalOpen(false);
   };
 
   const handleDeleteClick = (participant) => {
     setSelectedParticipant(participant);
-    setIsModalOpen(true);
+    setIsDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
     if (selectedParticipant) {
       onRemoveParticipant(selectedParticipant.id);
     }
-    setIsModalOpen(false);
+    setIsDeleteModalOpen(false);
     setSelectedParticipant(null);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
     setSelectedParticipant(null);
   };
 
@@ -114,8 +121,8 @@ const Participants = ({
       </div>
 
       <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseDeleteModal}
         onConfirm={handleConfirmDelete}
         title="Remove Participant"
         message={
@@ -125,6 +132,12 @@ const Participants = ({
         }
         confirmText="Remove"
         cancelText="Cancel"
+      />
+
+      <InviteParticipantModal
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        onInvite={handleInviteParticipant}
       />
     </>
   );

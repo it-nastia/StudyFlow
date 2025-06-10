@@ -132,7 +132,7 @@ const LandingPage = () => {
             <a href="#audiences">Audiences</a>
             <a href="#workflow">Workflow</a>
           </nav>
-          {isAuthenticated ? (
+          {/* {isAuthenticated ? (
             <div className={styles.userSection}>
               <button
                 className={styles.startWorkButton}
@@ -157,16 +157,16 @@ const LandingPage = () => {
                 </button>
               </div>
             </div>
-          ) : (
-            <div className={styles.authButtons}>
-              <Link to="/login" className={styles.loginButton}>
-                Log In
-              </Link>
-              <Link to="/register" className={styles.registerButton}>
-                Sign Up
-              </Link>
-            </div>
-          )}
+          ) :
+           ()} */}
+          <div className={styles.authButtons}>
+            <Link to="/login" className={styles.loginButton}>
+              Log In
+            </Link>
+            <Link to="/register" className={styles.signupButton}>
+              Sign Up
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -246,7 +246,7 @@ const LandingPage = () => {
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <Link to="/" className={styles.footerLogo}>
+          <Link to="/" className={styles.logo}>
             <img src={logo} alt="StudyFlow Logo" className={styles.logoImg} />
             <span className={styles.logoName}>StudyFlow</span>
           </Link>

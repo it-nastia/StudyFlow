@@ -20,9 +20,8 @@ const Grades = ({ participants, tasks }) => {
             {tasks.map((task) => (
               <th key={task.id} className={styles.taskHeader}>
                 <Link to={`/task/${task.id}`} className={styles.taskLink}>
-                  Task {task.id}
+                  {task.assignment}
                 </Link>
-                <div className={styles.maxGrade}>_/{task.grade}</div>
               </th>
             ))}
             <th className={styles.totalHeader}>Total score</th>

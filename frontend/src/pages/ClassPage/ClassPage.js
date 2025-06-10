@@ -106,6 +106,7 @@ const ClassPage = () => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const { classId } = useParams();
   const navigate = useNavigate();
+  const [inviteError, setInviteError] = useState(null);
 
   const fetchClassData = useCallback(async () => {
     if (!classId) {
@@ -124,8 +125,6 @@ const ClassPage = () => {
       if (!classResponse.data) {
         throw new Error("No class data received from server");
       }
-
-      console.log("Raw class data:", classResponse.data);
 
       // Check if we have a token before trying to get user data
       const token = localStorage.getItem("token");
@@ -159,10 +158,8 @@ const ClassPage = () => {
         ...classResponse.data,
         lectures:
           classResponse.data.lectures?.map((item) => {
-            console.log("Raw lecture item:", item);
             const lecture = item.lecture;
             const status = lecture.userStatuses?.[0]?.status || "To-Do";
-            console.log("Extracted lecture status:", status);
             return transformLectureData({
               ...lecture,
               status: status,
@@ -170,10 +167,8 @@ const ClassPage = () => {
           }) || [],
         tasks:
           classResponse.data.tasks?.map((item) => {
-            console.log("Raw task item:", item);
             const task = item.task;
             const status = task.userStatuses?.[0]?.status || "To-Do";
-            console.log("Extracted task status:", status);
             return transformTaskData({
               ...task,
               status: status,
@@ -188,8 +183,6 @@ const ClassPage = () => {
             transformUserData(item.user, true)
           ) || [],
       };
-
-      console.log("Final formatted data:", formattedData);
 
       setClassData(formattedData);
     } catch (error) {
@@ -238,6 +231,33 @@ const ClassPage = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleInviteParticipant = async (email) => {
+    try {
+      await axios.post(`/api/classes/${classId}/invite`, { email });
+      // Refresh class data to get updated participants list
+      fetchClassData();
+    } catch (error) {
+      console.error("Error inviting participant:", error);
+      const errorMessage =
+        error.response?.data?.message || "Failed to invite participant";
+      setInviteError(errorMessage);
+      throw new Error(errorMessage); // This will be caught by the InviteParticipantModal
+    }
+  };
+
+  const handleRemoveParticipant = async (participantId) => {
+    try {
+      await axios.delete(
+        `/api/classes/${classId}/participants/${participantId}`
+      );
+      // Refresh class data to get updated participants list
+      fetchClassData();
+    } catch (error) {
+      console.error("Error removing participant:", error);
+      // You might want to show an error message to the user here
     }
   };
 
@@ -386,6 +406,9 @@ const ClassPage = () => {
           <Participants
             participants={classData.participants}
             editors={classData.editors}
+            onRemoveParticipant={handleRemoveParticipant}
+            onInviteParticipant={handleInviteParticipant}
+            inviteError={inviteError}
           />
         )}
       </div>

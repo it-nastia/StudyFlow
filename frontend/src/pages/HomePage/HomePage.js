@@ -70,7 +70,8 @@ const HomePage = () => {
                 .filter((lecture) => {
                   const lectureDate = new Date(lecture.date);
                   lectureDate.setHours(0, 0, 0, 0);
-                  return lectureDate.getTime() === today.getTime();
+
+                  return lectureDate.getDate() === today.getDate();
                 })
                 .map((lecture) => ({
                   assignment: lecture.assignment,
@@ -81,7 +82,7 @@ const HomePage = () => {
                     lecture.timeStart && lecture.timeEnd
                       ? `${lecture.timeStart}-${lecture.timeEnd}`
                       : "",
-                  deadline: lecture.deadline,
+                  deadline: null,
                   status: normalizeStatus(lecture.status),
                   videoLink: lecture.meetingLink,
                   workspaceName: workspace.name,
@@ -89,33 +90,59 @@ const HomePage = () => {
                 }));
 
               // Filter tasks that are currently active (between assignmentDate and deadline)
-              const activeTasks = tasks
+              // const activeTasks = tasks
+              //   .filter((task) => {
+              //     const assignmentDate = task.assignmentDate
+              //       ? new Date(task.assignmentDate)
+              //       : null;
+              //     const deadline = task.deadline
+              //       ? new Date(task.deadline)
+              //       : null;
+              //     const normalizedStatus = normalizeStatus(task.status);
+
+              //     // Check if task is active based on dates
+              //     let isActive = false;
+              //     if (!assignmentDate && !deadline) return false;
+              //     if (assignmentDate && !deadline) {
+              //       isActive = today >= assignmentDate;
+              //     } else if (!assignmentDate && deadline) {
+              //       isActive = today <= deadline;
+              //     } else {
+              //       isActive = today >= assignmentDate && today <= deadline;
+              //     }
+
+              //     // Check if task status is "To-Do" or "In Progress"
+              //     const isActiveStatus =
+              //       normalizedStatus === "To-Do" ||
+              //       normalizedStatus === "In Progress";
+
+              //     return isActive && isActiveStatus;
+              //   })
+              //   .map((task) => ({
+              //     assignment: task.assignment,
+              //     title: task.title,
+              //     description: task.description,
+              //     date: task.date,
+              //     time:
+              //       task.timeStart && task.timeEnd
+              //         ? `${task.timeStart}-${task.timeEnd}`
+              //         : "",
+              //     deadline: task.deadline,
+              //     grade: task.grade,
+              //     status: normalizeStatus(task.status),
+              //     videoLink: task.meetingLink,
+              //     workspaceName: workspace.name,
+              //     className: classItem.name,
+              //   }));
+              //
+
+              // Filter tasks that have assignmentDate as today
+              const todayTasks = tasks
                 .filter((task) => {
-                  const assignmentDate = task.assignmentDate
-                    ? new Date(task.assignmentDate)
-                    : null;
-                  const deadline = task.deadline
-                    ? new Date(task.deadline)
-                    : null;
-                  const normalizedStatus = normalizeStatus(task.status);
+                  const taskDate = new Date(task.date);
+                  taskDate.setHours(0, 0, 0, 0);
 
-                  // Check if task is active based on dates
-                  let isActive = false;
-                  if (!assignmentDate && !deadline) return false;
-                  if (assignmentDate && !deadline) {
-                    isActive = today >= assignmentDate;
-                  } else if (!assignmentDate && deadline) {
-                    isActive = today <= deadline;
-                  } else {
-                    isActive = today >= assignmentDate && today <= deadline;
-                  }
-
-                  // Check if task status is "To-Do" or "In Progress"
-                  const isActiveStatus =
-                    normalizedStatus === "To-Do" ||
-                    normalizedStatus === "In Progress";
-
-                  return isActive && isActiveStatus;
+                  return taskDate.getDate() === today.getDate();
                 })
                 .map((task) => ({
                   assignment: task.assignment,
@@ -133,8 +160,8 @@ const HomePage = () => {
                   workspaceName: workspace.name,
                   className: classItem.name,
                 }));
-
-              allItems.push(...todayLectures, ...activeTasks);
+              //
+              allItems.push(...todayLectures, ...todayTasks);
             }
           } catch (err) {
             console.error(`Error loading workspace ${workspace.id}:`, err);

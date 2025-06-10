@@ -19,9 +19,9 @@ const TaskCard = ({
   return (
     <div className={styles.card}>
       <div className={styles.card__content}>
-        <h3 className={styles.card__assignment}>{assignment}</h3>
+        <h3 className={styles.card__assignment}>{className}</h3>
         <div className={styles.card__info}>
-          <h4 className={styles.card__title}>{className}</h4>
+          <h4 className={styles.card__title}>{assignment}</h4>
           <span className={styles.card__devider}> | </span>
           <p className={styles.card__description}>{title}</p>
         </div>
@@ -30,10 +30,12 @@ const TaskCard = ({
           <span className={styles.card__date}>{date}</span>
           <span className={styles.card__time}>{time}</span>
         </div>
-        <div className={styles.card__deadline}>
-          <CalendarCheck className={styles.card__icon} />
-          <span>{deadline}</span>
-        </div>
+        {deadline && (
+          <div className={styles.card__deadline}>
+            <CalendarCheck className={styles.card__icon} />
+            <span>{deadline}</span>
+          </div>
+        )}
       </div>
       <div className={styles.card__aside}>
         <a

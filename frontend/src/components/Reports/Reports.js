@@ -6,12 +6,12 @@ const Reports = ({ participants = [] }) => {
   // Mock data for demonstration
 
   const mockReports = {
-    1: {
+    2: {
       files: [{ name: "report1.pdf", size: 1024000 }],
-      grade: 9,
+      grade: 8,
       submittedAt: "2025-08-06T14:30:00",
     },
-    2: {
+    1: {
       files: [],
       grade: null,
       submittedAt: null,

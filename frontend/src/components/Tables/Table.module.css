@@ -98,6 +98,10 @@ td.smallCell {
 
 .table td {
   min-width: 70px;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.95rem;
 }
 
@@ -114,12 +118,14 @@ td.smallCell {
 select {
   font-size: 0.95rem;
   border-radius: 0px;
+  width: 100px;
 }
 
 td option {
   width: 100%;
   padding: 8px;
   text-align: center;
+  width: 100px;
 }
 
 option {

@@ -1,7 +1,8 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-require("dotenv").config();
+const morgan = require("morgan");
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -14,7 +15,7 @@ const fileRoutes = require("./routes/fileRoutes");
 const app = express();
 
 // Middleware
-app.use(helmet()); // Безопасность
+app.use(helmet()); // Security
 
 function setCorsHeaders(req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -28,10 +29,10 @@ function setCorsHeaders(req, res, next) {
 
 app.use(setCorsHeaders);
 
-app.use(express.json()); // Парсинг JSON
-app.use(express.urlencoded({ extended: true })); // Парсинг URL-encoded bodies
+app.use(express.json()); // JSON parsing
+app.use(express.urlencoded({ extended: true })); // Parsing URL-encoded bodies
 
-// Корневой маршрут с информацией об API
+// Root route with API information
 app.get("/", (req, res) => {
   res.json({
     name: "StudyFlow API",
@@ -73,16 +74,16 @@ app.get("/", (req, res) => {
   });
 });
 
-// Маршруты API
-app.use("/api/auth", authRoutes); // Аутентификация и регистрация
-app.use("/api/users", userRoutes); // Операции с пользователями
-app.use("/api/workspaces", workspaceRoutes); // Операции с рабочими пространствами
-app.use("/api/classes", classRoutes); // Операции с классами
-app.use("/api/lectures", lectureRoutes); // Операции с лекциями
-app.use("/api/tasks", taskRoutes); // Операции с задачами
-app.use("/api/files", fileRoutes); // Операции с файлами
+// API routes
+app.use("/api/auth", authRoutes); // Authentication and registration
+app.use("/api/users", userRoutes); // User operations
+app.use("/api/workspaces", workspaceRoutes); // Workspace operations
+app.use("/api/classes", classRoutes); // Class operations
+app.use("/api/lectures", lectureRoutes); // Lecture operations
+app.use("/api/tasks", taskRoutes); // Task operations
+app.use("/api/files", fileRoutes); // File operations
 
-// Базовый маршрут для проверки работоспособности API
+// Basic route for checking API health
 app.get("/api/health", (req, res) => {
   res.json({
     status: "OK",
@@ -95,7 +96,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Обработка 404 для несуществующих маршрутов
+// Handle 404 for non-existent routes
 app.use((req, res, next) => {
   if (req.path.startsWith("/api/")) {
     return res.status(404).json({
@@ -106,7 +107,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Обработка ошибок
+// Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({

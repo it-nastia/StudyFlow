@@ -52,6 +52,8 @@
 .logoName {
   display: inline-block;
   vertical-align: middle;
+  font-weight: 600;
+  font-size: 1.4rem;
 }
 
 .nav {
@@ -132,7 +134,7 @@
 .signupButton {
   padding: 8px 20px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 1rem;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -140,7 +142,7 @@
 
 .loginButton {
   color: var(--accent-color);
-  background: none;
+  background: var(--primary-background-color);
   border: 1px solid var(--accent-color);
 }
 
@@ -152,11 +154,13 @@
 .signupButton {
   color: white;
   background-color: var(--accent-color);
-  border: none;
+  border: 1px solid var(--accent-color);
 }
 
 .signupButton:hover {
-  background-color: var(--accent-hover-color);
+  background-color: var(--primary-background-color);
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
 }
 
 .startWorkButton {
@@ -190,8 +194,9 @@
 .heroContent {
   flex: 1;
   max-width: 600px;
+  text-align: left;
   position: relative;
-  text-align: center;
+  z-index: 1000;
 }
 
 .hero::after {
@@ -370,7 +375,7 @@
   position: relative;
   padding: 2rem;
   text-align: center;
-  background-color: var(--card-color);
+  background-color: white;
   border-radius: 8px;
   transition: background-color 0.3s ease;
 }
