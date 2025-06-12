@@ -3,7 +3,7 @@ const prisma = require("../config/database");
 
 const generateToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "24h", // токен истекает через 24 часа
+    expiresIn: "24h", // token expires in 24 hours
   });
 };
 
@@ -17,7 +17,7 @@ const verifyToken = (token) => {
 
 const auth = async (req, res, next) => {
   try {
-    // Получаем токен из заголовка
+    // Get the token from the header
     const authHeader = req.header("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return res.status(401).json({ error: "Authentication required" });
@@ -30,7 +30,7 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    // Проверяем существование пользователя
+    // Check if the user exists
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: {
@@ -45,7 +45,7 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ error: "User not found" });
     }
 
-    // Добавляем пользователя в объект запроса
+    // Add the user to the request object
     req.user = user;
     next();
   } catch (error) {

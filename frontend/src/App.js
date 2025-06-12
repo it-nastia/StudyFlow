@@ -27,7 +27,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Публичные маршруты */}
+        {/* Public routes */}
         <Route
           path="/"
           element={isAuthenticated ? <LandingPage /> : <LandingPage />}
@@ -41,7 +41,7 @@ const App = () => {
           element={isAuthenticated ? <Register /> : <Register />}
         />
 
-        {/* Защищенные маршруты */}
+        {/* Protected routes */}
         <Route
           path="/home"
           element={
@@ -133,7 +133,7 @@ const App = () => {
           }
         />
 
-        {/* Редирект для несуществующих маршрутов */}
+        {/* Redirect for non-existent routes */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

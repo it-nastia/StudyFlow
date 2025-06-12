@@ -25,17 +25,34 @@ const WorkspaceMainTable = ({ classes = [], onJoin, onCreate, onLeave }) => {
     }
   };
 
-  const handleJoinSuccess = (classData) => {
-    console.log("Successfully joined class:", classData);
-  };
-
   const handleJoinClick = () => {
     setIsJoinModalOpen(true);
+    setError(null);
   };
 
   const handleJoinClass = async (classCode) => {
-    await onJoin(classCode);
-    setIsJoinModalOpen(false);
+    try {
+      const result = await onJoin(classCode);
+
+      if (!result || !result.id) {
+        throw new Error("Invalid response from server");
+      }
+
+      // Close modal first
+      setIsJoinModalOpen(false);
+
+      // Then navigate to the class
+      navigate(`/class/${result.id}`);
+
+      return result;
+    } catch (error) {
+      console.error("Error joining class:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to join class";
+      throw new Error(errorMessage);
+    }
   };
 
   const handleLeaveClick = (classItem) => {

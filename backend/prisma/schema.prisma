@@ -196,6 +196,7 @@ model Report {
 
   // Отношения
   taskReports ReportsList[]
+  files       ReportFilesList[]
 
   @@map("reports")
 }
@@ -224,6 +225,7 @@ model File {
   // Отношения
   lectures    LectureFilesList[]
   tasks       TaskFilesList[]
+  reports     ReportFilesList[]
 
   @@map("files")
 }
@@ -246,4 +248,14 @@ model TaskFilesList {
 
   @@id([taskId, fileId])
   @@map("task_files_list")
+}
+
+model ReportFilesList {
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reportId Int    @map("report_id")
+  file     File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId   Int    @map("file_id")
+
+  @@id([reportId, fileId])
+  @@map("report_files_list")
 }

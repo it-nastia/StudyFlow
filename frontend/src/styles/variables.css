@@ -1,6 +1,6 @@
 :root {
-  --primary-background-color: #f7f9fb; /* светлый фон */
-  --secondary-background-color: #e3e8f1; /* фон для карточек и задач */
+  --primary-background-color: #f7f9fb; /* light background */
+  --secondary-background-color: #e3e8f1; /* background for cards and tasks */
 
   --card-color: #f0f4f8;
 
@@ -9,40 +9,21 @@
   --primary-text-color: #1e2022;
   --secondary-text-color: #52616b;
 
-  --accent-color: #232d4b; /* акцентный цвет для кнопок и ссылок */
+  --accent-color: #232d4b; /* accent color for buttons and links */
 
-  --button-background-color: #cfe3fa; /* фоновый цвет для кнопок */
-  --hover-button-background-color: #d6e3ef; /* фоновый цвет для кнопок при наведении */
+  --button-background-color: #cfe3fa; /* background color for buttons */
+  --hover-button-background-color: #d6e3ef; /* background color for buttons on hover */
   --button-border-color: #bfc6ce;
 
-  --header-background-color: #c5d3e4; /* цвет фона для шапки */
+  --header-background-color: #c5d3e4; /* background color for the header */
 
-  --table-header-background-color: #dfe6f2; /* цвет фона для заголовков таблиц */
+  --table-header-background-color: #dfe6f2; /* background color for table headers */
 
   --tab-color: #526584;
-  --hover-background-color: #d8e0ed; /* цвет фона при наведении на элементы */
-  --hover-text-color: #1e2022; /* цвет текста при наведении на элементы */
-  --active-background-color: #6a7af3; /* цвет фона для активных элементов */
+  --hover-background-color: #d8e0ed; /* background color on hover for elements */
+  --hover-text-color: #1e2022; /* text color on hover for elements */
+  --active-background-color: #6a7af3; /* background color for active elements */
 
   --error-color: #c11515;
   --disabled-color: #9e9e9e;
 }
-
-/* :root {
-    --bg: #212123;
-    --dark: #191919;
-    --dark-sea: #576067;
-    --grey: #b8b8b8;
-    --white: #fff;
-    --violet: #8b57c6;
-    --violet-dark: #6c3eb8;
-    --light: #f6f6f7;
-    --sea: #616e74;
-}
-
-:root {
-    --darkreader-neutral-background: #212222;
-    --darkreader-neutral-text: #eae3d9;
-    --darkreader-selection-background: #165aaa;
-    --darkreader-selection-text: #fbf5ec;
-} */

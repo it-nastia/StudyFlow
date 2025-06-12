@@ -203,6 +203,12 @@ const LectureEdit = () => {
   const [attachments, setAttachments] = useState([]);
   const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [deletingFileIds, setDeletingFileIds] = useState(new Set());
+
+  // Validation states
+  const [validationErrors, setValidationErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -242,6 +248,120 @@ const LectureEdit = () => {
     },
   });
 
+  // Validation functions
+  const validateField = (fieldName, value) => {
+    const errors = {};
+
+    switch (fieldName) {
+      case "assignment":
+        if (!value || value.trim().length === 0) {
+          errors.assignment = "Assignment is required";
+        } else if (value.trim().length < 3) {
+          errors.assignment = "Assignment must be at least 3 characters long";
+        } else if (value.trim().length > 255) {
+          errors.assignment = "Assignment must not exceed 255 characters";
+        }
+        break;
+
+      case "title":
+        if (!value || value.trim().length === 0) {
+          errors.title = "Title is required";
+        } else if (value.trim().length < 3) {
+          errors.title = "Title must be at least 3 characters long";
+        } else if (value.trim().length > 100) {
+          errors.title = "Title must not exceed 100 characters";
+        }
+        break;
+
+      case "description":
+        // Description is optional, no validation needed
+        break;
+
+      case "assignmentDate":
+        if (value) {
+          const selectedDate = new Date(value);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          if (selectedDate < today) {
+            errors.assignmentDate = "Assignment date cannot be in the past";
+          }
+        }
+        break;
+
+      case "timeStart":
+        if (value && timeEnd) {
+          if (value >= timeEnd) {
+            errors.timeStart = "Start time must be before end time";
+          }
+        }
+        break;
+
+      case "timeEnd":
+        if (value && timeStart) {
+          if (value <= timeStart) {
+            errors.timeEnd = "End time must be after start time";
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return errors;
+  };
+
+  const validateAllFields = () => {
+    const fields = {
+      assignment,
+      title,
+      description,
+      assignmentDate,
+      timeStart,
+      timeEnd,
+    };
+
+    let allErrors = {};
+    Object.keys(fields).forEach((fieldName) => {
+      const fieldErrors = validateField(fieldName, fields[fieldName]);
+      allErrors = { ...allErrors, ...fieldErrors };
+    });
+
+    setValidationErrors(allErrors);
+    return Object.keys(allErrors).length === 0;
+  };
+
+  const handleFieldChange = (fieldName, value) => {
+    setTouched((prev) => ({ ...prev, [fieldName]: true }));
+
+    switch (fieldName) {
+      case "assignment":
+        setAssignment(value);
+        break;
+      case "title":
+        setTitle(value);
+        break;
+      case "assignmentDate":
+        setAssignmentDate(value);
+        break;
+      case "timeStart":
+        setTimeStart(value);
+        break;
+      case "timeEnd":
+        setTimeEnd(value);
+        break;
+      default:
+        break;
+    }
+
+    // Clear validation errors when user starts typing after a failed save attempt
+    if (showValidationErrors) {
+      setShowValidationErrors(false);
+      setValidationErrors({});
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -269,6 +389,10 @@ const LectureEdit = () => {
           if (editor && lecture.description) {
             editor.commands.setContent(lecture.description);
           }
+        } else {
+          // Set today's date for new lectures
+          const today = new Date().toISOString().split("T")[0];
+          setAssignmentDate(today);
         }
 
         setLoading(false);
@@ -302,8 +426,62 @@ const LectureEdit = () => {
     event.target.value = "";
   };
 
-  const handleRemoveFile = (fileId) => {
-    setAttachments((prev) => prev.filter((file) => file.id !== fileId));
+  const handleRemoveFile = async (fileId) => {
+    try {
+      // Find the file to be removed
+      const fileToRemove = attachments.find((file) => file.id === fileId);
+
+      if (!fileToRemove) {
+        console.warn("File not found in attachments");
+        return;
+      }
+
+      // Check if this is an uploaded file (has no 'file' property and has a numeric id)
+      const isUploadedFile =
+        !fileToRemove.file && typeof fileToRemove.id === "number";
+
+      if (isUploadedFile) {
+        console.log(
+          `Deleting uploaded file: ${fileToRemove.name} (ID: ${fileToRemove.id})`
+        );
+
+        // Add to deleting set to show loading state
+        setDeletingFileIds((prev) => new Set(prev).add(fileId));
+
+        // Delete from server
+        await axios.delete(`/api/files/${fileToRemove.id}`);
+        console.log(`File deleted from server: ${fileToRemove.name}`);
+
+        // Remove from deleting set
+        setDeletingFileIds((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(fileId);
+          return newSet;
+        });
+      } else {
+        console.log(`Removing local file: ${fileToRemove.name}`);
+      }
+
+      // Remove from local state
+      setAttachments((prev) => prev.filter((file) => file.id !== fileId));
+    } catch (error) {
+      console.error("Error removing file:", error);
+
+      // Remove from deleting set on error
+      setDeletingFileIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(fileId);
+        return newSet;
+      });
+
+      // Still remove from local state even if server deletion fails
+      setAttachments((prev) => prev.filter((file) => file.id !== fileId));
+
+      // Show error to user
+      setError(
+        error.response?.data?.error || "Failed to delete file from server"
+      );
+    }
   };
 
   const formatTimeForDB = (timeString) => {
@@ -314,7 +492,14 @@ const LectureEdit = () => {
 
   const handleSave = async () => {
     try {
+      // Validate all fields before saving
+      if (!validateAllFields()) {
+        setShowValidationErrors(true);
+        return;
+      }
+
       setIsLoading(true);
+      setError(null);
 
       // Format the date and time data
       const lectureData = {
@@ -446,30 +631,53 @@ const LectureEdit = () => {
             <label className={styles.label}>Assignment</label>
             <input
               type="text"
-              className={styles.input}
+              className={`${styles.input} ${
+                showValidationErrors && validationErrors.assignment
+                  ? styles.inputError
+                  : ""
+              }`}
               placeholder="Enter assignment"
               value={assignment}
-              onChange={(e) => setAssignment(e.target.value)}
+              onChange={(e) => handleFieldChange("assignment", e.target.value)}
             />
+            {showValidationErrors && validationErrors.assignment && (
+              <span className={styles.errorMessage}>
+                {validationErrors.assignment}
+              </span>
+            )}
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.label}>Title</label>
             <input
               type="text"
-              className={styles.input}
+              className={`${styles.input} ${
+                showValidationErrors && validationErrors.title
+                  ? styles.inputError
+                  : ""
+              }`}
               placeholder="Enter title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => handleFieldChange("title", e.target.value)}
             />
+            {showValidationErrors && validationErrors.title && (
+              <span className={styles.errorMessage}>
+                {validationErrors.title}
+              </span>
+            )}
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Description</label>
+          <div className={styles.formGroup + " " + styles.description}>
+            <p className={styles.label}>Description</p>
             <div className={styles.editorWrapper}>
               <MenuBar editor={editor} />
               <EditorContent editor={editor} className={styles.editor} />
             </div>
+            {showValidationErrors && validationErrors.description && (
+              <span className={styles.errorMessage}>
+                {validationErrors.description}
+              </span>
+            )}
           </div>
         </div>
 
@@ -479,30 +687,59 @@ const LectureEdit = () => {
             <label className={styles.label}>Assignment Date</label>
             <input
               type="date"
-              className={styles.input}
+              className={`${styles.input} ${
+                showValidationErrors && validationErrors.assignmentDate
+                  ? styles.inputError
+                  : ""
+              }`}
               value={assignmentDate}
-              onChange={(e) => setAssignmentDate(e.target.value)}
+              onChange={(e) =>
+                handleFieldChange("assignmentDate", e.target.value)
+              }
             />
+            {showValidationErrors && validationErrors.assignmentDate && (
+              <span className={styles.errorMessage}>
+                {validationErrors.assignmentDate}
+              </span>
+            )}
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.label}>Start Time</label>
             <input
               type="time"
-              className={styles.input}
+              className={`${styles.input} ${
+                showValidationErrors && validationErrors.timeStart
+                  ? styles.inputError
+                  : ""
+              }`}
               value={timeStart}
-              onChange={(e) => setTimeStart(e.target.value)}
+              onChange={(e) => handleFieldChange("timeStart", e.target.value)}
             />
+            {showValidationErrors && validationErrors.timeStart && (
+              <span className={styles.errorMessage}>
+                {validationErrors.timeStart}
+              </span>
+            )}
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.label}>End Time</label>
             <input
               type="time"
-              className={styles.input}
+              className={`${styles.input} ${
+                showValidationErrors && validationErrors.timeEnd
+                  ? styles.inputError
+                  : ""
+              }`}
               value={timeEnd}
-              onChange={(e) => setTimeEnd(e.target.value)}
+              onChange={(e) => handleFieldChange("timeEnd", e.target.value)}
             />
+            {showValidationErrors && validationErrors.timeEnd && (
+              <span className={styles.errorMessage}>
+                {validationErrors.timeEnd}
+              </span>
+            )}
           </div>
 
           <div className={styles.formGroup}>
@@ -537,9 +774,14 @@ const LectureEdit = () => {
                       <button
                         className={styles.removeFile}
                         onClick={() => handleRemoveFile(file.id)}
+                        disabled={deletingFileIds.has(file.id)}
                         title="Remove file"
                       >
-                        <X size={16} />
+                        {deletingFileIds.has(file.id) ? (
+                          <span style={{ fontSize: "12px" }}>...</span>
+                        ) : (
+                          <X size={16} />
+                        )}
                       </button>
                     </li>
                   ))}

@@ -47,6 +47,112 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
+// Join a class by code in a workspace
+router.post("/:workspaceId/join-class", auth, async (req, res) => {
+  try {
+    const workspaceId = parseInt(req.params.workspaceId);
+    const userId = req.user.id;
+    const { classCode } = req.body;
+
+    if (!classCode || !classCode.trim()) {
+      return res.status(400).json({ message: "Class code is required" });
+    }
+
+    // Check if user has access to the workspace
+    const workspace = await prisma.workspace.findFirst({
+      where: {
+        id: workspaceId,
+        users: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    });
+
+    if (!workspace) {
+      return res
+        .status(404)
+        .json({ message: "Workspace not found or access denied" });
+    }
+
+    // Find the class by code
+    const classToJoin = await prisma.class.findUnique({
+      where: { code: classCode.trim() },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        about: true,
+        meetingLink: true,
+      },
+    });
+
+    if (!classToJoin) {
+      return res.status(404).json({
+        message: "Class not found. Please check the code and try again.",
+      });
+    }
+
+    // Check if user is already a participant
+    const existingParticipant = await prisma.classParticipantList.findUnique({
+      where: {
+        userId_classId: {
+          userId: userId,
+          classId: classToJoin.id,
+        },
+      },
+    });
+
+    if (existingParticipant) {
+      return res.status(400).json({
+        message: "You are already a participant in this class.",
+      });
+    }
+
+    // Check if class is already in the workspace
+    const existingClassInWorkspace = await prisma.classesList.findUnique({
+      where: {
+        workspaceId_classId: {
+          workspaceId: workspaceId,
+          classId: classToJoin.id,
+        },
+      },
+    });
+
+    // Add class to workspace and user as participant in a transaction
+    const result = await prisma.$transaction(async (prisma) => {
+      // Add class to workspace if not already there
+      if (!existingClassInWorkspace) {
+        await prisma.classesList.create({
+          data: {
+            workspaceId: workspaceId,
+            classId: classToJoin.id,
+          },
+        });
+      }
+
+      // Add user as participant
+      await prisma.classParticipantList.create({
+        data: {
+          userId: userId,
+          classId: classToJoin.id,
+        },
+      });
+
+      return classToJoin;
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error joining class:", error);
+    res.status(500).json({
+      message: "Failed to join class",
+      details: error.message,
+    });
+  }
+});
+
 // Create a new class in a workspace
 router.post("/:workspaceId/classes", auth, async (req, res) => {
   try {

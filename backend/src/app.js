@@ -11,8 +11,29 @@ const classRoutes = require("./routes/classRoutes");
 const lectureRoutes = require("./routes/lectureRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const fileRoutes = require("./routes/fileRoutes");
+const reportRoutes = require("./routes/reportRoutes");
 
 const app = express();
+
+// Test Azure Storage connectivity on startup
+async function initializeServices() {
+  try {
+    const azureStorage = require("./services/azureStorage");
+    await azureStorage.healthCheck();
+    console.log("✅ Azure Storage service initialized successfully");
+  } catch (error) {
+    console.error("❌ Azure Storage initialization failed:", error.message);
+    console.error("Please check your Azure Storage configuration:");
+    console.error("- AZURE_STORAGE_CONNECTION_STRING environment variable");
+    console.error("- AZURE_STORAGE_CONTAINER_NAME environment variable");
+    console.error("- Azure Storage account access and permissions");
+
+    // Don't exit the server, but log the warning
+    console.warn(
+      "⚠️  Server will continue but file uploads will not work until Azure Storage is properly configured"
+    );
+  }
+}
 
 // Middleware
 app.use(helmet()); // Security
@@ -82,6 +103,7 @@ app.use("/api/classes", classRoutes); // Class operations
 app.use("/api/lectures", lectureRoutes); // Lecture operations
 app.use("/api/tasks", taskRoutes); // Task operations
 app.use("/api/files", fileRoutes); // File operations
+app.use("/api/reports", reportRoutes); // Report operations
 
 // Basic route for checking API health
 app.get("/api/health", (req, res) => {
@@ -117,8 +139,24 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+
+// Start server and initialize services
+async function startServer() {
+  try {
+    await initializeServices();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+      console.log(
+        `📊 Health check available at http://localhost:${PORT}/api/health`
+      );
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 module.exports = app;

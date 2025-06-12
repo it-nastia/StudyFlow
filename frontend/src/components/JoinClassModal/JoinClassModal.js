@@ -5,33 +5,59 @@ import styles from "./JoinClassModal.module.css";
 const JoinClassModal = ({ isOpen, onClose, onJoin }) => {
   const [classCode, setClassCode] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const validateClassCode = (code) => {
+    if (!code || code.trim().length === 0) {
+      return "Please enter a class code";
+    }
+    // Add any additional validation rules here
+    return null;
+  };
 
-    // Basic validation
-    if (!classCode.trim()) {
-      setError("Please enter a class code");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    const validationError = validateClassCode(classCode);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
-    onJoin(classCode.trim());
-    setClassCode("");
-    setError("");
+    try {
+      setIsLoading(true);
+      await onJoin(classCode.trim());
+    } catch (err) {
+      console.error("Error joining class:", err);
+      setError(err.message || "Failed to join class");
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
     setClassCode("");
     setError("");
+    setIsLoading(false);
     onClose();
+  };
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setClassCode(value);
+    setError("");
   };
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <button className={styles.closeButton} onClick={handleClose}>
+        <button
+          className={styles.closeButton}
+          onClick={handleClose}
+          disabled={isLoading}
+        >
           <X size={20} />
         </button>
 
@@ -49,12 +75,10 @@ const JoinClassModal = ({ isOpen, onClose, onJoin }) => {
               id="classCode"
               type="text"
               value={classCode}
-              onChange={(e) => {
-                setClassCode(e.target.value);
-                setError("");
-              }}
+              onChange={handleInputChange}
               placeholder="Enter class code"
-              className={styles.input}
+              className={`${styles.input} ${error ? styles.inputError : ""}`}
+              disabled={isLoading}
               autoFocus
             />
             {error && <span className={styles.error}>{error}</span>}
@@ -65,14 +89,16 @@ const JoinClassModal = ({ isOpen, onClose, onJoin }) => {
               type="button"
               className={`${styles.button} ${styles.cancelButton}`}
               onClick={handleClose}
+              disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="submit"
               className={`${styles.button} ${styles.joinButton}`}
+              disabled={isLoading || !classCode.trim()}
             >
-              Join Class
+              {isLoading ? "Joining..." : "Join Class"}
             </button>
           </div>
         </form>

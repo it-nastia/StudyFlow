@@ -33,6 +33,9 @@ import python from "highlight.js/lib/languages/python";
 
 // Components
 import Reports from "../../components/Reports/Reports";
+import StudentSubmission from "../../components/StudentSubmission/StudentSubmission";
+import EditorFileManager from "../../components/EditorFileManager/EditorFileManager";
+import StudentFileViewer from "../../components/StudentFileViewer/StudentFileViewer";
 
 // Styles
 import styles from "../LectureEditPage/LectureEdit.module.css";
@@ -212,6 +215,17 @@ const TaskPage = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const refreshAttachments = async () => {
+    try {
+      const taskResponse = await axios.get(`/api/tasks/${taskId}`);
+      if (taskResponse?.data) {
+        setAttachments(taskResponse.data.attachments || []);
+      }
+    } catch (error) {
+      console.error("Error refreshing attachments:", error);
+    }
+  };
+
   const handleTabClick = (tabId) => {
     if (tabId === "edit") {
       navigate(`/class/${classId}/task/${taskId}/edit`);
@@ -283,51 +297,41 @@ const TaskPage = () => {
         <Reports participants={participants} />
       ) : (
         <div className={styles.content}>
-          <div className={styles.mainContent}>
-            <div className={styles.heading}>
-              <p className={styles.headingValue}>{title}</p>
-            </div>
+          <div className={styles.main}>
+            <div className={styles.mainContent}>
+              <div className={styles.heading}>
+                <p className={styles.headingValue}>{title}</p>
+              </div>
 
-            <div className={styles.formGroup}>
-              <div>
-                <EditorContent editor={editor} className={styles.editor} />
+              <div className={styles.formGroup}>
+                <div>
+                  <EditorContent editor={editor} className={styles.editor} />
+                </div>
               </div>
             </div>
 
-            {/* Attachments Section */}
-            <div className={styles.attachmentsSection}>
-              <h2 className={styles.attachmentsTitle}>
-                <Paperclip size={20} />
-                Attachments
-              </h2>
-              <div className={styles.attachmentsGrid}>
-                {attachments.length === 0 ? (
-                  <p className={styles.noFiles}>No files attached</p>
-                ) : (
-                  attachments.map((file) => (
-                    <a
-                      key={file.id}
-                      href={file.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.attachmentCard}
-                    >
-                      <div className={styles.attachmentIcon}>
-                        <FileText size={24} />
-                      </div>
-                      <div className={styles.attachmentDetails}>
-                        <span className={styles.attachmentName}>
-                          {file.name}
-                        </span>
-                        <span className={styles.attachmentSize}>
-                          {formatFileSize(file.size)}
-                        </span>
-                      </div>
-                    </a>
-                  ))
-                )}
-              </div>
-            </div>
+            {/* Role-Based File Management */}
+            {isEditor ? (
+              <EditorFileManager
+                type="task"
+                itemId={taskId}
+                existingFiles={attachments}
+                onFilesUpdate={refreshAttachments}
+              />
+            ) : (
+              <StudentFileViewer files={attachments} type="task" />
+            )}
+
+            {/* Student Submission Section - Only for participants */}
+            {!isEditor && (
+              <StudentSubmission
+                taskId={taskId}
+                onSubmissionUpdate={() => {
+                  // Optionally refresh the page data or update reports
+                  console.log("Submission updated");
+                }}
+              />
+            )}
           </div>
 
           {/* Side Panel */}

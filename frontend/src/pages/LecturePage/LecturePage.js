@@ -29,6 +29,10 @@ import { createLowlight } from "lowlight";
 import js from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
 
+// Components
+import EditorFileManager from "../../components/EditorFileManager/EditorFileManager";
+import StudentFileViewer from "../../components/StudentFileViewer/StudentFileViewer";
+
 // Styles
 import styles from "../LectureEditPage/LectureEdit.module.css";
 
@@ -206,6 +210,17 @@ const LecturePage = () => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const refreshAttachments = async () => {
+    try {
+      const lectureResponse = await axios.get(`/api/lectures/${lectureId}`);
+      if (lectureResponse?.data) {
+        setAttachments(lectureResponse.data.attachments || []);
+      }
+    } catch (error) {
+      console.error("Error refreshing attachments:", error);
+    }
+  };
+
   const handleTabClick = (tabId) => {
     if (tabId === "edit") {
       navigate(`/class/${classId}/lecture/${lectureId}/edit`);
@@ -270,18 +285,30 @@ const LecturePage = () => {
 
       {/* Main Content */}
       <div className={styles.content}>
-        <div className={styles.mainContent}>
-          <div className={styles.heading}>
-            <p className={styles.headingValue}>{title}</p>
-          </div>
+        <div className={styles.main}>
+          <div className={styles.mainContent}>
+            <div className={styles.heading}>
+              <p className={styles.headingValue}>{title}</p>
+            </div>
 
-          <div className={styles.formGroup}>
-            <div>
-              <EditorContent editor={editor} className={styles.editor} />
+            <div className={styles.formGroup}>
+              <div>
+                <EditorContent editor={editor} className={styles.editor} />
+              </div>
             </div>
           </div>
+          {/* Role-Based File Management */}
+          {isEditor ? (
+            <EditorFileManager
+              type="lecture"
+              itemId={lectureId}
+              existingFiles={attachments}
+              onFilesUpdate={refreshAttachments}
+            />
+          ) : (
+            <StudentFileViewer files={attachments} type="lecture" />
+          )}
         </div>
-
         {/* Side Panel */}
         <div className={styles.sidePanel}>
           <div className={styles.formGroup + " " + styles.formGroupTime}>
@@ -318,14 +345,14 @@ const LecturePage = () => {
             </select>
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Attachments</label>
+          {/* <div className={styles.formGroup}>
+            <label className={styles.label}>Quick File Access</label>
             <div className={styles.attachmentBox}>
               {attachments.length === 0 ? (
                 <p className={styles.noFiles}>No files attached</p>
               ) : (
                 <ul className={styles.fileList}>
-                  {attachments.map((file) => (
+                  {attachments.slice(0, 3).map((file) => (
                     <li key={file.id} className={styles.fileItem}>
                       <div className={styles.fileInfo}>
                         <Paperclip size={16} className={styles.fileIcon} />
@@ -337,16 +364,21 @@ const LecturePage = () => {
                         >
                           {file.name}
                         </a>
-                        <span className={styles.fileSize}>
-                          ({formatFileSize(file.size)})
-                        </span>
                       </div>
                     </li>
                   ))}
+                  {attachments.length > 3 && (
+                    <li className={styles.moreFiles}>
+                      <span>
+                        + {attachments.length - 3} more file
+                        {attachments.length - 3 > 1 ? "s" : ""}
+                      </span>
+                    </li>
+                  )}
                 </ul>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

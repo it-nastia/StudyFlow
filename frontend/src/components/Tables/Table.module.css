@@ -150,21 +150,6 @@ option {
   border-radius: 0;
 }
 
-/* .statusSelect option[value="Done"],
-.statusSelect.Done {
-  background-color: #4caf50;
-}
-
-.statusSelect option[value="To-Do"],
-.statusSelect.To-Do {
-  background-color: #ef5350;
-}
-
-.statusSelect option[value="In Progress"],
-.statusSelect.In-Progress {
-  background-color: #ffa726;
-} */
-
 .emptyState {
   text-align: center;
   padding: 20px !important;

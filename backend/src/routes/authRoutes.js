@@ -8,7 +8,7 @@ const {
 } = require("../utils/validation");
 const auth = require("../middleware/auth");
 
-// Регистрация
+// Registration
 router.post(
   "/register",
   validateRegistration,
@@ -16,13 +16,13 @@ router.post(
   authController.register
 );
 
-// Вход
+// Login
 router.post("/login", validateLogin, validate, authController.login);
 
-// Получение информации о текущем пользователе
+// Get information about the current user
 router.get("/me", auth, authController.getMe);
 
-// Обновление профиля
+// Update profile
 router.put("/profile", auth, authController.updateProfile);
 
 module.exports = router;

@@ -9,6 +9,7 @@ import {
   fetchWorkspaceData,
   fetchClassData,
   createClass,
+  joinClass,
   getAuthHeaders,
   transformLectureData,
   transformTaskData,
@@ -132,9 +133,26 @@ const WorkspacePage = () => {
     fetchWorkspaceAndClassData();
   }, [fetchWorkspaceAndClassData]);
 
-  const handleJoinClass = useCallback(() => {
-    // TODO: Implement class joining functionality
-  }, []);
+  const handleJoinClass = useCallback(
+    async (classCode) => {
+      try {
+        console.log("Attempting to join class with code:", classCode);
+        const joinedClass = await joinClass(id, classCode);
+
+        // Update workspace state with the new class
+        setWorkspace((prevWorkspace) => ({
+          ...prevWorkspace,
+          classes: [...(prevWorkspace.classes || []), joinedClass],
+        }));
+
+        return joinedClass;
+      } catch (error) {
+        console.error("Error joining class:", error);
+        throw error;
+      }
+    },
+    [id]
+  );
 
   const handleCreateClass = useCallback(
     async (classData) => {
@@ -152,6 +170,22 @@ const WorkspacePage = () => {
     },
     [id]
   );
+
+  const handleLeaveClass = useCallback(async (classId) => {
+    try {
+      // TODO: Implement leave class functionality
+      console.log("Leaving class with ID:", classId);
+
+      // For now, just remove from local state
+      setWorkspace((prevWorkspace) => ({
+        ...prevWorkspace,
+        classes: prevWorkspace.classes.filter((cls) => cls.id !== classId),
+      }));
+    } catch (error) {
+      console.error("Error leaving class:", error);
+      throw error;
+    }
+  }, []);
 
   const calendarEvents = useMemo(
     () => [...allLectures, ...allTasks],
@@ -194,6 +228,7 @@ const WorkspacePage = () => {
             classes={workspace.classes}
             onJoin={handleJoinClass}
             onCreate={handleCreateClass}
+            onLeave={handleLeaveClass}
           />
         )}
         {activeTab === "kanban" && (

@@ -147,6 +147,36 @@ export const createClass = async (workspaceId, classData, authHeaders) => {
   }
 };
 
+export const joinClass = async (workspaceId, classCode) => {
+  try {
+    console.log(
+      "Joining class with code:",
+      classCode,
+      "in workspace:",
+      workspaceId
+    );
+
+    const response = await axios.post(
+      `/api/workspaces/${workspaceId}/join-class`,
+      {
+        classCode: classCode,
+      }
+    );
+
+    console.log("Join class response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error joining class:", error);
+
+    // Extract error message from response
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+
+    throw error;
+  }
+};
+
 export const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   if (!token) {
