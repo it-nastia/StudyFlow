@@ -61,6 +61,6 @@ router.get("/tasks/:taskId/my-report", auth, getUserTaskReport);
 router.delete("/:reportId", auth, deleteReport);
 
 // Update report grade (for teachers)
-router.put("/:reportId/grade", auth, updateReportGrade);
+router.patch("/:reportId/grade", auth, updateReportGrade);
 
 module.exports = router;

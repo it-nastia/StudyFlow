@@ -216,6 +216,43 @@ class AzureStorageService {
       throw new Error(`Failed to get file URL: ${error.message}`);
     }
   }
+
+  async downloadFile(blobName) {
+    try {
+      if (!blobName) {
+        throw new Error("Blob name is required for download");
+      }
+
+      const blockBlobClient = this.containerClient.getBlockBlobClient(blobName);
+
+      // Check if blob exists
+      const exists = await blockBlobClient.exists();
+      if (!exists) {
+        throw new Error(`File not found in storage: ${blobName}`);
+      }
+
+      const downloadResponse = await blockBlobClient.download();
+
+      if (!downloadResponse.readableStreamBody) {
+        throw new Error("Failed to get file stream from Azure Storage");
+      }
+
+      // Convert stream to buffer
+      const chunks = [];
+      for await (const chunk of downloadResponse.readableStreamBody) {
+        chunks.push(chunk);
+      }
+
+      const buffer = Buffer.concat(chunks);
+      console.log(
+        `File downloaded successfully: ${blobName}, size: ${buffer.length}`
+      );
+      return buffer;
+    } catch (error) {
+      console.error("Error downloading from Azure Storage:", error);
+      throw new Error(`Failed to download file from storage: ${error.message}`);
+    }
+  }
 }
 
 module.exports = new AzureStorageService();

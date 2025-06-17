@@ -3,16 +3,24 @@ import { UserRoundPlus, Trash2 } from "lucide-react";
 import styles from "./Participants.module.css";
 import ConfirmationModal from "../ConfirmationModal/ConfirmationModal";
 import InviteParticipantModal from "../InviteParticipantModal/InviteParticipantModal";
+import axios from "../../utils/axios";
 
 const Participants = ({
   participants = [],
   editors = [],
   onRemoveParticipant,
   onInviteParticipant,
+  classId,
 }) => {
   const [selectedParticipant, setSelectedParticipant] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [localParticipants, setLocalParticipants] = useState(participants);
+
+  // Update local state when props change
+  React.useEffect(() => {
+    setLocalParticipants(participants);
+  }, [participants]);
 
   const handleAddEditor = () => {
     // TODO: Implement adding editor functionality
@@ -33,12 +41,41 @@ const Participants = ({
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedParticipant) {
-      onRemoveParticipant(selectedParticipant.id);
+      try {
+        console.log("Attempting to remove participant:", {
+          participantId: selectedParticipant.userId,
+          classId: parseInt(classId),
+          participant: selectedParticipant,
+        });
+
+        await axios.delete(
+          `/api/classes/${parseInt(classId)}/participants/${
+            selectedParticipant.userId
+          }`
+        );
+
+        // Update local state immediately
+        setLocalParticipants((prev) =>
+          prev.filter((p) => p.userId !== selectedParticipant.userId)
+        );
+
+        // Notify parent component
+        onRemoveParticipant(selectedParticipant.userId);
+
+        // Close modal and reset selection
+        setIsDeleteModalOpen(false);
+        setSelectedParticipant(null);
+      } catch (error) {
+        console.error("Error removing participant:", error);
+        console.error("Error details:", {
+          response: error.response?.data,
+          status: error.response?.status,
+        });
+        // You might want to show an error message to the user here
+      }
     }
-    setIsDeleteModalOpen(false);
-    setSelectedParticipant(null);
   };
 
   const handleCloseDeleteModal = () => {
@@ -97,10 +134,10 @@ const Participants = ({
           </div>
 
           <ul className={styles.list}>
-            {participants.length === 0 ? (
+            {localParticipants.length === 0 ? (
               <li className={styles.emptyState}>No participants yet</li>
             ) : (
-              participants.map((participant) => (
+              localParticipants.map((participant) => (
                 <li key={participant.id} className={styles.listItem}>
                   <div className={styles.userInfo}>
                     <span className={styles.name}>{participant.name}</span>

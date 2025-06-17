@@ -198,4 +198,160 @@ router.put("/:taskId", auth, updateTask);
 // Add files to a task
 router.post("/:taskId/files", auth, addFilesToTask);
 
+// Delete a task and all related records
+router.delete("/:taskId", auth, async (req, res) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    const userId = req.user.id;
+
+    // First check if user has access to delete this task
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: {
+        classes: {
+          include: {
+            class: {
+              include: {
+                editors: {
+                  where: {
+                    userId: userId,
+                  },
+                },
+              },
+            },
+          },
+        },
+        files: {
+          include: {
+            file: true,
+          },
+        },
+        reports: {
+          include: {
+            report: {
+              include: {
+                files: {
+                  include: {
+                    file: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Check if user is an editor of the class containing this task
+    const isEditor = task.classes.some(
+      (classItem) => classItem.class.editors.length > 0
+    );
+
+    if (!isEditor) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Delete files from Azure Storage
+    const azureStorage = require("../services/azureStorage");
+
+    // Delete task files
+    if (task.files && task.files.length > 0) {
+      for (const fileEntry of task.files) {
+        if (fileEntry.file && fileEntry.file.publicId) {
+          try {
+            await azureStorage.deleteFile(fileEntry.file.publicId);
+            console.log(
+              `Deleted task file from Azure Storage: ${fileEntry.file.publicId}`
+            );
+          } catch (error) {
+            console.error(
+              `Failed to delete task file from Azure Storage: ${fileEntry.file.publicId}`,
+              error
+            );
+          }
+        }
+      }
+    }
+
+    // Delete report files
+    if (task.reports && task.reports.length > 0) {
+      for (const reportEntry of task.reports) {
+        if (reportEntry.report && reportEntry.report.files) {
+          for (const fileEntry of reportEntry.report.files) {
+            if (fileEntry.file && fileEntry.file.publicId) {
+              try {
+                await azureStorage.deleteFile(fileEntry.file.publicId);
+                console.log(
+                  `Deleted report file from Azure Storage: ${fileEntry.file.publicId}`
+                );
+              } catch (error) {
+                console.error(
+                  `Failed to delete report file from Azure Storage: ${fileEntry.file.publicId}`,
+                  error
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Delete related records in the correct order using a transaction
+    await prisma.$transaction(async (tx) => {
+      // 1. Delete ReportFilesList entries for reports related to this task
+      const reports = await tx.reportsList.findMany({
+        where: { taskId },
+        select: { reportId: true },
+      });
+
+      if (reports.length > 0) {
+        await tx.reportFilesList.deleteMany({
+          where: {
+            reportId: {
+              in: reports.map((r) => r.reportId),
+            },
+          },
+        });
+      }
+
+      // 2. Delete ReportsList entries
+      await tx.reportsList.deleteMany({
+        where: { taskId },
+      });
+
+      // 3. Delete TaskFilesList entries
+      await tx.taskFilesList.deleteMany({
+        where: { taskId },
+      });
+
+      // 4. Delete UserTaskStatus entries
+      await tx.userTaskStatus.deleteMany({
+        where: { taskId },
+      });
+
+      // 5. Delete TasksList entries
+      await tx.tasksList.deleteMany({
+        where: { taskId },
+      });
+
+      // 6. Finally, delete the Task itself
+      await tx.task.delete({
+        where: { id: taskId },
+      });
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    res.status(500).json({
+      message: "Failed to delete task",
+      details: error.message,
+    });
+  }
+});
+
 module.exports = router;

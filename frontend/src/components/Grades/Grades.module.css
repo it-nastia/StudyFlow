@@ -44,9 +44,9 @@
 }
 
 .maxGrade {
-  font-size: 14px;
   color: var(--secondary-text-color);
   margin-top: 4px;
+  font-size: 1rem;
 }
 
 .participantName {
@@ -57,11 +57,59 @@
 
 .gradeCell {
   color: var(--secondary-text-color);
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.gradeDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.currentGrade {
+  font-weight: 500;
+  color: var(--primary-text-color);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.maxGrade {
+  font-size: 1rem;
+  color: var(--secondary-text-color);
+  white-space: nowrap;
+  font-weight: 500;
 }
 
 .totalScore {
   background-color: #e8f5e9;
   font-weight: 500;
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.totalDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.currentTotal {
+  font-weight: 700;
+  color: var(--primary-text-color);
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.maxTotal {
+  font-weight: 700;
+  color: var(--primary-text-color);
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
 .emptyState {

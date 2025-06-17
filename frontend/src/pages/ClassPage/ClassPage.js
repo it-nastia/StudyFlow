@@ -39,6 +39,7 @@ const TABS = [
 
 const transformUserData = (user, isEditor = false) => ({
   id: user.id,
+  userId: user.id,
   name: `${user.firstName} ${user.lastName}`,
   email: user.email,
   phone: user.phone,
@@ -253,8 +254,14 @@ const ClassPage = () => {
       await axios.delete(
         `/api/classes/${classId}/participants/${participantId}`
       );
-      // Refresh class data to get updated participants list
-      fetchClassData();
+
+      // Update the local state by filtering out the removed participant
+      setClassData((prevData) => ({
+        ...prevData,
+        participants: prevData.participants.filter(
+          (p) => p.userId !== participantId
+        ),
+      }));
     } catch (error) {
       console.error("Error removing participant:", error);
       // You might want to show an error message to the user here
@@ -409,6 +416,7 @@ const ClassPage = () => {
             onRemoveParticipant={handleRemoveParticipant}
             onInviteParticipant={handleInviteParticipant}
             inviteError={inviteError}
+            classId={classId}
           />
         )}
       </div>

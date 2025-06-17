@@ -771,7 +771,7 @@ const TaskEdit = () => {
         {/* Side Panel */}
         <div className={styles.sidePanel}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Assignment Date</label>
+            <label className={styles.label}>Date</label>
             <input
               type="date"
               className={`${styles.input} ${
@@ -847,7 +847,7 @@ const TaskEdit = () => {
               </span>
             )}
           </div>
-
+          <hr className={styles.divider} />
           <div className={styles.formGroup}>
             <label className={styles.label}>Grade</label>
             <input
@@ -882,8 +882,8 @@ const TaskEdit = () => {
               <option value="Done">Done</option>
             </select>
           </div>
-
-          <div className={styles.formGroup}>
+          <hr className={styles.divider} />
+          <div className={styles.formGroupFiles}>
             <label className={styles.label}>Attach</label>
             <div className={styles.attachmentBox}>
               {attachments.length === 0 ? (

@@ -179,10 +179,10 @@ const EditorFileManager = ({
     <div className={styles.managerContainer}>
       <h3 className={styles.title}>
         <FileText size={20} />
-        Manage Additional Files
-        <span className={styles.subtitle}>
+        <span className={styles.titleText}>Manage Additional Files</span>
+        {/* <span className={styles.subtitle}>
           ({type === "task" ? "Task" : "Lecture"} files that students can view)
-        </span>
+        </span> */}
       </h3>
 
       {error && <div className={styles.errorMessage}>{error}</div>}

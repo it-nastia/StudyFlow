@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { uploadFiles, deleteFile } = require("../controllers/fileController");
+const {
+  uploadFiles,
+  deleteFile,
+  downloadFile,
+} = require("../controllers/fileController");
 
 // Настройка multer для обработки файлов в памяти
 const storage = multer.memoryStorage();
@@ -14,6 +18,7 @@ const upload = multer({
 
 // Маршруты для работы с файлами
 router.post("/upload", upload.array("files"), uploadFiles);
+router.get("/:fileId/download", downloadFile);
 router.delete("/:fileId", deleteFile);
 
 module.exports = router;

@@ -104,18 +104,10 @@ const CalendarPage = () => {
       setAllTasks(tasks);
       setAllLectures(lectures);
 
-      if (tasks.length === 0 && lectures.length === 0) {
-        setError("No tasks or lectures found in any workspace");
-      }
-
+      // Only show errors if there are actual class loading errors, not empty data
       if (classErrors.length > 0) {
-        setError(
-          `Failed to load data for some classes:\n${classErrors
-            .map(
-              (err) => `- ${err.workspaceName} > ${err.className}: ${err.error}`
-            )
-            .join("\n")}`
-        );
+        console.warn("Some classes failed to load:", classErrors);
+        // Don't set error state - just log the warnings
       }
     } catch (err) {
       console.error("Error loading workspaces data:", err);
@@ -142,10 +134,6 @@ const CalendarPage = () => {
 
   if (error) {
     return <div className={styles.calendarContainer}>Error: {error}</div>;
-  }
-
-  if (!calendarEvents || calendarEvents.length === 0) {
-    return <div className={styles.calendarContainer}>No events available</div>;
   }
 
   return (

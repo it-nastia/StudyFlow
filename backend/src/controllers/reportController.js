@@ -337,7 +337,15 @@ const updateReportGrade = async (req, res) => {
     const { grade } = req.body;
     const userId = req.user.id;
 
-    // Check if user is an editor of the class containing this task
+    // Validate grade
+    if (grade !== null && grade !== undefined) {
+      const gradeValue = parseFloat(grade);
+      if (isNaN(gradeValue) || gradeValue < 0) {
+        return res.status(400).json({ error: "Invalid grade value" });
+      }
+    }
+
+    // Check if user has permission to grade (must be teacher of the class)
     const reportEntry = await prisma.reportsList.findFirst({
       where: {
         reportId: parseInt(reportId),
@@ -363,18 +371,26 @@ const updateReportGrade = async (req, res) => {
       return res.status(404).json({ error: "Report not found" });
     }
 
-    // Check if user is an editor
-    const isEditor = reportEntry.task.classes.some((classItem) =>
-      classItem.class.editors.some((editor) => editor.userId === userId)
+    // Check if user is a teacher/editor of the class
+    const isEditor = reportEntry.task.classes.some((taskClass) =>
+      taskClass.class.editors.some((editor) => editor.userId === userId)
     );
 
     if (!isEditor) {
       return res
         .status(403)
-        .json({ error: "Access denied. Only teachers can grade reports." });
+        .json({ error: "Permission denied. Only teachers can grade reports." });
     }
 
-    // Update the grade
+    // Get task maximum grade for validation
+    const maxGrade = reportEntry.task.grade;
+    if (maxGrade && grade && parseFloat(grade) > maxGrade) {
+      return res.status(400).json({
+        error: `Grade cannot exceed the maximum task grade of ${maxGrade}`,
+      });
+    }
+
+    // Update the report grade
     const updatedReport = await prisma.report.update({
       where: {
         id: parseInt(reportId),
@@ -384,7 +400,13 @@ const updateReportGrade = async (req, res) => {
       },
     });
 
-    res.json(updatedReport);
+    console.log(
+      `Report ${reportId} grade updated to ${grade} by user ${userId}`
+    );
+    res.json({
+      message: "Grade updated successfully",
+      grade: updatedReport.grade,
+    });
   } catch (error) {
     console.error("Error updating report grade:", error);
     res.status(500).json({

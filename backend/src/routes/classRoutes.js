@@ -367,6 +367,19 @@ router.delete(
       const participantId = parseInt(req.params.participantId);
       const userId = req.user.id;
 
+      if (isNaN(classId) || isNaN(participantId)) {
+        return res.status(400).json({
+          message: "Invalid class ID or participant ID",
+          details: "Both IDs must be valid numbers",
+        });
+      }
+
+      console.log("Attempting to remove participant:", {
+        classId,
+        participantId,
+        userId,
+      });
+
       // Check if the user is an editor of the class
       const userClass = await prisma.class.findFirst({
         where: {
@@ -380,13 +393,14 @@ router.delete(
       });
 
       if (!userClass) {
+        console.log("Access denied - User is not an editor of the class");
         return res
           .status(403)
           .json({ message: "Access denied or class not found" });
       }
 
-      // Remove the participant
-      await prisma.classParticipant.delete({
+      // Check if the participant exists in the class
+      const participant = await prisma.classParticipantList.findUnique({
         where: {
           userId_classId: {
             userId: participantId,
@@ -395,9 +409,66 @@ router.delete(
         },
       });
 
+      if (!participant) {
+        console.log("Participant not found in class");
+        return res
+          .status(404)
+          .json({ message: "Participant not found in class" });
+      }
+
+      console.log("Found participant, attempting to remove");
+
+      // Remove the participant and their workspace access in a transaction
+      await prisma.$transaction(async (prisma) => {
+        // Remove the participant from the class
+        await prisma.classParticipantList.delete({
+          where: {
+            userId_classId: {
+              userId: participantId,
+              classId: classId,
+            },
+          },
+        });
+
+        // Find all workspaces where the user has access to this class
+        const userWorkspaces = await prisma.workspace.findMany({
+          where: {
+            users: {
+              some: {
+                userId: participantId,
+              },
+            },
+            classes: {
+              some: {
+                classId: classId,
+              },
+            },
+          },
+        });
+
+        // Remove the class from each of the user's workspaces
+        for (const workspace of userWorkspaces) {
+          await prisma.classesList.delete({
+            where: {
+              workspaceId_classId: {
+                workspaceId: workspace.id,
+                classId: classId,
+              },
+            },
+          });
+        }
+      });
+
+      console.log("Participant removed successfully");
       res.status(200).json({ message: "Participant removed successfully" });
     } catch (error) {
       console.error("Error removing participant:", error);
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        meta: error.meta,
+      });
       res.status(500).json({
         message: "Failed to remove participant",
         details: error.message,

@@ -133,7 +133,46 @@ const deleteFile = async (req, res) => {
   }
 };
 
+const downloadFile = async (req, res) => {
+  try {
+    const { fileId } = req.params;
+
+    if (!fileId || isNaN(parseInt(fileId))) {
+      return res.status(400).json({ error: "Invalid file ID" });
+    }
+
+    const file = await prisma.file.findUnique({
+      where: { id: parseInt(fileId) },
+    });
+
+    if (!file) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
+    console.log(`Downloading file: ${file.name} (${file.publicId})`);
+
+    // Get file buffer from Azure Storage
+    const fileBuffer = await azureStorage.downloadFile(file.publicId);
+
+    // Set appropriate headers
+    res.setHeader("Content-Disposition", `attachment; filename="${file.name}"`);
+    res.setHeader("Content-Type", file.type);
+    res.setHeader("Content-Length", file.size);
+
+    console.log(`File download successful: ${file.name}`);
+    res.status(200).send(fileBuffer);
+  } catch (error) {
+    console.error("Error in file download:", error);
+    res.status(500).json({
+      error: "Failed to download file",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   uploadFiles,
   deleteFile,
+  downloadFile,
 };

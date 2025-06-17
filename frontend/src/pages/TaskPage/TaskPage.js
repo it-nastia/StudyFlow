@@ -294,7 +294,7 @@ const TaskPage = () => {
 
       {/* Main Content */}
       {activeTab === "reports" ? (
-        <Reports participants={participants} />
+        <Reports participants={participants} taskId={taskId} />
       ) : (
         <div className={styles.content}>
           <div className={styles.main}>
@@ -349,7 +349,7 @@ const TaskPage = () => {
                 {formatDate(deadline)}
               </time>
             </div>
-
+            <hr className={styles.divider} />
             <div className={styles.formGroup + " " + styles.formGroupTime}>
               <label className={styles.label}>Start Time:</label>
               <time className={styles.readOnlyField}>
@@ -363,7 +363,7 @@ const TaskPage = () => {
                 {timeEnd || "Not set"}
               </time>
             </div>
-
+            <hr className={styles.divider} />
             <div className={styles.formGroup + " " + styles.formGroupTime}>
               <label className={styles.label}>Grade:</label>
               <span className={styles.readOnlyField}>

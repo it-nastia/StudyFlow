@@ -92,7 +92,7 @@ const sendClassInvitation = async (email, className, classCode) => {
               </ol>
 
               <p>If you don't have a StudyFlow account yet, you'll need to create one first:</p>
-              <a href="http://localhost:3000/register" style="display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 4px; margin: 16px 0;">Create Account</a>
+              <a href="http://localhost:3002/register" style="display: inline-block; padding: 12px 24px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 4px; margin: 16px 0;">Create Account</a>
               <p style="margin-top: 20px;">Once you've joined, you'll have access to all class materials, assignments, and discussions.</p>
             </div>
             <div class="footer">

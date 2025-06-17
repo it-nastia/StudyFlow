@@ -221,5 +221,5 @@ option {
 .table td:last-child {
   text-align: center;
   vertical-align: middle;
-  width: 60px;
+  nin-width: 100px;
 }

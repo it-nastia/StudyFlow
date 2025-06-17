@@ -12,6 +12,7 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
   const statusOptions = ["To-Do", "In Progress", "Done"];
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [reportGrades, setReportGrades] = useState({});
 
   // Map display status to server status and vice versa
   const statusMapping = {
@@ -27,18 +28,42 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
     },
   };
 
-  // console.log("TaskTable received tasks:", initialTasks);
-
   useEffect(() => {
-    //console.log("Tasks updated:", initialTasks);
     setTasks(initialTasks);
+    // Fetch report grades for all tasks
+    fetchReportGrades();
   }, [initialTasks]);
+
+  const fetchReportGrades = async () => {
+    try {
+      const gradesPromises = initialTasks.map(async (task) => {
+        try {
+          const response = await axios.get(`/api/reports/tasks/${task.id}`);
+          const reports = response.data;
+          // Get the first report's grade if it exists
+          const reportGrade = reports[0]?.report?.grade;
+          return { taskId: task.id, grade: reportGrade };
+        } catch (error) {
+          console.error(`Error fetching report for task ${task.id}:`, error);
+          return { taskId: task.id, grade: null };
+        }
+      });
+
+      const grades = await Promise.all(gradesPromises);
+      const gradesMap = {};
+      grades.forEach(({ taskId, grade }) => {
+        gradesMap[taskId] = grade;
+      });
+      setReportGrades(gradesMap);
+    } catch (error) {
+      console.error("Error fetching report grades:", error);
+    }
+  };
 
   const handleStatusChange = async (id, newDisplayStatus) => {
     try {
       // Convert display status to server status
       const serverStatus = statusMapping.display[newDisplayStatus];
-      //console.log("Sending status to server:", serverStatus);
 
       await axios.patch(`/api/tasks/${id}/status`, {
         status: serverStatus,
@@ -98,8 +123,8 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
             <th>Date</th>
             <th>Deadline</th>
             <th>Time</th>
-            <th>Status</th>
             <th>Grade</th>
+            <th>Status</th>
             {isEditor && <th>Delete</th>}
           </tr>
         </thead>
@@ -149,6 +174,13 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
                     {" - "}
                     <time dateTime={task.timeEnd}>{task.timeEnd}</time>
                   </td>
+                  <td className={styles.smallCell}>
+                    {isEditor
+                      ? `${task.grade || "—"}`
+                      : reportGrades[task.id]
+                      ? `${reportGrades[task.id]} / ${task.grade || "—"}`
+                      : `— / ${task.grade || "—"}`}
+                  </td>
                   <td>
                     <select
                       value={displayStatus}
@@ -166,17 +198,6 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
                       ))}
                     </select>
                   </td>
-                  <td className={styles.smallCell}>{task.grade}</td>
-                  {isEditor && (
-                    <td>
-                      <button
-                        onClick={() => openDeleteModal(task)}
-                        className={styles.deleteButton}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </td>
-                  )}
                 </tr>
               );
             })

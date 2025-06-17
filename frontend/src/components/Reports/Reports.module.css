@@ -51,25 +51,55 @@
   align-items: center;
   gap: 8px;
   padding: 4px 0;
+  flex-wrap: wrap;
 }
 
 .fileIcon {
   color: var(--secondary-text-color);
+  flex-shrink: 0;
 }
 
 .fileName {
-  color: var(--accent-color);
-  text-decoration: none;
+  color: var(--primary-text-color);
   font-weight: 500;
-}
-
-.fileName:hover {
-  text-decoration: underline;
+  flex: 1;
+  min-width: 0;
 }
 
 .fileSize {
   color: var(--secondary-text-color);
   font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.fileActions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.actionButton {
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--secondary-text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.actionButton:hover {
+  background: var(--hover-background-color);
+  color: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.actionButton:active {
+  transform: scale(0.95);
 }
 
 .noFiles {
@@ -77,9 +107,88 @@
   font-style: italic;
 }
 
+.loading,
+.error {
+  padding: 20px;
+  text-align: center;
+  color: var(--secondary-text-color);
+  font-style: italic;
+}
+
+.error {
+  color: var(--error-color);
+}
+
 .gradeCell {
   text-align: center;
-  min-width: 100px;
+  min-width: 120px;
+  padding: 8px 12px;
+}
+
+.gradeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.gradeInput {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gradeInputField {
+  width: 60px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.9em;
+  background: var(--primary-background-color);
+  color: var(--primary-text-color);
+  transition: all 0.2s ease;
+}
+
+.gradeInputField:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.1);
+}
+
+.gradeInputField.updating {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+.gradeInputField.success {
+  background: #d1e7dd;
+  border-color: #198754;
+}
+
+.gradeInputField.error {
+  background: #f8d7da;
+  border-color: #dc3545;
+}
+
+.gradeInputField:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.maxGrade {
+  color: var(--secondary-text-color);
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.statusText {
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.statusText {
+  color: var(--secondary-text-color);
 }
 
 .grade {
@@ -90,4 +199,10 @@
 .noGrade {
   color: var(--secondary-text-color);
   font-style: italic;
+}
+
+.noSubmission {
+  color: var(--secondary-text-color);
+  font-style: italic;
+  font-size: 0.9em;
 }

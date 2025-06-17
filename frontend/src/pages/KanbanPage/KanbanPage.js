@@ -86,10 +86,6 @@ const KanbanPage = () => {
     return <div className={styles.kanbanContainer}>Error: {error}</div>;
   }
 
-  if ((!tasks || tasks.length === 0) && (!lectures || lectures.length === 0)) {
-    return <div className={styles.kanbanContainer}>No data available</div>;
-  }
-
   return (
     <div className={styles.kanbanContainer}>
       <h2 className={styles.title}>Kanban Board</h2>
