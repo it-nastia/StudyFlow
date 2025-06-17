@@ -237,9 +237,9 @@ const WorkspacePage = () => {
               <div className={styles.loading}>
                 Loading tasks and lectures...
               </div>
-            ) : kanbanError ? (
-              <div className={styles.error}>{kanbanError}</div>
             ) : (
+              // ) : kanbanError ? (
+              //   <div className={styles.error}>{kanbanError}</div>
               <KanbanBoard
                 tasks={allTasks}
                 lectures={allLectures}

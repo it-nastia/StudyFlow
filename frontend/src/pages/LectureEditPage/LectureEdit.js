@@ -697,13 +697,12 @@ const LectureEdit = () => {
                 handleFieldChange("assignmentDate", e.target.value)
               }
             />
-            {showValidationErrors && validationErrors.assignmentDate && (
-              <span className={styles.errorMessage}>
-                {validationErrors.assignmentDate}
-              </span>
-            )}
           </div>
-
+          {showValidationErrors && validationErrors.assignmentDate && (
+            <span className={styles.errorMessage}>
+              {validationErrors.assignmentDate}
+            </span>
+          )}
           <div className={styles.formGroup}>
             <label className={styles.label}>Start Time</label>
             <input
@@ -716,13 +715,12 @@ const LectureEdit = () => {
               value={timeStart}
               onChange={(e) => handleFieldChange("timeStart", e.target.value)}
             />
-            {showValidationErrors && validationErrors.timeStart && (
-              <span className={styles.errorMessage}>
-                {validationErrors.timeStart}
-              </span>
-            )}
           </div>
-
+          {showValidationErrors && validationErrors.timeStart && (
+            <span className={styles.errorMessage}>
+              {validationErrors.timeStart}
+            </span>
+          )}
           <div className={styles.formGroup}>
             <label className={styles.label}>End Time</label>
             <input
@@ -735,12 +733,12 @@ const LectureEdit = () => {
               value={timeEnd}
               onChange={(e) => handleFieldChange("timeEnd", e.target.value)}
             />
-            {showValidationErrors && validationErrors.timeEnd && (
-              <span className={styles.errorMessage}>
-                {validationErrors.timeEnd}
-              </span>
-            )}
           </div>
+          {showValidationErrors && validationErrors.timeEnd && (
+            <span className={styles.errorMessage}>
+              {validationErrors.timeEnd}
+            </span>
+          )}
           <hr className={styles.divider} />
           <div className={styles.formGroup}>
             <label className={styles.label}>Status</label>

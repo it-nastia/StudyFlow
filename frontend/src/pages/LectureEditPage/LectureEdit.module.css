@@ -130,12 +130,12 @@
 }
 
 .formGroup:not(:last-child) {
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.1rem;
 }
 
 .label {
   display: block;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
   font-weight: 500;
   flex-grow: 1;
   width: 100%;
@@ -169,10 +169,10 @@
 }
 
 .errorMessage {
-  display: block;
+  /* display: block; */
   color: #dc3545;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: -0.5rem;
 }
 
 .textarea {

@@ -841,12 +841,12 @@ const TaskEdit = () => {
               value={timeEnd}
               onChange={(e) => handleFieldChange("timeEnd", e.target.value)}
             />
-            {showValidationErrors && validationErrors.timeEnd && (
-              <span className={styles.errorMessage}>
-                {validationErrors.timeEnd}
-              </span>
-            )}
           </div>
+          {showValidationErrors && validationErrors.timeEnd && (
+            <span className={styles.errorMessage}>
+              {validationErrors.timeEnd}
+            </span>
+          )}
           <hr className={styles.divider} />
           <div className={styles.formGroup}>
             <label className={styles.label}>Grade</label>
@@ -863,13 +863,12 @@ const TaskEdit = () => {
               value={grade}
               onChange={(e) => handleFieldChange("grade", e.target.value)}
             />
-            {showValidationErrors && validationErrors.grade && (
-              <span className={styles.errorMessage}>
-                {validationErrors.grade}
-              </span>
-            )}
           </div>
-
+          {showValidationErrors && validationErrors.grade && (
+            <span className={styles.errorMessage}>
+              {validationErrors.grade}
+            </span>
+          )}
           <div className={styles.formGroup}>
             <label className={styles.label}>Status</label>
             <select

@@ -207,6 +207,7 @@
 .recoverPasswordButton {
   background-color: #5a728b;
   color: #ffffff;
+  visibility: hidden;
 }
 
 .recoverPasswordButton:hover {
@@ -221,6 +222,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 100px;
 }
 
 .editButton {
