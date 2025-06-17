@@ -6,6 +6,8 @@ const {
   deleteFile,
   downloadFile,
 } = require("../controllers/fileController");
+const { auth } = require("../middleware/auth");
+const { BlobServiceClient } = require("@azure/storage-blob");
 
 // Настройка multer для обработки файлов в памяти
 const storage = multer.memoryStorage();

@@ -6,6 +6,7 @@ const {
   updateLecture,
   addFilesToLecture,
 } = require("../controllers/lectureController");
+const azureStorage = require("../services/azureStorage");
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -168,5 +169,104 @@ router.put("/:lectureId", updateLecture);
 
 // Связывание файлов с лекцией
 router.post("/:lectureId/files", addFilesToLecture);
+
+// Delete a lecture and all related records
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    // Get the lecture with its relationships
+    const lecture = await prisma.lecture.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        classes: {
+          include: {
+            class: {
+              include: {
+                editors: {
+                  where: {
+                    userId: userId,
+                  },
+                },
+              },
+            },
+          },
+        },
+        files: {
+          include: {
+            file: true,
+          },
+        },
+      },
+    });
+
+    if (!lecture) {
+      return res.status(404).json({ error: "Lecture not found" });
+    }
+
+    // Check if user is an editor of any class containing this lecture
+    const isEditor = lecture.classes.some((lectureClass) =>
+      lectureClass.class.editors.some((editor) => editor.userId === userId)
+    );
+
+    if (!isEditor) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    // Delete files from Azure Storage
+    if (lecture.files && lecture.files.length > 0) {
+      for (const fileEntry of lecture.files) {
+        if (fileEntry.file && fileEntry.file.publicId) {
+          try {
+            await azureStorage.deleteFile(fileEntry.file.publicId);
+            console.log(
+              `Successfully deleted file ${fileEntry.file.publicId} from Azure Storage`
+            );
+          } catch (error) {
+            console.error(
+              `Error deleting file ${fileEntry.file.publicId} from Azure Storage:`,
+              error
+            );
+            // Continue with deletion even if file deletion fails
+          }
+        }
+      }
+    }
+
+    // Delete all related records in a transaction
+    await prisma.$transaction(async (tx) => {
+      // Delete lecture files
+      await tx.lectureFilesList.deleteMany({
+        where: { lectureId: parseInt(id) },
+      });
+
+      // Delete user lecture statuses
+      await tx.userLectureStatus.deleteMany({
+        where: { lectureId: parseInt(id) },
+      });
+
+      // Delete lecture-class relationships
+      await tx.lecturesList.deleteMany({
+        where: { lectureId: parseInt(id) },
+      });
+
+      // Finally delete the lecture
+      await tx.lecture.delete({
+        where: { id: parseInt(id) },
+      });
+    });
+
+    res.json({
+      message: "Lecture and all related records deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting lecture:", error);
+    res.status(500).json({
+      error: "Failed to delete lecture",
+      details: error.message,
+    });
+  }
+});
 
 module.exports = router;

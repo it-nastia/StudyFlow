@@ -64,6 +64,7 @@ const TaskPage = () => {
   const [attachments, setAttachments] = useState([]);
   const [isEditor, setIsEditor] = useState(false);
   const [participants, setParticipants] = useState([]);
+  const [taskData, setTaskData] = useState(null);
 
   const editor = useEditor({
     extensions: [
@@ -190,6 +191,7 @@ const TaskPage = () => {
           setTimeEnd(task.timeEnd || "");
           setGrade(task.grade || "");
           setAttachments(task.attachments || []);
+          setTaskData(task);
 
           if (editor && task.description) {
             editor.commands.setContent(task.description);
@@ -326,6 +328,7 @@ const TaskPage = () => {
             {!isEditor && (
               <StudentSubmission
                 taskId={taskId}
+                task={taskData}
                 onSubmissionUpdate={() => {
                   // Optionally refresh the page data or update reports
                   console.log("Submission updated");

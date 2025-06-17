@@ -199,7 +199,6 @@
   border: 1px solid var(--border-color);
   border-radius: 0.375rem;
   padding: 5px;
-  /* min-height: 50px; */
   margin-bottom: 0.5rem;
   background-color: white;
 }
@@ -563,6 +562,7 @@
   min-height: 38px;
   width: 100%;
   line-height: 1.5;
+  text-wrap: nowrap;
 }
 
 .fileName {
@@ -692,7 +692,7 @@
 .noFiles {
   color: #64748b;
   text-align: center;
-  padding: 2rem;
+  padding: 0.5rem;
   background-color: white;
   border-radius: 8px;
   border: 2px dashed #e2e8f0;

@@ -198,6 +198,16 @@ const TaskTable = ({ tasks: initialTasks = [], isEditor = false }) => {
                       ))}
                     </select>
                   </td>
+                  {isEditor && (
+                    <td>
+                      <button
+                        onClick={() => openDeleteModal(task)}
+                        className={styles.deleteButton}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })

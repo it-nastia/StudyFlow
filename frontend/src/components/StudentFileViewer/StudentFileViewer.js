@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, Download, Eye } from "lucide-react";
+import { FileText, Download, Eye, X } from "lucide-react";
 import styles from "./StudentFileViewer.module.css";
 
 const StudentFileViewer = ({ files = [], type = "task" }) => {
@@ -59,6 +59,29 @@ const StudentFileViewer = ({ files = [], type = "task" }) => {
     }
   };
 
+  const handleDownload = async (file) => {
+    try {
+      // Extract container name and blob name from the URL
+      const url = new URL(file.url);
+      const pathParts = url.pathname.split("/");
+      const containerName = pathParts[1]; // studyflow
+      const blobName = pathParts.slice(2).join("/"); // rest of the path
+
+      // Create download URL using our backend endpoint
+      const downloadUrl = `${process.env.REACT_APP_API_URL}/api/files/download/${containerName}/${blobName}`;
+
+      // Create a temporary link and trigger download
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = file.name || file.originalName || "download";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
+  };
+
   if (!files || files.length === 0) {
     return (
       <div className={styles.viewerContainer}>
@@ -114,22 +137,20 @@ const StudentFileViewer = ({ files = [], type = "task" }) => {
               <a
                 href={file.url}
                 target="_blank"
-                rel="noopener noreferrer"
                 className={styles.actionButton}
                 title="View file"
               >
                 <Eye size={16} />
                 <span>View</span>
               </a>
-              <a
-                href={file.url}
-                download
+              <button
+                onClick={() => handleDownload(file)}
                 className={styles.actionButton}
                 title="Download file"
               >
                 <Download size={16} />
                 <span>Download</span>
-              </a>
+              </button>
             </div>
           </div>
         ))}

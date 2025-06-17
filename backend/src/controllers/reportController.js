@@ -85,7 +85,7 @@ const submitReport = async (req, res) => {
         name: uploadedFiles.map((f) => f.name).join(", "),
         type: "submission",
         path: uploadedFiles[0].url, // Store first file URL as main path
-        uploadDate: new Date(),
+        uploadDate: new Date().toISOString(), // Store in ISO format with timezone
         taskReports: {
           create: {
             taskId: parseInt(taskId),

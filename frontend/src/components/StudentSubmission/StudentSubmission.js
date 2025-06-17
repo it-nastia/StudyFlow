@@ -3,7 +3,7 @@ import axios from "../../utils/axios";
 import { Plus, X, Paperclip, Send, Upload } from "lucide-react";
 import styles from "./StudentSubmission.module.css";
 
-const StudentSubmission = ({ taskId, onSubmissionUpdate }) => {
+const StudentSubmission = ({ taskId, onSubmissionUpdate, task }) => {
   const [files, setFiles] = useState([]);
   const [existingSubmission, setExistingSubmission] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -221,7 +221,9 @@ const StudentSubmission = ({ taskId, onSubmissionUpdate }) => {
           <div className={styles.statusBadge}>✓ Submitted</div>
           <div className={styles.statusDate}>Submission received</div>
           {grade && (
-            <div className={styles.statusGrade}>Grade: {grade}/100</div>
+            <div className={styles.statusGrade}>
+              Grade: {grade}/{task?.grade || "—"}
+            </div>
           )}
         </div>
       );
@@ -233,14 +235,28 @@ const StudentSubmission = ({ taskId, onSubmissionUpdate }) => {
         throw new Error("Invalid date");
       }
 
+      // Format date and time in local timezone
+      const formattedDate = submissionDate.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      const formattedTime = submissionDate.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
       return (
         <div className={styles.submissionStatus}>
           <div className={styles.statusBadge}>✓ Submitted</div>
           <div className={styles.statusDate}>
-            Submitted on: {submissionDate.toLocaleString()}
+            Submitted on: {formattedDate}
+            {/*  at {formattedTime} */}
           </div>
           {grade && (
-            <div className={styles.statusGrade}>Grade: {grade}/100</div>
+            <div className={styles.statusGrade}>
+              Grade: {grade}/{task?.grade || "—"}
+            </div>
           )}
         </div>
       );
@@ -251,7 +267,9 @@ const StudentSubmission = ({ taskId, onSubmissionUpdate }) => {
           <div className={styles.statusBadge}>✓ Submitted</div>
           <div className={styles.statusDate}>Submission received</div>
           {grade && (
-            <div className={styles.statusGrade}>Grade: {grade}/100</div>
+            <div className={styles.statusGrade}>
+              Grade: {grade}/{task?.grade || "—"}
+            </div>
           )}
         </div>
       );
